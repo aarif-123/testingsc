@@ -1,0 +1,1852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Aether — Research Intelligence Platform</title>
+<meta name="description" content="Aether: anxiety management, cognitive load reduction, and writing acceleration for researchers."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg-base:#090C11;--bg-surface:#0E1318;--bg-elevated:#141B22;--bg-overlay:#1A2330;--bg-hover:#1E2A38;--bg-active:#243040;
+  --border-subtle:rgba(255,255,255,0.05);--border-default:rgba(255,255,255,0.09);--border-strong:rgba(255,255,255,0.16);
+  --text-primary:#E8EDF3;--text-secondary:#8A97A8;--text-tertiary:#556070;
+  --accent:#4A90D9;--accent-muted:rgba(74,144,217,0.15);--accent-glow:rgba(74,144,217,0.08);
+  --red:#E05C5C;--red-muted:rgba(224,92,92,0.12);--yellow:#D4A843;--yellow-muted:rgba(212,168,67,0.12);
+  --green:#4CAF8A;--green-muted:rgba(76,175,138,0.12);--purple:#7C6AF7;--purple-muted:rgba(124,106,247,0.12);
+  --orange:#E8874A;--orange-muted:rgba(232,135,74,0.15);
+  --hl-claim:rgba(74,144,217,0.22);--hl-method:rgba(124,106,247,0.22);--hl-result:rgba(76,175,138,0.22);--hl-limitation:rgba(224,92,92,0.22);
+  --font-sans:'Inter',system-ui,sans-serif;--font-mono:'JetBrains Mono',monospace;--font-serif:'Playfair Display',Georgia,serif;
+  --nav-w:60px;--r-sm:4px;--r-md:8px;--r-lg:12px;--r-xl:16px;
+  --t-fast:120ms cubic-bezier(0.4,0,0.2,1);--t-med:220ms cubic-bezier(0.4,0,0.2,1);--t-slow:380ms cubic-bezier(0.4,0,0.2,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px}
+body{font-family:var(--font-sans);background:var(--bg-base);color:var(--text-primary);height:100vh;overflow:hidden;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border-default);border-radius:2px}
+
+/* ── Shell ── */
+#app{display:flex;height:100vh;overflow:hidden}
+#nav-rail{width:var(--nav-w);height:100vh;background:var(--bg-surface);border-right:1px solid var(--border-subtle);display:flex;flex-direction:column;align-items:center;padding:16px 0;gap:4px;z-index:100;flex-shrink:0}
+.nav-logo{width:36px;height:36px;background:var(--accent);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-weight:700;font-size:15px;color:#fff;letter-spacing:-0.5px;flex-shrink:0;cursor:default}
+.nav-item{width:40px;height:40px;border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-tertiary);transition:background var(--t-fast),color var(--t-fast);position:relative;border:none;background:transparent}
+.nav-item:hover{background:var(--bg-hover);color:var(--text-secondary)}
+.nav-item.active{background:var(--accent-muted);color:var(--accent)}
+.nav-item svg{width:18px;height:18px;stroke-width:1.5}
+.nav-badge{position:absolute;top:6px;right:6px;width:8px;height:8px;background:var(--red);border-radius:50%;border:1.5px solid var(--bg-surface)}
+.nav-tooltip{position:absolute;left:calc(100% + 12px);background:var(--bg-overlay);color:var(--text-primary);padding:5px 10px;border-radius:var(--r-sm);font-size:11px;font-weight:500;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity var(--t-fast);border:1px solid var(--border-default);z-index:999}
+.nav-item:hover .nav-tooltip{opacity:1}
+.nav-spacer{flex:1}
+.nav-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--purple));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;margin-top:8px;cursor:pointer;border:2px solid var(--border-default)}
+
+#main{flex:1;overflow:hidden;display:flex;flex-direction:column}
+.screen{display:none;height:100%;overflow:hidden;flex-direction:column}
+.screen.active{display:flex}
+
+/* ── Topbar ── */
+.topbar{display:flex;align-items:center;padding:0 24px;height:52px;border-bottom:1px solid var(--border-subtle);background:var(--bg-surface);gap:16px;flex-shrink:0}
+.topbar-title{font-size:13px;font-weight:600;color:var(--text-primary);letter-spacing:0.2px}
+.topbar-subtitle{font-size:12px;color:var(--text-tertiary)}
+.topbar-spacer{flex:1}
+.topbar-meta{display:flex;align-items:center;gap:20px}
+.streak-badge{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--yellow);font-weight:500}
+.streak-badge svg{width:14px;height:14px}
+.topbar-date{font-size:11px;color:var(--text-tertiary);font-family:var(--font-mono)}
+
+/* ── Buttons ── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:var(--r-sm);font-size:12px;font-weight:500;font-family:var(--font-sans);cursor:pointer;border:none;transition:all var(--t-fast);letter-spacing:0.2px}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:#5A9FE8}
+.btn-ghost{background:transparent;color:var(--text-secondary);border:1px solid var(--border-default)}.btn-ghost:hover{background:var(--bg-hover);color:var(--text-primary);border-color:var(--border-strong)}
+.btn svg{width:13px;height:13px}
+
+/* ── Chips ── */
+.chip{display:inline-flex;align-items:center;padding:2px 8px;border-radius:100px;font-size:11px;font-weight:500}
+.chip-default{background:var(--bg-overlay);color:var(--text-secondary)}.chip-accent{background:var(--accent-muted);color:var(--accent)}
+.chip-red{background:var(--red-muted);color:var(--red)}.chip-yellow{background:var(--yellow-muted);color:var(--yellow)}
+.chip-green{background:var(--green-muted);color:var(--green)}.chip-purple{background:var(--purple-muted);color:var(--purple)}
+
+/* ── Animations ── */
+@keyframes fadeSlideUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(224,92,92,0.5)}50%{box-shadow:0 0 0 7px rgba(224,92,92,0)}}
+@keyframes shimmer{from{background-position:-200% 0}to{background-position:200% 0}}
+.anim-in{animation:fadeSlideUp 0.3s cubic-bezier(0.4,0,0.2,1) both}
+.pulse{animation:pulse 2s ease infinite}
+
+/* ════════════════════════════════════════
+   SCREEN 1 — MORNING FEED
+════════════════════════════════════════ */
+#screen-feed{flex-direction:row!important}
+.feed-main{flex:1;overflow-y:auto;padding:28px 32px;display:flex;flex-direction:column;gap:22px}
+.feed-sidebar{width:300px;border-left:1px solid var(--border-subtle);overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px;background:var(--bg-surface)}
+.feed-greeting h1{font-family:var(--font-serif);font-size:26px;font-weight:600;letter-spacing:-0.5px}
+.date-line{font-size:11px;color:var(--text-tertiary);margin-top:4px;font-family:var(--font-mono);letter-spacing:0.8px}
+.section-label{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:12px}
+.sidebar-section-title{font-size:10px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:10px}
+
+.signal-card{border-radius:var(--r-lg);padding:18px 20px;border:1px solid var(--border-subtle);background:var(--bg-elevated);cursor:pointer;transition:all var(--t-fast)}
+.signal-card:hover{background:var(--bg-overlay);transform:translateY(-1px);box-shadow:0 4px 20px rgba(0,0,0,0.2)}
+.signal-card.threat{border-color:rgba(224,92,92,0.3);background:linear-gradient(135deg,var(--bg-elevated),rgba(224,92,92,0.05))}
+.signal-card.threat:hover{border-color:rgba(224,92,92,0.5)}
+.signal-card.validates{border-color:rgba(76,175,138,0.3);background:linear-gradient(135deg,var(--bg-elevated),rgba(76,175,138,0.05))}
+.signal-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.signal-type{display:flex;align-items:center;gap:8px;font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase}
+.signal-type.threat{color:var(--red)}.signal-type.validates{color:var(--green)}.signal-type.info{color:var(--accent)}
+.signal-dot{width:7px;height:7px;border-radius:50%}
+.threat .signal-dot{background:var(--red)}.validates .signal-dot{background:var(--green)}.info .signal-dot{background:var(--accent)}
+.signal-timestamp{font-size:11px;color:var(--text-tertiary);font-family:var(--font-mono)}
+.signal-paper-title{font-size:14px;font-weight:500;color:var(--text-primary);line-height:1.4;margin-bottom:8px}
+.signal-desc{font-size:12px;color:var(--text-secondary);line-height:1.6}
+
+.sim-bar{display:flex;align-items:center;gap:10px;margin-top:12px}
+.sim-label{font-size:11px;color:var(--text-tertiary);white-space:nowrap}
+.sim-track{flex:1;height:4px;background:var(--bg-hover);border-radius:2px;overflow:hidden}
+.sim-fill{height:100%;border-radius:2px;transition:width 0.6s ease}
+.sim-fill.high{background:var(--red)}.sim-fill.med{background:var(--yellow)}.sim-fill.low{background:var(--green)}
+.sim-val{font-size:12px;font-weight:600;font-family:var(--font-mono);min-width:30px;text-align:right}
+.sim-val.high{color:var(--red)}.sim-val.med{color:var(--yellow)}
+
+.papers-card{background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:var(--r-lg);overflow:hidden}
+.papers-card-header{padding:13px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border-subtle)}
+.paper-row{padding:11px 18px;display:flex;align-items:flex-start;gap:12px;border-bottom:1px solid var(--border-subtle);cursor:pointer;transition:background var(--t-fast)}
+.paper-row:last-child{border-bottom:none}.paper-row:hover{background:var(--bg-hover)}
+.paper-row-dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.paper-row-dot.unread{background:var(--accent)}.paper-row-dot.read{background:var(--text-tertiary)}
+.paper-row-title{font-size:13px;color:var(--text-primary);line-height:1.4;flex:1}
+.paper-row-meta{font-size:11px;color:var(--text-tertiary);margin-top:2px;font-family:var(--font-mono)}
+
+.progress-ring-wrap{display:flex;align-items:center;gap:14px;padding:14px;background:var(--bg-elevated);border-radius:var(--r-md);border:1px solid var(--border-subtle)}
+.streak-box{background:linear-gradient(135deg,rgba(212,168,67,0.1),rgba(212,168,67,0.04));border:1px solid rgba(212,168,67,0.2);border-radius:var(--r-md);padding:14px;display:flex;align-items:center;justify-content:space-between}
+.streak-num{font-size:32px;font-weight:700;font-family:var(--font-mono);color:var(--yellow);line-height:1}
+.streak-lbl{font-size:11px;color:var(--yellow);opacity:0.7;margin-top:2px}
+.unread-item{padding:12px;background:var(--bg-elevated);border-radius:var(--r-md);border:1px solid var(--border-subtle);cursor:pointer;transition:all var(--t-fast);margin-bottom:8px}
+.unread-item:hover{border-color:var(--accent);background:var(--accent-glow);transform:translateX(2px)}
+.unread-item-title{font-size:12px;color:var(--text-primary);line-height:1.4;margin-bottom:4px}
+.unread-item-meta{font-size:11px;color:var(--text-tertiary);margin-bottom:8px}
+.progress-bar{height:2px;background:var(--bg-hover);border-radius:1px;overflow:hidden}
+.progress-fill{height:100%;background:var(--accent);border-radius:1px}
+
+/* baselines */
+.bl-table{width:100%;border-collapse:collapse;font-size:12px}
+.bl-table th{text-align:left;padding:7px 12px;font-size:10px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;color:var(--text-tertiary);border-bottom:1px solid var(--border-subtle)}
+.bl-table td{padding:9px 12px;border-bottom:1px solid var(--border-subtle);color:var(--text-secondary);vertical-align:middle}
+.bl-table td.score{font-family:var(--font-mono);font-weight:500;color:var(--text-primary)}
+.bl-table tr:hover td{background:var(--bg-hover)}
+
+/* ════════════════════════════════════════
+   SCREEN 2 — DEEP READER
+════════════════════════════════════════ */
+.reader-layout{display:flex;flex:1;overflow:hidden}
+.reader-paper{flex:1;overflow-y:auto;padding:32px 40px;max-width:660px;border-right:1px solid var(--border-subtle)}
+.paper-title-h1{font-size:20px;font-weight:600;line-height:1.35;color:var(--text-primary);margin-bottom:12px;letter-spacing:-0.3px}
+.paper-authors{font-size:13px;color:var(--accent);margin-bottom:4px}
+.paper-venue{font-size:12px;color:var(--text-tertiary);font-family:var(--font-mono);margin-bottom:20px}
+.section-nav{display:flex;flex-wrap:wrap;gap:6px;padding:12px 0;border-top:1px solid var(--border-subtle);border-bottom:1px solid var(--border-subtle);margin-bottom:24px}
+.sec-btn{background:transparent;border:1px solid var(--border-subtle);color:var(--text-secondary);padding:4px 10px;border-radius:var(--r-sm);font-size:11px;cursor:pointer;font-family:var(--font-sans);transition:all var(--t-fast)}
+.sec-btn:hover{border-color:var(--accent);color:var(--accent)}.sec-btn.active{background:var(--accent-muted);border-color:var(--accent);color:var(--accent)}
+.paper-section{margin-bottom:28px;padding-bottom:28px;border-bottom:1px solid var(--border-subtle)}
+.paper-section:last-child{border-bottom:none}
+.sec-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.sec-title{font-size:15px;font-weight:600;color:var(--text-primary)}
+.ai-toggle{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--accent);cursor:pointer;opacity:0.7;transition:opacity var(--t-fast);background:none;border:none;font-family:var(--font-sans)}
+.ai-toggle:hover{opacity:1}
+.ai-summary{background:var(--accent-glow);border-left:2px solid var(--accent);padding:10px 14px;border-radius:0 var(--r-sm) var(--r-sm) 0;font-size:12px;color:var(--text-secondary);line-height:1.6;margin-bottom:12px;font-style:italic;transition:all var(--t-med)}
+.ai-summary.hidden{display:none}
+.body-text{font-size:13.5px;line-height:1.78;color:var(--text-secondary)}
+.hl-claim{background:var(--hl-claim);border-radius:2px;padding:1px 2px;color:var(--text-primary)}
+.hl-method{background:var(--hl-method);border-radius:2px;padding:1px 2px;color:var(--text-primary)}
+.hl-result{background:var(--hl-result);border-radius:2px;padding:1px 2px;color:var(--text-primary)}
+.hl-limitation{background:var(--hl-limitation);border-radius:2px;padding:1px 2px;color:var(--text-primary)}
+
+.reader-workspace{width:280px;border-right:1px solid var(--border-subtle);display:flex;flex-direction:column;overflow:hidden;background:var(--bg-surface)}
+.ws-tabs{display:flex;border-bottom:1px solid var(--border-subtle);flex-shrink:0}
+.ws-tab{flex:1;padding:10px 0;text-align:center;font-size:11px;font-weight:500;color:var(--text-tertiary);cursor:pointer;border-bottom:2px solid transparent;transition:all var(--t-fast);background:none;border-top:none;border-left:none;border-right:none;font-family:var(--font-sans)}
+.ws-tab.active{color:var(--accent);border-bottom-color:var(--accent)}.ws-tab:hover{color:var(--text-secondary)}
+.ws-content{flex:1;overflow-y:auto;padding:16px}
+
+.hl-item{padding:10px 12px;background:var(--bg-elevated);border-radius:var(--r-md);margin-bottom:8px;border:1px solid var(--border-subtle);cursor:pointer;transition:all var(--t-fast)}
+.hl-item:hover{border-color:var(--border-default);transform:translateX(2px)}
+.hl-type-row{display:flex;align-items:center;gap:5px;margin-bottom:6px}
+.hl-dot{width:8px;height:8px;border-radius:50%}
+.hl-dot.claim{background:var(--accent)}.hl-dot.method{background:var(--purple)}.hl-dot.result{background:var(--green)}.hl-dot.limitation{background:var(--red)}
+.hl-type-label{font-size:10px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase}
+.hl-type-label.claim{color:var(--accent)}.hl-type-label.method{color:var(--purple)}.hl-type-label.result{color:var(--green)}.hl-type-label.limitation{color:var(--red)}
+.hl-text{font-size:12px;color:var(--text-primary);line-height:1.5;margin-bottom:6px}
+.hl-note{font-size:11px;color:var(--text-tertiary);font-style:italic}
+
+.s4-card{background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:var(--r-md);overflow:hidden;margin-bottom:12px}
+.s4-header{padding:9px 14px;border-bottom:1px solid var(--border-subtle);font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-tertiary)}
+.s4-item{padding:10px 14px;border-bottom:1px solid var(--border-subtle)}.s4-item:last-child{border-bottom:none}
+.s4-label{font-size:10px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:4px}
+.s4-text{font-size:12px;color:var(--text-secondary);line-height:1.5}
+
+.reader-context{width:280px;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:20px}
+.ctx-title{font-size:10px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:10px}
+.ctx-paper-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border-subtle);cursor:pointer;transition:all var(--t-fast)}
+.ctx-paper-item:last-child{border-bottom:none}.ctx-paper-item:hover .ctx-paper-title{color:var(--accent)}
+.ctx-paper-icon{width:28px;height:28px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;transition:all var(--t-fast)}
+.ctx-paper-icon.read{background:var(--accent-muted);color:var(--accent)}.ctx-paper-icon.unread{background:var(--bg-overlay);color:var(--text-tertiary)}
+.ctx-paper-title{font-size:12px;color:var(--text-secondary);line-height:1.4;transition:color var(--t-fast)}
+.ctx-paper-year{font-size:11px;color:var(--text-tertiary);font-family:var(--font-mono)}
+.novelty-meter{background:var(--bg-elevated);border-radius:var(--r-md);padding:14px;border:1px solid var(--border-subtle)}
+.novelty-val{font-size:28px;font-weight:700;font-family:var(--font-mono);color:var(--accent);line-height:1;margin-bottom:4px}
+.novelty-lbl{font-size:11px;color:var(--text-tertiary);margin-bottom:10px}
+.novelty-track{height:4px;background:var(--bg-hover);border-radius:2px;overflow:hidden}
+.novelty-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--purple));border-radius:2px;transition:width 0.6s cubic-bezier(0.4,0,0.2,1)}
+
+.speed-bar{height:36px;border-top:1px solid var(--border-subtle);display:flex;align-items:center;padding:0 20px;gap:20px;font-size:11px;color:var(--text-tertiary);background:var(--bg-surface);font-family:var(--font-mono);flex-shrink:0}
+.speed-val{color:var(--text-secondary);font-weight:500}
+
+/* ════════════════════════════════════════
+   SCREEN 3 — KNOWLEDGE GRAPH
+════════════════════════════════════════ */
+#screen-graph{position:relative}
+.graph-wrap{position:relative;flex:1;overflow:hidden}
+#graph-canvas{position:absolute;top:0;left:0;width:100%;height:100%;cursor:default}
+.graph-controls{position:absolute;top:16px;left:16px;display:flex;flex-direction:column;gap:8px;z-index:10}
+.graph-btn{width:36px;height:36px;background:var(--bg-elevated);border:1px solid var(--border-default);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-secondary);transition:all var(--t-fast)}
+.graph-btn:hover{background:var(--bg-hover);color:var(--text-primary);border-color:var(--border-strong)}
+.graph-btn svg{width:16px;height:16px}
+.graph-legend{position:absolute;bottom:70px;left:16px;background:var(--bg-elevated);border:1px solid var(--border-default);border-radius:var(--r-md);padding:12px 16px;z-index:10;display:flex;flex-direction:column;gap:8px}
+.legend-row{display:flex;align-items:center;gap:10px;font-size:11px;color:var(--text-secondary)}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.time-slider-box{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);background:var(--bg-elevated);border:1px solid var(--border-default);border-radius:var(--r-lg);padding:12px 20px;z-index:10;display:flex;align-items:center;gap:16px;min-width:400px}
+.time-slider-lbl{font-size:11px;color:var(--text-tertiary);white-space:nowrap}
+input[type=range].time-slider{flex:1;-webkit-appearance:none;height:3px;background:var(--border-default);border-radius:2px;outline:none}
+input[type=range].time-slider::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid var(--bg-elevated);box-shadow:0 0 8px rgba(74,144,217,0.4)}
+.time-year{font-size:13px;font-weight:600;font-family:var(--font-mono);color:var(--accent);min-width:40px;text-align:right}
+.graph-tooltip{position:fixed;background:var(--bg-overlay);border:1px solid var(--border-strong);border-radius:var(--r-md);padding:12px 16px;z-index:200;pointer-events:none;max-width:240px;box-shadow:0 8px 32px rgba(0,0,0,0.5);display:none}
+.graph-tooltip.show{display:block}
+.gt-title{font-size:12px;font-weight:500;color:var(--text-primary);line-height:1.4;margin-bottom:6px}
+.gt-meta{font-size:11px;color:var(--text-tertiary);font-family:var(--font-mono)}
+.graph-flyout{position:absolute;right:0;top:0;bottom:0;width:380px;background:var(--bg-surface);border-left:1px solid var(--border-default);z-index:30;overflow-y:auto;transform:translateX(100%);transition:transform var(--t-med);padding:20px}
+.graph-flyout.open{transform:translateX(0)}
+.flyout-close{position:absolute;top:16px;right:16px;width:28px;height:28px;background:var(--bg-overlay);border:none;border-radius:var(--r-sm);cursor:pointer;color:var(--text-secondary);display:flex;align-items:center;justify-content:center;transition:all var(--t-fast)}
+.flyout-close:hover{background:var(--bg-hover);color:var(--text-primary)}
+.flyout-close svg{width:14px;height:14px}
+
+/* ════════════════════════════════════════
+   SCREEN 4 — LIT REVIEW
+════════════════════════════════════════ */
+#screen-litreview{flex-direction:row!important}
+.lit-clusters{width:300px;border-right:1px solid var(--border-subtle);overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:10px;background:var(--bg-surface)}
+.cluster-card{background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:var(--r-lg);overflow:hidden;cursor:pointer;transition:all var(--t-fast)}
+.cluster-card:hover{border-color:var(--border-default);transform:translateX(2px)}.cluster-card.selected{border-color:var(--accent);box-shadow:0 0 0 1px rgba(74,144,217,0.2)}
+.cluster-head{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--border-subtle)}
+.cluster-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.cluster-name{font-size:13px;font-weight:500;color:var(--text-primary);flex:1}
+.cluster-count{font-size:11px;color:var(--text-tertiary);font-family:var(--font-mono)}
+.cluster-papers-list{padding:10px 14px;display:flex;flex-direction:column;gap:4px}
+.cluster-paper-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-secondary);padding:4px 6px;border-radius:var(--r-sm);cursor:pointer;transition:all var(--t-fast)}
+.cluster-paper-row:hover{background:var(--bg-hover);color:var(--text-primary)}
+.cluster-paper-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.lit-draft{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.draft-toolbar{height:46px;border-bottom:1px solid var(--border-subtle);display:flex;align-items:center;padding:0 20px;gap:12px;background:var(--bg-surface);flex-shrink:0}
+.draft-content{flex:1;overflow-y:auto;padding:24px 32px}
+.draft-para{margin-bottom:20px;padding:16px;background:var(--bg-elevated);border-radius:var(--r-md);border:1px solid var(--border-subtle);border-left:3px solid var(--border-subtle);transition:all var(--t-fast)}
+.draft-para.active{border-left-color:var(--accent);background:var(--accent-glow)}
+.draft-para-label{display:flex;align-items:center;gap:6px;margin-bottom:10px}
+.draft-para-dot{width:8px;height:8px;border-radius:50%}
+.draft-text{font-size:13.5px;line-height:1.78;color:var(--text-secondary);outline:none;min-height:60px}
+.draft-text:focus{color:var(--text-primary)}
+.coverage-sidebar{width:220px;border-left:1px solid var(--border-subtle);overflow-y:auto;padding:16px;background:var(--bg-surface)}
+.cov-item{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border-subtle)}
+.cov-item:last-child{border-bottom:none}
+.cov-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.cov-dot.used{background:var(--green)}.cov-dot.unused{background:var(--red);opacity:0.6}
+.cov-name{font-size:11px;color:var(--text-secondary);line-height:1.3}
+
+/* ════════════════════════════════════════
+   SCREEN 5 — MONITOR
+════════════════════════════════════════ */
+#screen-monitor{flex-direction:row!important}
+.monitor-sidebar{width:280px;border-right:1px solid var(--border-subtle);overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:8px;background:var(--bg-surface)}
+.monitor-item{background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:var(--r-md);padding:12px 14px;cursor:pointer;transition:all var(--t-fast)}
+.monitor-item:hover{border-color:var(--border-default);transform:translateX(2px)}.monitor-item.active{border-color:var(--accent);background:var(--accent-glow)}
+.monitor-item-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
+.monitor-name{font-size:13px;font-weight:500;color:var(--text-primary)}
+.monitor-type-chip{font-size:9px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;padding:2px 6px;border-radius:100px}
+.monitor-type-chip.topic{background:var(--accent-muted);color:var(--accent)}.monitor-type-chip.abstract{background:var(--purple-muted);color:var(--purple)}.monitor-type-chip.author{background:var(--green-muted);color:var(--green)}
+.monitor-stats{display:flex;align-items:center;gap:10px;margin-top:6px}
+.monitor-stat{font-size:11px;color:var(--text-tertiary)}
+.alert-cnt{background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:100px;min-width:18px;text-align:center}
+.trend-up{color:var(--red);font-size:10px;font-weight:600}.trend-stable{color:var(--text-tertiary);font-size:10px}
+.sparkline{display:flex;align-items:flex-end;gap:3px;height:36px;margin-top:8px}
+.spark-bar{flex:1;border-radius:2px 2px 0 0;min-height:4px;transition:height 0.4s ease}
+
+.monitor-alerts{flex:1;overflow-y:auto;padding:24px 28px;display:flex;flex-direction:column;gap:14px}
+.alert-card{background:var(--bg-elevated);border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--border-subtle);transition:all var(--t-fast)}
+.alert-card:hover{border-color:var(--border-default);transform:translateY(-1px);box-shadow:0 4px 20px rgba(0,0,0,0.15)}
+.alert-card.red{border-left:3px solid var(--red)}.alert-card.yellow{border-left:3px solid var(--yellow)}.alert-card.blue{border-left:3px solid var(--accent)}
+.alert-card.unread{background:var(--bg-overlay)}
+.alert-head{padding:14px 18px;display:flex;align-items:flex-start;gap:12px}
+.alert-badge{font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:100px;white-space:nowrap;margin-top:1px;flex-shrink:0}
+.alert-badge.red{background:var(--red-muted);color:var(--red);border:1px solid rgba(224,92,92,0.25)}
+.alert-badge.yellow{background:var(--yellow-muted);color:var(--yellow);border:1px solid rgba(212,168,67,0.25)}
+.alert-badge.blue{background:var(--accent-muted);color:var(--accent);border:1px solid rgba(74,144,217,0.25)}
+.alert-content{flex:1}
+.alert-title{font-size:13px;font-weight:500;color:var(--text-primary);margin-bottom:4px}
+.alert-paper{font-size:12px;color:var(--accent);margin-bottom:3px;line-height:1.4}
+.alert-authors{font-size:11px;color:var(--text-tertiary)}
+.alert-body{padding:12px 18px 14px;border-top:1px solid var(--border-subtle);font-size:12px;color:var(--text-secondary);line-height:1.6}
+.alert-ts{font-size:11px;color:var(--text-tertiary);font-family:var(--font-mono);white-space:nowrap}
+.unread-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);margin:4px 0 0 auto}
+
+.abstract-panel{width:300px;border-left:1px solid var(--border-subtle);padding:20px;overflow-y:auto;background:var(--bg-surface)}
+.abstract-ta{width:100%;background:var(--bg-elevated);border:1px solid var(--border-default);border-radius:var(--r-md);padding:12px;color:var(--text-primary);font-family:var(--font-sans);font-size:12px;line-height:1.6;resize:none;outline:none;transition:border-color var(--t-fast);min-height:100px}
+.abstract-ta:focus{border-color:var(--accent)}
+.niche-meter{background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:var(--r-md);padding:14px;margin-top:12px}
+.niche-score{font-size:36px;font-weight:700;font-family:var(--font-mono);line-height:1;margin-bottom:4px}
+.niche-lbl{font-size:11px;color:var(--text-tertiary);margin-bottom:12px}
+.niche-badge{padding:7px 12px;border-radius:var(--r-sm);font-size:12px;font-weight:500;text-align:center}
+.niche-badge.crowded{background:var(--red-muted);color:var(--red)}.niche-badge.contested{background:var(--yellow-muted);color:var(--yellow)}.niche-badge.clear{background:var(--green-muted);color:var(--green)}
+
+/* ── Highlight menu ── */
+.hl-menu{position:fixed;background:var(--bg-overlay);border:1px solid var(--border-strong);border-radius:var(--r-md);padding:4px;z-index:9000;box-shadow:0 8px 32px rgba(0,0,0,0.5);min-width:210px;display:none}
+.hl-menu.show{display:flex;flex-direction:column;animation:fadeSlideUp 0.15s ease}
+.hl-menu-item{padding:8px 12px;border-radius:var(--r-sm);font-size:12px;color:var(--text-secondary);cursor:pointer;display:flex;align-items:center;gap:8px;transition:all var(--t-fast)}
+.hl-menu-item:hover{background:var(--bg-active);color:var(--text-primary)}
+.hl-menu-sep{height:1px;background:var(--border-subtle);margin:2px 0}
+
+/* ── Summary modal ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(9,12,17,0.75);backdrop-filter:blur(6px);z-index:8000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity var(--t-med)}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:var(--r-xl);padding:28px;max-width:540px;width:90%;transform:translateY(20px);transition:transform var(--t-med);box-shadow:0 24px 64px rgba(0,0,0,0.6)}
+.modal-overlay.open .modal{transform:translateY(0)}
+.modal-title{font-size:16px;font-weight:600;color:var(--text-primary);margin-bottom:6px}
+.modal-subtitle{font-size:12px;color:var(--text-tertiary);margin-bottom:20px}
+.modal-q{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.modal-q-label{font-size:10px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;color:var(--text-tertiary)}
+.modal-q-input{background:var(--bg-overlay);border:1px solid var(--border-default);border-radius:var(--r-md);padding:8px 12px;color:var(--text-primary);font-size:13px;font-family:var(--font-sans);outline:none;transition:border-color var(--t-fast);resize:none;line-height:1.5}
+.modal-q-input:focus{border-color:var(--accent)}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
+
+/* ── Toast ── */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--bg-overlay);color:var(--text-primary);padding:10px 20px;border-radius:var(--r-md);border:1px solid var(--border-strong);font-size:13px;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,0.4);opacity:0;transition:all 0.2s ease;pointer-events:none;white-space:nowrap}
+
+/* ── Kbd shortcut hint ── */
+kbd{background:var(--bg-overlay);padding:1px 5px;border-radius:3px;border:1px solid var(--border-default);font-family:var(--font-mono);font-size:10px}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;color:var(--text-tertiary);font-size:12px;text-align:center;gap:8px}
+.empty-state svg{width:28px;height:28px;opacity:0.3}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- NAV RAIL -->
+<nav id="nav-rail">
+  <div class="nav-logo">Æ</div>
+  <button class="nav-item active" data-screen="feed" aria-label="Morning Feed">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 6h16M4 10h16M4 14h10M4 18h6" stroke-linecap="round"/></svg>
+    <div class="nav-tooltip">Morning Feed</div>
+  </button>
+  <button class="nav-item" data-screen="reader" aria-label="Deep Reader">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div class="nav-tooltip">Deep Reader</div>
+  </button>
+  <button class="nav-item" data-screen="graph" aria-label="Knowledge Graph">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="19" cy="19" r="2"/><circle cx="12" cy="12" r="2"/><path d="M7 12h5M14 12l3.5-5M14 12l3.5 5" stroke-linecap="round"/></svg>
+    <div class="nav-tooltip">Knowledge Graph</div>
+  </button>
+  <button class="nav-item" data-screen="litreview" aria-label="Lit Review">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div class="nav-tooltip">Lit Review</div>
+  </button>
+  <button class="nav-item" data-screen="monitor" aria-label="Monitor">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div class="nav-badge"></div>
+    <div class="nav-tooltip">Monitor &amp; Alerts</div>
+  </button>
+  <div class="nav-spacer"></div>
+  <div class="nav-avatar" title="Alex Chen">AC</div>
+</nav>
+
+<main id="main">
+
+<!-- ═══════════════ SCREEN 1 — FEED ═══════════════ -->
+<div class="screen active" id="screen-feed">
+  <div class="topbar">
+    <div><div class="topbar-title">Morning Briefing</div><div class="topbar-subtitle">Your research landscape, curated</div></div>
+    <div class="topbar-spacer"></div>
+    <div class="topbar-meta">
+      <div class="streak-badge">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.66 11.2C17.43 10.9 17.15 10.64 16.89 10.38C16.22 9.78 15.46 9.35 14.82 8.72C13.33 7.26 13 4.85 13.95 3C13 3.23 12.17 3.75 11.46 4.32C8.87 6.4 7.85 10.07 9.07 13.22C9.11 13.32 9.15 13.42 9.15 13.55C9.15 13.77 9 13.97 8.8 14.05C8.57 14.15 8.33 14.09 8.14 13.93C8.08 13.88 8.04 13.83 8 13.76C6.87 12.33 6.69 10.28 7.45 8.64C5.78 10 4.87 12.3 5 14.47C5.06 14.97 5.12 15.47 5.29 15.97C5.43 16.57 5.7 17.17 6 17.7C7.08 19.43 8.95 20.67 10.96 20.92C13.1 21.19 15.39 20.8 17.03 19.32C18.86 17.66 19.5 15 18.56 12.72L18.43 12.46C18.22 12 17.66 11.2 17.66 11.2Z"/></svg>
+        <span id="streak-txt">11-day streak</span>
+      </div>
+      <div class="topbar-date" id="feed-date"></div>
+    </div>
+  </div>
+  <div style="display:flex;flex:1;overflow:hidden">
+    <div class="feed-main">
+      <div class="feed-greeting"><h1 id="greeting-name">Good morning, Alex.</h1><div class="date-line" id="greeting-date"></div></div>
+      <div><div class="section-label">INTELLIGENCE SIGNALS</div><div id="feed-signals" style="display:flex;flex-direction:column;gap:12px"></div></div>
+      <div><div class="section-label">NEW PAPERS</div><div class="papers-card" id="feed-new-papers"></div></div>
+      <div><div class="section-label">ASSIGNED BY ADVISOR</div><div class="papers-card" id="feed-assigned"></div></div>
+      <div>
+        <div class="section-label">BASELINES REGISTRY</div>
+        <div class="papers-card" style="overflow:hidden">
+          <div class="papers-card-header"><span style="font-size:12px;color:var(--text-secondary)">Auto-extracted from your library</span><span class="chip chip-accent">5 entries</span></div>
+          <table class="bl-table">
+            <thead><tr><th>Method</th><th>Dataset</th><th>Metric</th><th>Score</th><th>Year</th></tr></thead>
+            <tbody id="bl-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="feed-sidebar">
+      <div><div class="sidebar-section-title">TODAY'S READING</div>
+        <div class="progress-ring-wrap">
+          <svg width="44" height="44" viewBox="0 0 44 44" id="progress-ring-svg"></svg>
+          <div><div style="font-size:20px;font-weight:600;font-family:var(--font-mono);line-height:1"><span id="p-count">3</span></div><div style="font-size:10px;color:var(--text-secondary)" id="p-target">/ 3 today</div><div style="font-size:11px;color:var(--green);margin-top:2px;font-weight:500">✓ Goal met</div></div>
+        </div>
+      </div>
+      <div><div class="sidebar-section-title">CONSISTENCY</div>
+        <div class="streak-box"><div><div class="streak-num" id="streak-num">11</div><div class="streak-lbl">day reading streak</div></div><div style="font-size:28px">🔥</div></div>
+      </div>
+      <div style="flex:1"><div class="sidebar-section-title" style="margin-bottom:10px">UNREAD QUEUE</div><div id="unread-queue"></div></div>
+      <div><div class="sidebar-section-title">LAB CO-READING</div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px" id="coread-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ SCREEN 2 — READER ═══════════════ -->
+<div class="screen" id="screen-reader">
+  <div class="topbar">
+    <button class="btn btn-ghost" id="btn-back" style="padding:4px 8px">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>Back
+    </button>
+    <div style="flex:1;min-width:0"><div class="topbar-title" id="reader-title" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:500px">—</div><div class="topbar-subtitle" id="reader-arxiv">—</div></div>
+    <div class="topbar-spacer"></div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="btn btn-ghost" id="btn-done">Mark as Done</button>
+      <button class="btn btn-primary" id="btn-save"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>Save</button>
+    </div>
+  </div>
+  <div class="reader-layout">
+    <div class="reader-paper" id="paper-col"></div>
+    <div class="reader-workspace">
+      <div class="ws-tabs">
+        <button class="ws-tab active" data-tab="highlights">Highlights</button>
+        <button class="ws-tab" data-tab="summary">Summary</button>
+        <button class="ws-tab" data-tab="notes">Notes</button>
+      </div>
+      <div class="ws-content">
+        <div class="ws-pane" data-tab="highlights" id="pane-highlights"></div>
+        <div class="ws-pane" data-tab="summary" id="pane-summary" style="display:none"></div>
+        <div class="ws-pane" data-tab="notes" id="pane-notes" style="display:none"><textarea style="width:100%;min-height:180px;background:var(--bg-elevated);border:1px solid var(--border-default);border-radius:var(--r-md);padding:12px;color:var(--text-primary);font-family:var(--font-sans);font-size:12px;resize:none;outline:none;line-height:1.65" placeholder="Your notes…&#10;&#10;No structure required."></textarea></div>
+      </div>
+    </div>
+    <div class="reader-context">
+      <div><div class="ctx-title">NOVELTY SCORE</div>
+        <div class="novelty-meter"><div class="novelty-val" id="nv-val">72%</div><div class="novelty-lbl" id="nv-lbl">High novelty — deep read recommended</div><div class="novelty-track"><div class="novelty-fill" id="nv-fill" style="width:72%"></div></div></div>
+      </div>
+      <div><div class="ctx-title">CITED — IN YOUR LIBRARY</div><div id="ctx-cited"></div></div>
+      <div><div class="ctx-title">READ NEXT — SIMILAR &amp; UNREAD</div><div id="ctx-similar"></div></div>
+      <div><div class="ctx-title">LAB CO-READING</div><div id="ctx-labmates"></div></div>
+    </div>
+  </div>
+  <div class="speed-bar">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+    <span class="speed-val" id="speed-val">— pages/min</span>
+    <span class="speed-val" id="speed-rem" style="color:var(--text-tertiary)">—</span>
+    <div style="flex:1"></div>
+    <span style="font-size:10px;color:var(--text-tertiary)">Select text for AI actions &nbsp;·&nbsp; <kbd>S</kbd> toggle section summary</span>
+  </div>
+</div>
+
+<!-- ═══════════════ SCREEN 3 — GRAPH ═══════════════ -->
+<div class="screen" id="screen-graph">
+  <div class="topbar">
+    <div class="topbar-title">Knowledge Graph</div><div class="topbar-subtitle" style="margin-left:8px">Library · 7 papers · citation + semantic edges</div>
+    <div class="topbar-spacer"></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-ghost" id="btn-toggle-semantic">Semantic edges</button>
+      <button class="btn btn-ghost" id="btn-toggle-citation">Citation edges</button>
+    </div>
+  </div>
+  <div class="graph-wrap" id="graph-wrap">
+    <canvas id="graph-canvas"></canvas>
+    <div class="graph-tooltip" id="graph-tooltip"></div>
+    <div class="graph-controls">
+      <button class="graph-btn" id="g-zoom-in" title="Zoom in"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35M8 11h6M11 8v6" stroke-linecap="round"/></svg></button>
+      <button class="graph-btn" id="g-zoom-out" title="Zoom out"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35M8 11h6" stroke-linecap="round"/></svg></button>
+      <button class="graph-btn" id="g-fit" title="Fit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 8V4m0 0h4M4 4l5 5M20 8V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5M20 16v4m0 0h-4m4 0l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+    <div class="graph-legend">
+      <div class="legend-row"><div class="legend-dot" style="background:#4A90D9"></div>Read + annotated</div>
+      <div class="legend-row"><div class="legend-dot" style="background:#4CAF8A"></div>Read</div>
+      <div class="legend-row"><div class="legend-dot" style="background:#3A4A5C;border:1px solid rgba(255,255,255,0.15)"></div>Unread</div>
+      <div class="legend-row"><div class="legend-dot" style="background:#E8874A"></div>Gap — not in library</div>
+      <div style="height:1px;background:var(--border-subtle);margin:2px 0"></div>
+      <div class="legend-row" style="font-size:10px;color:var(--text-tertiary)">Node size = citation weight</div>
+    </div>
+    <div class="time-slider-box">
+      <span class="time-slider-lbl">Show field up to</span>
+      <input type="range" class="time-slider" id="time-slider" min="2017" max="2025" value="2025" step="1"/>
+      <span class="time-year" id="time-year">2025</span>
+    </div>
+    <div class="graph-flyout" id="graph-flyout"></div>
+  </div>
+</div>
+
+<!-- ═══════════════ SCREEN 4 — LIT REVIEW ═══════════════ -->
+<div class="screen" id="screen-litreview">
+  <div class="topbar">
+    <div class="topbar-title">Literature Review Workspace</div><div class="topbar-subtitle" style="margin-left:8px">Related work · Efficient Attention Mechanisms</div>
+    <div class="topbar-spacer"></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-ghost" id="btn-bibtex">Export BibTeX</button>
+      <button class="btn btn-ghost" id="btn-latex">Export LaTeX</button>
+      <button class="btn btn-primary" id="btn-copy-draft">Copy Draft</button>
+    </div>
+  </div>
+  <div style="display:flex;flex:1;overflow:hidden">
+    <div class="lit-clusters">
+      <div class="sidebar-section-title">PAPER CLUSTERS</div>
+      <div style="font-size:11px;color:var(--text-tertiary);margin-bottom:14px">Click cluster to focus draft paragraph</div>
+      <div id="lit-clusters"></div>
+      <button class="btn btn-ghost" style="width:100%;justify-content:center;margin-top:8px" id="btn-add-cluster">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>Add Cluster
+      </button>
+    </div>
+    <div class="lit-draft">
+      <div class="draft-toolbar">
+        <span style="font-size:12px;color:var(--text-tertiary)">Draft</span>
+        <div class="topbar-spacer"></div>
+        <span style="font-size:11px;color:var(--text-secondary)"><span id="word-count">—</span> words</span>
+        <span style="font-size:11px;color:var(--text-tertiary);margin-left:12px"><span id="cite-count">—</span> citations</span>
+      </div>
+      <div class="draft-content" id="draft-content"></div>
+    </div>
+    <div class="coverage-sidebar" id="coverage-sidebar"></div>
+  </div>
+</div>
+
+<!-- ═══════════════ SCREEN 5 — MONITOR ═══════════════ -->
+<div class="screen" id="screen-monitor">
+  <div class="topbar">
+    <div class="topbar-title">Monitor &amp; Alerts</div><div class="topbar-subtitle" style="margin-left:8px">4 monitors · 2 unread alerts</div>
+    <div class="topbar-spacer"></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-ghost" id="btn-mark-read">Mark all read</button>
+      <button class="btn btn-primary" id="btn-new-monitor"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>New Monitor</button>
+    </div>
+  </div>
+  <div style="display:flex;flex:1;overflow:hidden">
+    <div class="monitor-sidebar"><div class="sidebar-section-title" style="margin-bottom:12px">ACTIVE MONITORS</div><div id="monitor-list"></div></div>
+    <div class="monitor-alerts" id="alerts-feed"></div>
+    <div class="abstract-panel" id="abstract-panel"></div>
+  </div>
+</div>
+
+</main>
+</div>
+
+<!-- FLOATING: Highlight Action Menu -->
+<div id="hl-menu" class="hl-menu" role="menu">
+  <div class="hl-menu-item" data-action="explain"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01" stroke-linecap="round"/></svg>Explain step by step</div>
+  <div class="hl-menu-item" data-action="contradict"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9.172 9.172L14.828 14.828M14.828 9.172l-5.656 5.656" stroke-linecap="round"/><circle cx="12" cy="12" r="10"/></svg>Find contradicting papers</div>
+  <div class="hl-menu-sep"></div>
+  <div class="hl-menu-item" data-action="litreview"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>Add to lit review</div>
+  <div class="hl-menu-item" data-action="baseline"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>Track as baseline</div>
+</div>
+
+<!-- FLOATING: 4-Question Summary Modal -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-title">4-Question Summary</div>
+    <div class="modal-subtitle" id="modal-paper-name">Takes ~90 seconds. Saves hours later.</div>
+    <div class="modal-q"><div class="modal-q-label">What is the core claim?</div><textarea class="modal-q-input" id="mq-claim" rows="2" placeholder="The central contribution in one sentence…"></textarea></div>
+    <div class="modal-q"><div class="modal-q-label">What is the method?</div><textarea class="modal-q-input" id="mq-method" rows="2" placeholder="Key technique or approach…"></textarea></div>
+    <div class="modal-q"><div class="modal-q-label">What dataset / benchmark?</div><textarea class="modal-q-input" id="mq-dataset" rows="1" placeholder="Evaluation setup…"></textarea></div>
+    <div class="modal-q"><div class="modal-q-label">What is the key limitation?</div><textarea class="modal-q-input" id="mq-limitation" rows="2" placeholder="What doesn't this paper solve?"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="modal-cancel">Cancel</button>
+      <button class="btn btn-primary" id="modal-save">Save Summary ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════
+const RESEARCHER = {
+  name: "Alex Chen", initials: "AC", streak: 11, papersToday: 3, paperTarget: 3,
+  labmates: [
+    { name: "Priya Nair",    initials: "PN", color: "#7C6AF7" },
+    { name: "James Wu",      initials: "JW", color: "#F76A6A" },
+    { name: "Sara Okonkwo",  initials: "SO", color: "#6AF7C4" },
+  ]
+};
+
+const PAPERS = [
+  {
+    id:"p001", title:"FlashAttention-3: Fast and Accurate Attention with Asynchrony and Low-precision",
+    authors:["Tri Dao","Daniel Y. Fu"], year:2024, venue:"NeurIPS 2024", arxivId:"2407.08608",
+    abstract:"We present FlashAttention-3, which introduces new techniques to speed up attention on GPUs that have asynchrony between different types of operations as well as supports for FP8 low-precision. We propose three main ideas: exploiting asynchrony of the Tensor Cores and TMA to overlap computation and data movement via warp-specialization; interleaving block-wise matmul and softmax operations; and incoherent processing that leverages hardware support for FP8 quantization. Together, FlashAttention-3 reaches 740–1090 TFLOPS/s on H100 GPUs, 1.5-2.0× faster than FlashAttention-2.",
+    tags:["attention","transformers","efficiency","hardware"], status:"read",
+    savedDate:"2025-01-15", readDate:"2025-01-16",
+    highlights:[
+      {id:"h001",text:"reaches 740–1090 TFLOPS/s on H100 GPUs",type:"result",note:"Key benchmark — compare against this"},
+      {id:"h002",text:"warp-specialization: producer warps issue TMA loads, consumer warps execute WGMMA",type:"method",note:"Core technique"},
+      {id:"h003",text:"1.5-2.0× faster than FlashAttention-2",type:"result",note:null},
+    ],
+    summary4:{claim:"FP8 + async overlap achieves 1.5-2× speedup over FA2 on H100",method:"Warp-specialized pipelines interleaving matmul/softmax with TMA asynchrony",dataset:"H100 GPUs, standard attention benchmarks",limitation:"Benefits are hardware-specific; requires H100 Tensor Core features"},
+    citations:["p003","p004","p007"], citedBy:["p002","p006"], similarTo:["p003","p004","p005"],
+    noveltyScore:0.72,
+    baselines:[{dataset:"H100 attention",metric:"TFLOPS/s",score:"1090",method:"FlashAttention-3"},{dataset:"H100 attention",metric:"TFLOPS/s",score:"520",method:"FlashAttention-2"}],
+    labmateReads:["PN"], gx:420, gy:280
+  },
+  {
+    id:"p002", title:"Ring Attention with Blockwise Transformers for Near-Infinite Context",
+    authors:["Hao Liu","Matei Zaharia","Pieter Abbeel"], year:2023, venue:"ICLR 2024", arxivId:"2310.01889",
+    abstract:"We present Ring Attention with Blockwise Transformers, which enables training and inference of sequences that are many times longer than possible with prior memory-efficient Transformers by leveraging distributed computing and ring-shaped communication patterns.",
+    tags:["long context","distributed","attention","efficiency"], status:"read",
+    savedDate:"2025-01-10", readDate:"2025-01-12",
+    highlights:[
+      {id:"h004",text:"ring-shaped communication pattern to distribute and compute attention",type:"method",note:"Elegant solution to context length limits"},
+      {id:"h005",text:"sequences that are many times longer than possible with prior methods",type:"claim",note:null},
+    ],
+    summary4:{claim:"Ring topology enables near-infinite context via device parallelism",method:"Circular attention shards across GPU ring with compute-communication overlap",dataset:"Language modeling up to 1M tokens",limitation:"Communication overhead scales with number of devices"},
+    citations:["p001","p003","p007"], citedBy:["p006"], similarTo:["p001","p003"],
+    noveltyScore:0.61, baselines:[], labmateReads:["JW","PN"], gx:580, gy:180
+  },
+  {
+    id:"p003", title:"Attention Is All You Need",
+    authors:["Ashish Vaswani","Noam Shazeer","Niki Parmar","Jakob Uszkoreit","Llion Jones","Aidan N. Gomez","Łukasz Kaiser","Illia Polosukhin"],
+    year:2017, venue:"NeurIPS 2017", arxivId:"1706.03762",
+    abstract:"We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. Experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable.",
+    tags:["transformers","attention","NLP","foundational"], status:"read",
+    savedDate:"2024-06-01", readDate:"2024-06-02",
+    highlights:[{id:"h006",text:"dispensing with recurrence and convolutions entirely",type:"claim",note:"The paradigm shift"},{id:"h007",text:"more parallelizable and requiring significantly less time to train",type:"result",note:null}],
+    summary4:{claim:"Pure attention outperforms RNNs on translation with full parallelism",method:"Multi-head self-attention with positional encodings",dataset:"WMT 2014 EN-DE and EN-FR",limitation:"Quadratic complexity in sequence length"},
+    citations:[], citedBy:["p001","p002","p004","p005"],
+    similarTo:["p004","p001"], noveltyScore:0.15,
+    baselines:[{dataset:"WMT 2014 EN-DE",metric:"BLEU",score:"28.4",method:"Transformer (base)"},{dataset:"WMT 2014 EN-FR",metric:"BLEU",score:"41.0",method:"Transformer (big)"}],
+    labmateReads:["PN","JW","SO"], gx:300, gy:420
+  },
+  {
+    id:"p004", title:"Efficient Transformers: A Survey",
+    authors:["Yi Tay","Mostafa Dehghani","Dara Bahri","Donald Metzler"],
+    year:2022, venue:"ACM Computing Surveys", arxivId:"2009.06732",
+    abstract:"Transformers have become the defacto standard for many NLP problems. However, Transformers suffer from quadratic complexity with respect to sequence length. This survey conducts a comprehensive review of the various efforts to improve Transformer efficiency.",
+    tags:["survey","transformers","efficiency","attention"], status:"read",
+    savedDate:"2024-09-05", readDate:"2024-09-07",
+    highlights:[{id:"h008",text:"quadratic complexity with respect to sequence length",type:"limitation",note:"Core bottleneck motivating my work"}],
+    summary4:{claim:"Comprehensive taxonomy of 20+ efficient attention mechanisms",method:"Literature survey with unified notation",dataset:"LRA benchmark",limitation:"Coverage ends at 2022 — many recent works missing"},
+    citations:["p003"], citedBy:["p001","p002"], similarTo:["p001","p002","p003"],
+    noveltyScore:0.18, baselines:[], labmateReads:["SO"], gx:180, gy:300
+  },
+  {
+    id:"p005", title:"Mamba: Linear-Time Sequence Modeling with Selective State Spaces",
+    authors:["Albert Gu","Tri Dao"], year:2023, venue:"ICLR 2024", arxivId:"2312.00752",
+    abstract:"We propose Mamba, a new architecture with a selective state space model that achieves throughput 5× higher than Transformers and linear scaling in sequence length while maintaining competitive quality on language modeling tasks.",
+    tags:["SSM","efficiency","sequence modeling","mamba"], status:"unread",
+    savedDate:"2025-01-18", readDate:null,
+    highlights:[], summary4:null,
+    citations:["p003","p004"], citedBy:["p006"], similarTo:["p001","p002","p003"],
+    noveltyScore:0.81,
+    baselines:[{dataset:"Pile perplexity",metric:"PPL",score:"7.98",method:"Mamba 3B"}],
+    labmateReads:["JW"], gx:520, gy:380
+  },
+  {
+    id:"p006", title:"Jamba: A Hybrid Transformer-Mamba Language Model",
+    authors:["Opher Lieber","Barak Lenz","Hofit Bata","Gal Cohen"],
+    year:2024, venue:"arXiv 2024", arxivId:"2403.19887",
+    abstract:"We present Jamba, a hybrid Transformer-Mamba MoE architecture achieving 3× throughput over competing models with 256K context length.",
+    tags:["hybrid","mamba","transformers","MoE","efficiency"], status:"unread",
+    savedDate:"2025-01-20", readDate:null,
+    highlights:[], summary4:null,
+    citations:["p001","p002","p005"], citedBy:[],
+    similarTo:["p005","p001"], noveltyScore:0.88,
+    baselines:[{dataset:"MMLU",metric:"Accuracy",score:"67.4%",method:"Jamba"}],
+    labmateReads:[], gx:660, gy:300
+  },
+  {
+    id:"p007", title:"Scalable MatMul-free Language Modeling",
+    authors:["Rui-Jie Zhu","Yu Zhang","Ethan Sifferman","Tyler Sheaves"],
+    year:2024, venue:"arXiv 2024", arxivId:"2406.02528",
+    abstract:"We show that matrix multiplication (MatMul) operations can be completely eliminated from LLMs while maintaining competitive language modeling performance and reducing GPU memory usage significantly.",
+    tags:["efficiency","matmul-free","language models","hardware"], status:"unread",
+    savedDate:"2025-01-21", readDate:null,
+    highlights:[], summary4:null,
+    citations:["p003","p004"], citedBy:["p001"],
+    similarTo:["p001","p005"], noveltyScore:0.94,
+    baselines:[], labmateReads:[], gx:380, gy:150
+  },
+];
+
+const ALERTS = [
+  {id:"a001",severity:"red",label:"HIGH OVERLAP",title:"Potential Conflict Detected",
+   paper:"Linear Attention via Kernel Decomposition for Efficient Transformers",
+   authors:["Wei Chen","Liu Yang"],arxivId:"2501.09234",similarity:84,detectedAt:"2 hours ago",
+   reason:"Addresses same efficiency-quality tradeoff using similar kernel approximation approach. Method section overlaps significantly with your monitored abstract.",read:false},
+  {id:"a002",severity:"yellow",label:"TANGENTIAL",title:"Related Work Published",
+   paper:"Sparse Attention Patterns in Production LLM Serving",
+   authors:["Alicia Romero","Kevin Park"],arxivId:"2501.08891",similarity:52,detectedAt:"Yesterday",
+   reason:"Explores attention sparsity from serving angle; different problem framing but shares evaluation benchmarks.",read:false},
+  {id:"a003",severity:"blue",label:"CITATION",title:"Cited Paper Got New Citation",
+   paper:"Memory-Efficient Attention via Optimal Tiling Strategies",
+   authors:["Sara Kim"],arxivId:"2501.07654",similarity:31,detectedAt:"3 days ago",
+   reason:"New paper cites FlashAttention-3 in related work. Builds on memory tiling analysis.",read:true},
+];
+
+const MONITORS = [
+  {id:"m001",name:"Efficient Attention",type:"topic",alertCount:2,weeklyVolume:14,trend:"rising",history:[8,10,11,13,14,14,14]},
+  {id:"m002",name:"State Space Models",type:"topic",alertCount:1,weeklyVolume:8,trend:"stable",history:[7,8,7,9,8,8,8]},
+  {id:"m003",name:"My Draft Abstract",type:"abstract",alertCount:1,weeklyVolume:null,trend:"rising",history:[22,18,31,45,52,48,84]},
+  {id:"m004",name:"Tri Dao",type:"author",alertCount:0,weeklyVolume:2,trend:"stable",history:[1,2,1,1,2,2,2]},
+];
+
+const LIT_CLUSTERS = [
+  {id:"c001",name:"Foundational Transformers",color:"#7C6AF7",papers:["p003","p004"],
+   draft:"Early approaches to sequence modeling (Vaswani et al., 2017; Tay et al., 2022) established the Transformer architecture as the dominant paradigm. These methods introduced multi-head self-attention as a replacement for recurrence, achieving strong parallelizability. However, they suffered from quadratic complexity in sequence length, motivating subsequent efficiency research."},
+  {id:"c002",name:"Hardware-Aware Attention",color:"#F7A26A",papers:["p001","p002"],
+   draft:"Hardware-aware attention mechanisms (Dao & Fu, 2024; Liu et al., 2023) addressed memory bandwidth bottlenecks through IO-aware algorithms. FlashAttention-3 leverages asynchronous tensor operations to achieve 1.5-2× speedups, while Ring Attention distributes computation across device topologies to enable near-infinite context lengths."},
+  {id:"c003",name:"Alternative Architectures",color:"#6AF7C4",papers:["p005"],
+   draft:"Alternative sequence architectures challenge attention's dominance. Mamba (Gu & Dao, 2023) demonstrates that selective state spaces can match Transformer quality with linear-time complexity, achieving 5× throughput improvements on long sequences."},
+];
+
+const SECTION_BODIES = {
+  s1:`We present <span class="hl-result">FlashAttention-3, which introduces new techniques to speed up attention on GPUs</span> that have asynchrony between different types of operations as well as supports for FP8 low-precision. We propose three main ideas: exploiting <span class="hl-method">asynchrony of the Tensor Cores and TMA to overlap computation and data movement via warp-specialization</span>; interleaving block-wise matmul and softmax operations; and incoherent processing that leverages hardware support for FP8 quantization. Together, <span class="hl-result">FlashAttention-3 reaches 740–1090 TFLOPS/s on H100 GPUs, 1.5-2.0× faster than FlashAttention-2</span>.`,
+  s2:`Attention is <span class="hl-limitation">memory bandwidth-bound on modern GPU hardware</span> — the fundamental bottleneck is not compute, but the bandwidth required to read and write the attention matrix between HBM and SRAM. Prior work (FlashAttention, FlashAttention-2) addressed this through IO-aware tiling strategies. However, <span class="hl-claim">the asynchrony between different compute units on H100 GPUs remains underexplored</span> as a source of additional speedup.`,
+  s3:`The H100 GPU introduces several new hardware primitives relevant to our work. The <span class="hl-method">Tensor Memory Accelerator (TMA) is a hardware unit that handles memory transfers autonomously</span>, freeing compute SMs from memory-copy instructions. Warp groups can be specialized to different roles — some warps execute tensor operations while others initiate memory transfers simultaneously.`,
+  s4:`FlashAttention-3 introduces three synergistic techniques. First, <span class="hl-method">warp-specialization: we partition warp groups into "producer" warps that issue TMA loads and "consumer" warps that execute WGMMA tensor operations</span>, enabling true overlap of computation and memory movement. Second, we interleave softmax and matrix-multiply operations such that neither unit is idle. Third, we use incoherent FP8 processing, enabling <span class="hl-result">FP8 precision with perplexity parity to BF16</span>.`,
+  s5:`We benchmark FlashAttention-3 on H100 SXM5 GPUs. <span class="hl-result">FA3 achieves 740-1090 TFLOPS/s depending on sequence length and head dimension, compared to 520 TFLOPS/s for FlashAttention-2</span> — a 1.5-2.0× improvement. At FP8 precision, FA3 reaches the highest throughputs while maintaining perplexity equivalent to BF16 baselines on standard language modeling benchmarks.`,
+  s6:`This work builds directly on FlashAttention (Dao et al., 2022) and FlashAttention-2 (Dao, 2023). Concurrent work on efficient attention includes linear attention approximations, sparse attention (Child et al., 2019), and state-space alternatives (Gu et al., 2023). <span class="hl-limitation">Most prior work focuses on algorithmic complexity reduction rather than hardware-level optimization</span> — our approach is complementary and orthogonal.`,
+  s7:`We have demonstrated that <span class="hl-claim">hardware-software co-design is the most direct path to attention efficiency on modern accelerators</span>. The H100 architecture exposes enough programmability that careful exploitation of asynchrony can yield substantial gains without algorithmic changes.`,
+};
+
+const PAPER_SECTIONS_P001 = [
+  {id:"s1",title:"Abstract",summary:"FP8 + async warp specialization achieves 1.5-2× speedup over FA2 on H100."},
+  {id:"s2",title:"1. Introduction",summary:"GPU memory bandwidth is the bottleneck; asynchrony between compute units is underexplored."},
+  {id:"s3",title:"2. Background",summary:"Reviews FA2 tiling strategy and H100 Tensor Core / TMA architecture."},
+  {id:"s4",title:"3. FlashAttention-3",summary:"Three techniques: warp-specialization, interleaved softmax-matmul, incoherent FP8."},
+  {id:"s5",title:"4. Experiments",summary:"740–1090 TFLOPS/s on H100; perplexity parity with BF16 at FP8."},
+  {id:"s6",title:"5. Related Work",summary:"Positions against FlashAttention-1/2, cuBLAS, and Triton kernels."},
+  {id:"s7",title:"6. Conclusion",summary:"Hardware-software co-design is necessary for attention efficiency at scale."},
+];
+
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+const S = {
+  screen: "feed",
+  activePaper: PAPERS[0],
+  activeWsTab: "highlights",
+  selectedCluster: "c001",
+  draftContent: {},
+  readingStart: Date.now(),
+  graph: null,
+  nicheScore: 84,
+  abstractText: "We propose a hardware-aware attention mechanism that exploits asynchronous memory access patterns to achieve subquadratic complexity while maintaining full attention semantics on modern GPU architectures.",
+  showSemantic: true,
+  showCitation: true,
+};
+LIT_CLUSTERS.forEach(c => { S.draftContent[c.id] = c.draft; });
+
+// ═══════════════════════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════════════════════
+function toast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.style.opacity = "1";
+  t.style.transform = "translateX(-50%) translateY(0)";
+  clearTimeout(t._tid);
+  t._tid = setTimeout(() => {
+    t.style.opacity = "0";
+    t.style.transform = "translateX(-50%) translateY(20px)";
+  }, 2500);
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+function shortTitle(t, len=48) {
+  return t.length > len ? t.substring(0,len)+"…" : t;
+}
+
+function getP(id) { return PAPERS.find(p => p.id === id); }
+
+// ═══════════════════════════════════════════════════════
+// ROUTER
+// ═══════════════════════════════════════════════════════
+function navigateTo(id) {
+  S.screen = id;
+  document.querySelectorAll(".nav-item[data-screen]").forEach(el => {
+    el.classList.toggle("active", el.dataset.screen === id);
+  });
+  document.querySelectorAll(".screen").forEach(el => {
+    el.classList.toggle("active", el.id === "screen-"+id);
+  });
+  if (id === "graph") initGraph();
+  if (id === "litreview") renderLitReview();
+  if (id === "monitor") renderMonitor();
+}
+
+// ═══════════════════════════════════════════════════════
+// SCREEN 1 — MORNING FEED
+// ═══════════════════════════════════════════════════════
+function renderFeed() {
+  const now = new Date();
+  const h = now.getHours();
+  const greet = h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
+  const dateStr = now.toLocaleDateString("en-US",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
+
+  document.getElementById("greeting-name").textContent = `${greet}, ${RESEARCHER.name.split(" ")[0]}.`;
+  document.getElementById("greeting-date").textContent = dateStr.toUpperCase();
+  document.getElementById("feed-date").textContent = dateStr.toUpperCase();
+  document.getElementById("streak-txt").textContent = `${RESEARCHER.streak}-day streak`;
+  document.getElementById("streak-num").textContent = RESEARCHER.streak;
+
+  // Signals
+  const sigContainer = document.getElementById("feed-signals");
+  sigContainer.innerHTML = "";
+  // Threat card
+  const threat = document.createElement("div");
+  threat.className = "signal-card threat anim-in";
+  threat.innerHTML = `
+    <div class="signal-card-header">
+      <div class="signal-type threat"><div class="signal-dot pulse"></div>THREAT DETECTED</div>
+      <span class="signal-timestamp">2 hours ago</span>
+    </div>
+    <div class="signal-paper-title">Linear Attention via Kernel Decomposition for Efficient Transformers</div>
+    <div class="signal-desc">A new paper may directly overlap with your research niche. Abstract similarity is critically high — review before continuing your work.</div>
+    <div class="sim-bar">
+      <span class="sim-label">Abstract similarity</span>
+      <div class="sim-track"><div class="sim-fill high" style="width:84%"></div></div>
+      <span class="sim-val high">84%</span>
+    </div>`;
+  threat.addEventListener("click", () => navigateTo("monitor"));
+  sigContainer.appendChild(threat);
+
+  // Validates card
+  const val = document.createElement("div");
+  val.className = "signal-card validates anim-in";
+  val.style.animationDelay = "60ms";
+  val.innerHTML = `
+    <div class="signal-card-header">
+      <div class="signal-type validates"><div class="signal-dot"></div>HYPOTHESIS VALIDATED</div>
+      <span class="signal-timestamp">Yesterday</span>
+    </div>
+    <div class="signal-paper-title">FlashAttention-3</div>
+    <div class="signal-desc">A paper aligned with your saved work gained significant traction. <strong style="color:var(--green)">+47 citations this week</strong> — the community is moving in your direction.</div>`;
+  val.addEventListener("click", () => openReader(PAPERS[0]));
+  sigContainer.appendChild(val);
+
+  // New papers
+  const np = document.getElementById("feed-new-papers");
+  const newPapers = PAPERS.filter(p => ["p006","p007"].includes(p.id));
+  np.innerHTML = `<div class="papers-card-header"><div class="section-label" style="margin:0">NEW IN EFFICIENT ATTENTION — SINCE YESTERDAY</div><span class="chip chip-accent">2 papers</span></div>`;
+  newPapers.forEach(p => {
+    const row = document.createElement("div");
+    row.className = "paper-row";
+    const lmHtml = p.labmateReads.map(ini => {
+      const lm = RESEARCHER.labmates.find(l => l.initials === ini);
+      return lm ? `<span style="width:16px;height:16px;border-radius:50%;background:${lm.color};display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#090C11;margin-left:-4px">${ini}</span>` : "";
+    }).join("");
+    row.innerHTML = `<div class="paper-row-dot unread"></div><div style="flex:1;min-width:0"><div class="paper-row-title">${esc(p.title)}</div><div class="paper-row-meta">${esc(p.authors[0])} et al. · ${esc(p.venue)}</div></div><div style="display:flex;align-items:center">${lmHtml}</div>`;
+    row.addEventListener("click", () => openReader(p));
+    np.appendChild(row);
+  });
+
+  // Assigned
+  const assigned = document.getElementById("feed-assigned");
+  assigned.innerHTML = `<div class="papers-card-header"><span style="font-size:12px;color:var(--text-secondary)">Papers assigned this week</span><span class="chip chip-purple">3 papers</span></div>`;
+  [
+    {p: PAPERS[0], badge: "chip-purple", label: "📋 Assigned"},
+    {p: PAPERS[4], badge: "chip-purple", label: "📋 Assigned"},
+    {p: PAPERS[5], badge: "chip-yellow", label: "Due Friday"},
+  ].forEach(({p, badge, label}) => {
+    const row = document.createElement("div");
+    row.className = "paper-row";
+    const statusColor = p.status === "read" ? "var(--green)" : "var(--accent)";
+    const statusLabel = p.status === "read" ? "✓ Read" : "Unread";
+    row.innerHTML = `<div class="paper-row-dot ${p.status}"></div><div style="flex:1"><div class="paper-row-title">${esc(shortTitle(p.title, 60))}</div><div class="paper-row-meta">${esc(p.authors[0])} · ${esc(p.venue)} · <span style="color:${statusColor}">${statusLabel}</span></div></div><span class="chip ${badge}">${label}</span>`;
+    row.addEventListener("click", () => openReader(p));
+    assigned.appendChild(row);
+  });
+
+  // Baselines table
+  const bl = document.getElementById("bl-tbody");
+  const allBaselines = PAPERS.flatMap(p => (p.baselines||[]).map(b => ({...b, year: p.year})));
+  bl.innerHTML = allBaselines.map(b => `
+    <tr><td>${esc(b.method)}</td><td>${esc(b.dataset)}</td><td>${esc(b.metric)}</td><td class="score" style="color:var(--green)">${esc(b.score)}</td><td>${b.year}</td></tr>
+  `).join("") || `<tr><td colspan="5" style="color:var(--text-tertiary);text-align:center;padding:16px">No baselines extracted yet</td></tr>`;
+
+  // Progress ring
+  const pct = RESEARCHER.papersToday / RESEARCHER.paperTarget;
+  const r = 18, circ = 2*Math.PI*r, dash = circ*pct;
+  document.getElementById("progress-ring-svg").innerHTML = `
+    <circle cx="22" cy="22" r="${r}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="3"/>
+    <circle cx="22" cy="22" r="${r}" fill="none" stroke="#4A90D9" stroke-width="3"
+      stroke-dasharray="${dash} ${circ}" stroke-dashoffset="${circ*0.25}" stroke-linecap="round"
+      style="transition:stroke-dasharray 0.6s ease"/>`;
+  document.getElementById("p-count").textContent = RESEARCHER.papersToday;
+  document.getElementById("p-target").textContent = `/ ${RESEARCHER.paperTarget} today`;
+
+  // Unread queue
+  const uq = document.getElementById("unread-queue");
+  uq.innerHTML = "";
+  PAPERS.filter(p => p.status === "unread").forEach(p => {
+    const el = document.createElement("div");
+    el.className = "unread-item";
+    el.innerHTML = `
+      <div class="unread-item-title">${esc(shortTitle(p.title))}</div>
+      <div class="unread-item-meta">${esc(p.authors[0])} et al. · ${p.year}</div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px">
+        ${p.tags.slice(0,3).map(t=>`<span class="chip chip-default">${esc(t)}</span>`).join("")}
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>`;
+    el.addEventListener("click", () => openReader(p));
+    uq.appendChild(el);
+  });
+
+  // Co-reading
+  const co = document.getElementById("coread-list");
+  co.innerHTML = [
+    {lm:RESEARCHER.labmates[0], paper:"FlashAttention-3"},
+    {lm:RESEARCHER.labmates[1], paper:"Mamba"},
+  ].map(({lm,paper}) => `
+    <div style="display:flex;align-items:center;gap:8px">
+      <div style="width:20px;height:20px;border-radius:50%;background:${lm.color};display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#090C11">${lm.initials}</div>
+      <span style="font-size:11px;color:var(--text-secondary)">${lm.name} reading ${paper}</span>
+    </div>`).join("");
+}
+
+// ═══════════════════════════════════════════════════════
+// SCREEN 2 — DEEP READER
+// ═══════════════════════════════════════════════════════
+function openReader(paper) {
+  S.activePaper = paper;
+  S.readingStart = Date.now();
+  navigateTo("reader");
+  renderReader();
+}
+
+function renderReader() {
+  const p = S.activePaper;
+  if (!p) return;
+  document.getElementById("reader-title").textContent = p.title;
+  document.getElementById("reader-arxiv").textContent = `arXiv:${p.arxivId} · ${p.venue} · ${p.year}`;
+
+  renderPaperText(p);
+  renderWorkspace(p);
+  renderContextPanel(p);
+  updateSpeed();
+  clearInterval(S._speedTimer);
+  S._speedTimer = setInterval(updateSpeed, 5000);
+}
+
+function renderPaperText(p) {
+  const col = document.getElementById("paper-col");
+  const sections = p.id === "p001" ? PAPER_SECTIONS_P001 : [
+    {id:"s1",title:"Abstract",summary:"AI summary not available. Read the abstract below."}
+  ];
+
+  const navHtml = sections.map((s,i) =>
+    `<button class="sec-btn${i===0?" active":""}" data-sid="${s.id}">${esc(s.title)}</button>`
+  ).join("");
+
+  const bodyHtml = sections.map((s,i) => {
+    const body = SECTION_BODIES[s.id] || esc(p.abstract) || "Section body not available.";
+    return `
+      <div class="paper-section" id="psec-${s.id}">
+        <div class="sec-header">
+          <h2 class="sec-title">${esc(s.title)}</h2>
+          <button class="ai-toggle" data-sid="${s.id}">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor"><path d="M8 2v12M4 6l4-4 4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            AI summary
+          </button>
+        </div>
+        <div class="ai-summary${i===0?"":" hidden"}" id="ai-${s.id}">${esc(s.summary)}</div>
+        <div class="body-text">${body}</div>
+      </div>`;
+  }).join("");
+
+  col.innerHTML = `
+    <h1 class="paper-title-h1">${esc(p.title)}</h1>
+    <div class="paper-authors">${esc(p.authors.join(", "))}</div>
+    <div class="paper-venue">${esc(p.venue)} · ${p.year} · arXiv:${p.arxivId}</div>
+    <div class="section-nav">${navHtml}</div>
+    ${bodyHtml}`;
+
+  // Section nav
+  col.querySelectorAll(".sec-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      col.querySelectorAll(".sec-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      document.getElementById("psec-"+btn.dataset.sid)?.scrollIntoView({behavior:"smooth",block:"start"});
+    });
+  });
+
+  // AI toggles
+  col.querySelectorAll(".ai-toggle").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.getElementById("ai-"+btn.dataset.sid)?.classList.toggle("hidden");
+    });
+  });
+
+  // S key: expand all summaries when active
+  col.addEventListener("mouseup", onTextSelect);
+}
+
+function onTextSelect() {
+  const sel = window.getSelection();
+  if (!sel || sel.isCollapsed || sel.toString().trim().length < 8) {
+    hideHlMenu();
+    return;
+  }
+  const range = sel.getRangeAt(0);
+  const rect = range.getBoundingClientRect();
+  showHlMenu(rect.left + rect.width/2, rect.bottom + 6, sel.toString().trim());
+}
+
+function showHlMenu(x, y, text) {
+  const m = document.getElementById("hl-menu");
+  m.classList.add("show");
+  const left = Math.max(8, Math.min(x - 105, window.innerWidth - 224));
+  m.style.left = left + "px";
+  m.style.top = y + "px";
+  m._text = text;
+}
+
+function hideHlMenu() {
+  document.getElementById("hl-menu").classList.remove("show");
+}
+
+function renderWorkspace(p) {
+  renderHighlightsTab(p);
+  renderSummaryTab(p);
+
+  document.querySelectorAll(".ws-tab").forEach(tab => {
+    tab.addEventListener("click", () => {
+      document.querySelectorAll(".ws-tab").forEach(t => t.classList.remove("active"));
+      tab.classList.add("active");
+      S.activeWsTab = tab.dataset.tab;
+      document.querySelectorAll(".ws-pane").forEach(pn => {
+        pn.style.display = pn.dataset.tab === tab.dataset.tab ? "block" : "none";
+      });
+    });
+  });
+}
+
+function renderHighlightsTab(p) {
+  const pane = document.getElementById("pane-highlights");
+  if (!p.highlights || !p.highlights.length) {
+    pane.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>No highlights yet.<br><span style="font-size:11px;margin-top:2px">Select text in the paper.</span></div>`;
+    return;
+  }
+  pane.innerHTML = p.highlights.map(h => `
+    <div class="hl-item">
+      <div class="hl-type-row"><div class="hl-dot ${h.type}"></div><span class="hl-type-label ${h.type}">${h.type.toUpperCase()}</span></div>
+      <div class="hl-text">"${esc(h.text)}"</div>
+      ${h.note ? `<div class="hl-note">📝 ${esc(h.note)}</div>` : ""}
+    </div>`).join("");
+}
+
+function renderSummaryTab(p) {
+  const pane = document.getElementById("pane-summary");
+  if (p.summary4) {
+    pane.innerHTML = `
+      <div class="s4-card">
+        <div class="s4-header">4-QUESTION SUMMARY</div>
+        <div class="s4-item"><div class="s4-label">Core Claim</div><div class="s4-text">${esc(p.summary4.claim)}</div></div>
+        <div class="s4-item"><div class="s4-label">Method</div><div class="s4-text">${esc(p.summary4.method)}</div></div>
+        <div class="s4-item"><div class="s4-label">Dataset / Benchmark</div><div class="s4-text">${esc(p.summary4.dataset)}</div></div>
+        <div class="s4-item"><div class="s4-label">Limitation</div><div class="s4-text">${esc(p.summary4.limitation)}</div></div>
+      </div>
+      <button class="btn btn-ghost" style="width:100%" id="btn-edit-s4">Edit Summary</button>`;
+    document.getElementById("btn-edit-s4").addEventListener("click", () => openModal(p));
+  } else {
+    pane.innerHTML = `
+      <div style="text-align:center;padding:24px 16px">
+        <div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;line-height:1.5">
+          Capture this paper in 90 seconds.<br>You'll thank yourself in 3 weeks.
+        </div>
+        <button class="btn btn-primary" style="width:100%;justify-content:center" id="btn-fill-s4">Fill 4-Question Summary</button>
+      </div>`;
+    document.getElementById("btn-fill-s4").addEventListener("click", () => openModal(p));
+  }
+}
+
+function renderContextPanel(p) {
+  const novPct = Math.round(p.noveltyScore * 100);
+  const novDesc = novPct > 70 ? "High novelty — deep read recommended" : novPct > 40 ? "Moderate novelty — skim then decide" : "Low novelty — likely familiar territory";
+  document.getElementById("nv-val").textContent = novPct + "%";
+  document.getElementById("nv-lbl").textContent = novDesc;
+  document.getElementById("nv-fill").style.width = novPct + "%";
+
+  // Cited in library
+  const cited = document.getElementById("ctx-cited");
+  const citedPapers = (p.citations||[]).map(getP).filter(Boolean);
+  if (!citedPapers.length) {
+    cited.innerHTML = `<div style="font-size:12px;color:var(--text-tertiary);padding:8px 0">No citations in your library yet.</div>`;
+  } else {
+    cited.innerHTML = citedPapers.map(cp => `
+      <div class="ctx-paper-item" data-pid="${cp.id}">
+        <div class="ctx-paper-icon ${cp.status}">${cp.status==="read"?"✓":"○"}</div>
+        <div><div class="ctx-paper-title">${esc(shortTitle(cp.title))}</div><div class="ctx-paper-year">${cp.year} · ${esc(cp.venue)}</div></div>
+      </div>`).join("");
+    cited.querySelectorAll("[data-pid]").forEach(el => {
+      el.addEventListener("click", () => { const pp = getP(el.dataset.pid); if(pp) openReader(pp); });
+    });
+  }
+
+  // Similar unread
+  const sim = document.getElementById("ctx-similar");
+  const simPapers = (p.similarTo||[]).map(getP).filter(pp => pp && pp.status==="unread").slice(0,3);
+  if (!simPapers.length) {
+    sim.innerHTML = `<div style="font-size:12px;color:var(--text-tertiary);padding:8px 0">No similar unread papers.</div>`;
+  } else {
+    sim.innerHTML = simPapers.map(sp => `
+      <div class="ctx-paper-item" data-pid="${sp.id}">
+        <div class="ctx-paper-icon unread">→</div>
+        <div><div class="ctx-paper-title">${esc(shortTitle(sp.title))}</div><div class="ctx-paper-year">${sp.year} · ${esc(sp.venue)}</div></div>
+      </div>`).join("");
+    sim.querySelectorAll("[data-pid]").forEach(el => {
+      el.addEventListener("click", () => { const pp = getP(el.dataset.pid); if(pp) openReader(pp); });
+    });
+  }
+
+  // Labmates
+  const lab = document.getElementById("ctx-labmates");
+  if (p.labmateReads && p.labmateReads.length) {
+    lab.innerHTML = p.labmateReads.map(ini => {
+      const lm = RESEARCHER.labmates.find(l => l.initials===ini);
+      return lm ? `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border-subtle)">
+        <div style="width:24px;height:24px;border-radius:50%;background:${lm.color};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#090C11">${ini}</div>
+        <span style="font-size:12px;color:var(--text-secondary)">${esc(lm.name)}</span>
+        <span class="chip chip-green" style="margin-left:auto">Read</span>
+      </div>` : "";
+    }).join("");
+  } else {
+    lab.innerHTML = `<div style="font-size:12px;color:var(--text-tertiary)">No labmates have read this yet.</div>`;
+  }
+}
+
+function updateSpeed() {
+  const elapsed = Math.max(0.1, (Date.now() - S.readingStart)/60000);
+  const speed = (1.8).toFixed(1);
+  const remaining = Math.max(0, Math.round(12 - elapsed));
+  const sv = document.getElementById("speed-val");
+  const sr = document.getElementById("speed-rem");
+  if(sv) sv.textContent = `${speed} pages/min`;
+  if(sr) sr.textContent = `~${remaining} min remaining`;
+}
+
+// ═══════════════════════════════════════════════════════
+// MODAL — 4-Question Summary
+// ═══════════════════════════════════════════════════════
+function openModal(paper) {
+  const ov = document.getElementById("modal-overlay");
+  ov.classList.add("open");
+  document.getElementById("modal-paper-name").textContent = shortTitle(paper.title, 60) + "…";
+  const q = paper.summary4 || {};
+  document.getElementById("mq-claim").value = q.claim||"";
+  document.getElementById("mq-method").value = q.method||"";
+  document.getElementById("mq-dataset").value = q.dataset||"";
+  document.getElementById("mq-limitation").value = q.limitation||"";
+  document.getElementById("modal-save").onclick = () => {
+    paper.summary4 = {
+      claim: document.getElementById("mq-claim").value,
+      method: document.getElementById("mq-method").value,
+      dataset: document.getElementById("mq-dataset").value,
+      limitation: document.getElementById("mq-limitation").value,
+    };
+    ov.classList.remove("open");
+    renderSummaryTab(paper);
+    toast("Summary saved. ✓");
+  };
+  document.getElementById("modal-cancel").onclick = () => ov.classList.remove("open");
+  ov.addEventListener("click", e => { if(e.target===ov) ov.classList.remove("open"); });
+}
+
+// ═══════════════════════════════════════════════════════
+// SCREEN 3 — KNOWLEDGE GRAPH
+// ═══════════════════════════════════════════════════════
+function initGraph() {
+  const canvas = document.getElementById("graph-canvas");
+  const wrap = document.getElementById("graph-wrap");
+  canvas.width = wrap.offsetWidth;
+  canvas.height = wrap.offsetHeight;
+
+  if (!S.graph) {
+    S.graph = new GraphEngine(canvas, PAPERS);
+    S.graph.fit();
+  } else {
+    canvas.width = wrap.offsetWidth;
+    canvas.height = wrap.offsetHeight;
+    S.graph.canvas = canvas;
+    S.graph.ctx = canvas.getContext("2d");
+    S.graph.render();
+  }
+
+  document.getElementById("g-zoom-in").onclick = () => S.graph.zoom(1.2);
+  document.getElementById("g-zoom-out").onclick = () => S.graph.zoom(0.83);
+  document.getElementById("g-fit").onclick = () => S.graph.fit();
+  document.getElementById("btn-toggle-semantic").onclick = () => {
+    S.showSemantic = !S.showSemantic;
+    S.graph.render();
+    toast(S.showSemantic ? "Semantic edges shown" : "Semantic edges hidden");
+  };
+  document.getElementById("btn-toggle-citation").onclick = () => {
+    S.showCitation = !S.showCitation;
+    S.graph.render();
+    toast(S.showCitation ? "Citation edges shown" : "Citation edges hidden");
+  };
+
+  const slider = document.getElementById("time-slider");
+  const yearEl = document.getElementById("time-year");
+  slider.addEventListener("input", () => {
+    const y = parseInt(slider.value);
+    yearEl.textContent = y;
+    S.graph.yearFilter = y;
+    S.graph.render();
+  });
+}
+
+class GraphEngine {
+  constructor(canvas, papers) {
+    this.canvas = canvas;
+    this.ctx = canvas.getContext("2d");
+    this.papers = papers;
+    this.scale = 1;
+    this.ox = 0; this.oy = 0;
+    this.yearFilter = 2025;
+    this.hoverId = null;
+    this.dragging = null;
+    this.panning = null;
+    this.positions = {};
+    this.initPositions();
+    this.bindEvents();
+    this.render();
+  }
+
+  initPositions() {
+    const w = this.canvas.width, h = this.canvas.height;
+    this.papers.forEach(p => {
+      this.positions[p.id] = {
+        x: p.gx / 800 * (w * 0.7) + w * 0.1,
+        y: p.gy / 600 * (h * 0.7) + h * 0.1,
+      };
+    });
+  }
+
+  visible() { return this.papers.filter(p => p.year <= this.yearFilter); }
+
+  nodeR(p) {
+    const citedByCount = this.papers.filter(pp => (pp.citations||[]).includes(p.id)).length;
+    return Math.max(14, Math.min(28, 14 + citedByCount * 5));
+  }
+
+  nodeColor(p) {
+    if (p.status==="read" && p.highlights && p.highlights.length) return "#4A90D9";
+    if (p.status==="read") return "#4CAF8A";
+    return "#3A4A5C";
+  }
+
+  toWorld(sx, sy) {
+    return { x: (sx - this.ox)/this.scale, y: (sy - this.oy)/this.scale };
+  }
+
+  hitTest(sx, sy) {
+    const w = this.toWorld(sx, sy);
+    for (let i = this.visible().length-1; i >= 0; i--) {
+      const p = this.visible()[i];
+      const pos = this.positions[p.id];
+      if (!pos) continue;
+      const r = this.nodeR(p);
+      if ((w.x-pos.x)**2 + (w.y-pos.y)**2 <= r*r) return p;
+    }
+    return null;
+  }
+
+  bindEvents() {
+    const c = this.canvas;
+    c.addEventListener("mousedown", e => {
+      const r = c.getBoundingClientRect();
+      const sx = e.clientX-r.left, sy = e.clientY-r.top;
+      const p = this.hitTest(sx, sy);
+      if (p) { this.dragging = {paper:p, sx, sy, ox:this.positions[p.id].x, oy:this.positions[p.id].y}; c.style.cursor="grabbing"; }
+      else { this.panning = {sx:e.clientX-this.ox, sy:e.clientY-this.oy}; c.style.cursor="grabbing"; }
+    });
+    c.addEventListener("mousemove", e => {
+      const r = c.getBoundingClientRect();
+      const sx = e.clientX-r.left, sy = e.clientY-r.top;
+      if (this.dragging) {
+        const dx = sx - this.dragging.sx, dy = sy - this.dragging.sy;
+        this.positions[this.dragging.paper.id] = {x: this.dragging.ox + dx/this.scale, y: this.dragging.oy + dy/this.scale};
+        this.render(); return;
+      }
+      if (this.panning) {
+        this.ox = e.clientX - this.panning.sx;
+        this.oy = e.clientY - this.panning.sy;
+        this.render(); return;
+      }
+      const p = this.hitTest(sx, sy);
+      const newId = p ? p.id : null;
+      if (newId !== this.hoverId) {
+        this.hoverId = newId;
+        c.style.cursor = p ? "pointer" : "default";
+        this.render();
+        this.updateTooltip(p, e.clientX, e.clientY);
+      } else if (p) {
+        this.updateTooltip(p, e.clientX, e.clientY);
+      }
+    });
+    c.addEventListener("mouseup", () => { this.dragging = null; this.panning = null; c.style.cursor = this.hoverId ? "pointer" : "default"; });
+    c.addEventListener("mouseleave", () => {
+      this.dragging = null; this.panning = null; this.hoverId = null;
+      this.render(); this.hideTooltip();
+    });
+    c.addEventListener("wheel", e => {
+      e.preventDefault();
+      const r = c.getBoundingClientRect();
+      const mx = e.clientX-r.left, my = e.clientY-r.top;
+      const d = e.deltaY > 0 ? 0.88 : 1.14;
+      const ns = Math.max(0.25, Math.min(4, this.scale*d));
+      this.ox = mx - (mx-this.ox)*(ns/this.scale);
+      this.oy = my - (my-this.oy)*(ns/this.scale);
+      this.scale = ns;
+      this.render();
+    }, {passive:false});
+    c.addEventListener("click", e => {
+      const r = c.getBoundingClientRect();
+      const p = this.hitTest(e.clientX-r.left, e.clientY-r.top);
+      if (p) this.openFlyout(p);
+    });
+  }
+
+  render() {
+    const {ctx,canvas,scale,ox,oy} = this;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Grid
+    ctx.strokeStyle = "rgba(255,255,255,0.025)";
+    ctx.lineWidth = 1;
+    const gs = 50*scale;
+    const startX = ox % gs, startY = oy % gs;
+    for (let x = startX; x < canvas.width; x += gs) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,canvas.height); ctx.stroke(); }
+    for (let y = startY; y < canvas.height; y += gs) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(canvas.width,y); ctx.stroke(); }
+
+    ctx.save();
+    ctx.translate(ox, oy);
+    ctx.scale(scale, scale);
+
+    const vis = this.visible();
+
+    // Edges
+    if (S.showCitation) {
+      vis.forEach(p => {
+        (p.citations||[]).forEach(tid => {
+          const tp = vis.find(pp => pp.id === tid);
+          if (!tp) return;
+          const fp = this.positions[p.id], tp2 = this.positions[tp.id];
+          if (!fp || !tp2) return;
+          ctx.save();
+          ctx.strokeStyle = "rgba(74,144,217,0.18)";
+          ctx.lineWidth = 1.5;
+          ctx.setLineDash([]);
+          ctx.beginPath();
+          const cx = (fp.x+tp2.x)/2, cy = (fp.y+tp2.y)/2 - 25;
+          ctx.moveTo(fp.x, fp.y);
+          ctx.quadraticCurveTo(cx, cy, tp2.x, tp2.y);
+          ctx.stroke();
+          ctx.restore();
+        });
+      });
+    }
+
+    if (S.showSemantic) {
+      const drawn = new Set();
+      vis.forEach(p => {
+        (p.similarTo||[]).forEach(tid => {
+          const key = [p.id,tid].sort().join("-");
+          if (drawn.has(key)) return;
+          drawn.add(key);
+          if ((p.citations||[]).includes(tid)) return;
+          const tp = vis.find(pp => pp.id === tid);
+          if (!tp) return;
+          const fp = this.positions[p.id], tp2 = this.positions[tp.id];
+          if (!fp || !tp2) return;
+          ctx.save();
+          ctx.strokeStyle = "rgba(124,106,247,0.12)";
+          ctx.lineWidth = 1;
+          ctx.setLineDash([4,6]);
+          ctx.beginPath();
+          ctx.moveTo(fp.x, fp.y);
+          ctx.lineTo(tp2.x, tp2.y);
+          ctx.stroke();
+          ctx.restore();
+        });
+      });
+    }
+
+    // Nodes
+    vis.forEach(p => {
+      const pos = this.positions[p.id];
+      if (!pos) return;
+      const r = this.nodeR(p);
+      const color = this.nodeColor(p);
+      const isHov = this.hoverId === p.id;
+
+      if (isHov) { ctx.shadowColor = color; ctx.shadowBlur = 20; }
+
+      const grad = ctx.createRadialGradient(pos.x-r*0.3, pos.y-r*0.3, 0, pos.x, pos.y, r);
+      grad.addColorStop(0, color+"CC");
+      grad.addColorStop(1, color+"55");
+      ctx.beginPath();
+      ctx.arc(pos.x, pos.y, r, 0, Math.PI*2);
+      ctx.fillStyle = grad;
+      ctx.fill();
+      ctx.strokeStyle = isHov ? color : "rgba(255,255,255,0.1)";
+      ctx.lineWidth = isHov ? 2 : 1;
+      ctx.setLineDash([]);
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      // Unread dot
+      if (p.status === "unread") {
+        ctx.beginPath();
+        ctx.arc(pos.x+r*0.65, pos.y-r*0.65, 4, 0, Math.PI*2);
+        ctx.fillStyle = "#4A90D9";
+        ctx.fill();
+      }
+
+      // Year label
+      ctx.font = `500 ${Math.max(9,Math.min(11,r*0.55))}px JetBrains Mono, monospace`;
+      ctx.fillStyle = "rgba(255,255,255,0.75)";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(p.year, pos.x, pos.y);
+
+      // Title below
+      const short = p.title.length > 20 ? p.title.substring(0,20)+"…" : p.title;
+      ctx.font = "400 10px Inter, sans-serif";
+      ctx.fillStyle = isHov ? "rgba(232,237,243,0.95)" : "rgba(138,151,168,0.75)";
+      ctx.textBaseline = "top";
+      ctx.fillText(short, pos.x, pos.y+r+5);
+    });
+
+    ctx.restore();
+  }
+
+  zoom(factor) {
+    const cx = this.canvas.width/2, cy = this.canvas.height/2;
+    const ns = Math.max(0.25, Math.min(4, this.scale*factor));
+    this.ox = cx - (cx-this.ox)*(ns/this.scale);
+    this.oy = cy - (cy-this.oy)*(ns/this.scale);
+    this.scale = ns;
+    this.render();
+  }
+
+  fit() {
+    const vis = this.visible();
+    if (!vis.length) return;
+    let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
+    vis.forEach(p => {
+      const pos = this.positions[p.id];
+      if (!pos) return;
+      minX=Math.min(minX,pos.x); minY=Math.min(minY,pos.y);
+      maxX=Math.max(maxX,pos.x); maxY=Math.max(maxY,pos.y);
+    });
+    const pad=80, cw=this.canvas.width, ch=this.canvas.height;
+    const scx = (cw-pad*2)/(maxX-minX||1);
+    const scy = (ch-pad*2)/(maxY-minY||1);
+    this.scale = Math.min(scx,scy,1.5);
+    this.ox = pad - minX*this.scale + (cw - (maxX-minX)*this.scale - pad*2)/2;
+    this.oy = pad - minY*this.scale + (ch - (maxY-minY)*this.scale - pad*2)/2;
+    this.render();
+  }
+
+  updateTooltip(p, cx, cy) {
+    const tt = document.getElementById("graph-tooltip");
+    if (!p) { this.hideTooltip(); return; }
+    tt.classList.add("show");
+    tt.style.left = (cx+14)+"px";
+    tt.style.top = (cy-8)+"px";
+    const statColor = p.status==="read" ? "var(--green)" : "var(--accent)";
+    const statLabel = p.status==="read" ? "✓ Read" : "● Unread";
+    tt.innerHTML = `
+      <div class="gt-title">${esc(p.title)}</div>
+      <div class="gt-meta">${esc(p.authors[0])} et al. · ${p.year}</div>
+      <div class="gt-meta" style="margin-top:4px;color:${statColor}">${statLabel}</div>`;
+  }
+
+  hideTooltip() {
+    document.getElementById("graph-tooltip").classList.remove("show");
+  }
+
+  openFlyout(paper) {
+    const flyout = document.getElementById("graph-flyout");
+    flyout.classList.add("open");
+    const statColor = paper.status==="read" ? "var(--green)" : "var(--accent)";
+    const statLabel = paper.status==="read" ? "✓ Read &amp; annotated" : "● Unread";
+    flyout.innerHTML = `
+      <button class="flyout-close" id="flyout-close">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor"><path d="M12 4L4 12M4 4l8 8" stroke-linecap="round"/></svg>
+      </button>
+      <div style="margin-top:8px">
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
+          <span class="chip chip-default">${paper.year}</span>
+          <span style="font-size:11px;color:${statColor};font-weight:500">${statLabel}</span>
+        </div>
+        <h2 style="font-size:15px;font-weight:600;color:var(--text-primary);line-height:1.4;margin-bottom:8px">${esc(paper.title)}</h2>
+        <div style="font-size:12px;color:var(--accent);margin-bottom:4px">${esc(paper.authors.join(", "))}</div>
+        <div style="font-size:11px;color:var(--text-tertiary);font-family:var(--font-mono);margin-bottom:16px">${esc(paper.venue)}</div>
+        <div style="font-size:12px;color:var(--text-secondary);line-height:1.65;margin-bottom:14px">${esc(paper.abstract.substring(0,230))}…</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:16px">
+          ${paper.tags.map(t=>`<span class="chip chip-default">${esc(t)}</span>`).join("")}
+        </div>
+        ${paper.highlights && paper.highlights.length ? `
+          <div style="margin-bottom:16px">
+            <div class="ctx-title">YOUR HIGHLIGHTS</div>
+            ${paper.highlights.slice(0,2).map(h=>`
+              <div style="padding:8px;background:var(--bg-overlay);border-radius:var(--r-sm);margin-bottom:6px;font-size:12px;color:var(--text-secondary);border-left:2px solid ${h.type==='result'?'var(--green)':h.type==='method'?'var(--purple)':'var(--accent)'}">"${esc(h.text)}"</div>
+            `).join("")}
+          </div>` : ""}
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-primary" id="flyout-open" style="flex:1;justify-content:center">Open in Reader</button>
+          <a href="https://arxiv.org/abs/${paper.arxivId}" target="_blank" class="btn btn-ghost">arXiv ↗</a>
+        </div>
+      </div>`;
+    document.getElementById("flyout-close").onclick = () => flyout.classList.remove("open");
+    document.getElementById("flyout-open").onclick = () => { flyout.classList.remove("open"); openReader(paper); };
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// SCREEN 4 — LIT REVIEW
+// ═══════════════════════════════════════════════════════
+function renderLitReview() {
+  renderClusters();
+  renderDraft();
+  renderCoverage();
+}
+
+function renderClusters() {
+  const container = document.getElementById("lit-clusters");
+  container.innerHTML = LIT_CLUSTERS.map(c => {
+    const papers = c.papers.map(getP).filter(Boolean);
+    const active = c.id === S.selectedCluster;
+    return `
+      <div class="cluster-card${active?" selected":""}" data-cid="${c.id}">
+        <div class="cluster-head">
+          <div class="cluster-dot" style="background:${c.color}"></div>
+          <div class="cluster-name">${esc(c.name)}</div>
+          <div class="cluster-count">${papers.length}</div>
+        </div>
+        <div class="cluster-papers-list">
+          ${papers.map(p=>`
+            <div class="cluster-paper-row" data-pid="${p.id}">
+              <div class="cluster-paper-dot" style="background:${c.color}"></div>
+              <span>${esc(shortTitle(p.title,40))}</span>
+            </div>`).join("")}
+        </div>
+      </div>`;
+  }).join("");
+
+  container.querySelectorAll(".cluster-card").forEach(el => {
+    el.addEventListener("click", () => {
+      S.selectedCluster = el.dataset.cid;
+      renderClusters();
+      document.querySelectorAll(".draft-para").forEach(dp => {
+        dp.classList.toggle("active", dp.dataset.cid === el.dataset.cid);
+      });
+      document.querySelector(`.draft-para[data-cid="${el.dataset.cid}"]`)?.scrollIntoView({behavior:"smooth",block:"nearest"});
+    });
+  });
+  container.querySelectorAll(".cluster-paper-row").forEach(el => {
+    el.addEventListener("click", e => { e.stopPropagation(); const p=getP(el.dataset.pid); if(p) openReader(p); });
+  });
+}
+
+function renderDraft() {
+  const dc = document.getElementById("draft-content");
+  dc.innerHTML = LIT_CLUSTERS.map(c => {
+    const active = c.id === S.selectedCluster;
+    return `
+      <div class="draft-para${active?" active":""}" data-cid="${c.id}">
+        <div class="draft-para-label">
+          <div class="draft-para-dot" style="background:${c.color}"></div>
+          <span style="color:${c.color};font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase">${esc(c.name)}</span>
+        </div>
+        <div class="draft-text" contenteditable="true" id="dt-${c.id}" spellcheck="true">${esc(S.draftContent[c.id]||"")}</div>
+      </div>`;
+  }).join("");
+
+  dc.querySelectorAll(".draft-text").forEach(el => {
+    el.addEventListener("input", () => {
+      S.draftContent[el.id.replace("dt-","")] = el.textContent;
+      updateWordCount();
+      renderCoverage();
+    });
+  });
+  updateWordCount();
+}
+
+function updateWordCount() {
+  const all = Object.values(S.draftContent).join(" ");
+  const words = all.trim().split(/\s+/).filter(Boolean).length;
+  const citeMatches = (all.match(/\d{4}\)/g)||[]).length;
+  const wc = document.getElementById("word-count");
+  const cc = document.getElementById("cite-count");
+  if(wc) wc.textContent = words;
+  if(cc) cc.textContent = citeMatches + " est.";
+}
+
+function renderCoverage() {
+  const cs = document.getElementById("coverage-sidebar");
+  const allText = Object.values(S.draftContent).join(" ").toLowerCase();
+  const allPapers = LIT_CLUSTERS.flatMap(c => c.papers).map(getP).filter(Boolean);
+  const usedCount = allPapers.filter(p => {
+    const lastName = p.authors[0].split(" ").pop().toLowerCase();
+    return allText.includes(lastName) || allText.includes(p.title.substring(0,8).toLowerCase());
+  }).length;
+
+  cs.innerHTML = `
+    <div class="sidebar-section-title">COVERAGE MAP</div>
+    <div style="font-size:12px;color:var(--text-secondary);margin-bottom:12px">
+      <span style="color:var(--text-primary);font-weight:600;font-family:var(--font-mono)">${usedCount}/${allPapers.length}</span> papers cited
+    </div>
+    ${allPapers.map(p => {
+      const lastName = p.authors[0].split(" ").pop().toLowerCase();
+      const used = allText.includes(lastName) || allText.includes(p.title.substring(0,8).toLowerCase());
+      return `<div class="cov-item">
+        <div class="cov-dot ${used?"used":"unused"}"></div>
+        <div class="cov-name">${esc(p.authors[0].split(" ").pop())} et al. ${p.year}</div>
+      </div>`;
+    }).join("")}
+    <div style="margin-top:16px">
+      <div class="sidebar-section-title">EXPORT</div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">
+        <button class="btn btn-ghost" style="justify-content:center" id="cs-bibtex">Export BibTeX</button>
+        <button class="btn btn-ghost" style="justify-content:center" id="cs-latex">Export LaTeX</button>
+      </div>
+    </div>`;
+
+  document.getElementById("cs-bibtex")?.addEventListener("click", exportBibTeX);
+  document.getElementById("cs-latex")?.addEventListener("click", exportLaTeX);
+}
+
+function exportBibTeX() {
+  const bib = PAPERS.map(p => {
+    const key = p.authors[0].split(" ").pop().toLowerCase() + p.year;
+    return `@article{${key},\n  title={${p.title}},\n  author={${p.authors.join(" and ")}},\n  year={${p.year}},\n  journal={${p.venue}}\n}`;
+  }).join("\n\n");
+  download("aether_references.bib", bib); toast("BibTeX exported ✓");
+}
+
+function exportLaTeX() {
+  const tex = LIT_CLUSTERS.map(c => `\\subsection{${c.name}}\n${S.draftContent[c.id]||""}`).join("\n\n");
+  download("related_work.tex", tex); toast("LaTeX exported ✓");
+}
+
+function download(name, content) {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([content],{type:"text/plain"}));
+  a.download = name; a.click();
+}
+
+// ═══════════════════════════════════════════════════════
+// SCREEN 5 — MONITOR & ALERTS
+// ═══════════════════════════════════════════════════════
+function renderMonitor() {
+  renderMonitorList();
+  renderAlerts();
+  renderAbstractPanel();
+}
+
+function renderMonitorList() {
+  const container = document.getElementById("monitor-list");
+  container.innerHTML = MONITORS.map((m,i) => `
+    <div class="monitor-item${i===0?" active":""}" data-mid="${m.id}">
+      <div class="monitor-item-head">
+        <div class="monitor-name">${esc(m.name)}</div>
+        <span class="monitor-type-chip ${m.type}">${m.type}</span>
+      </div>
+      ${m.alertCount>0?`<div style="font-size:12px;color:var(--red);font-weight:500;margin-top:3px">${m.alertCount} new alert${m.alertCount>1?"s":""}</div>`:""}
+      <div class="monitor-stats">
+        ${m.weeklyVolume!==null?`<span class="monitor-stat">${m.weeklyVolume}/wk</span>`:""}
+        <span class="${m.trend==="rising"?"trend-up":"trend-stable"}">${m.trend==="rising"?"↑ Rising":"→ Stable"}</span>
+        ${m.alertCount>0?`<span class="alert-cnt">${m.alertCount}</span>`:""}
+      </div>
+      <div class="sparkline">
+        ${m.history.map(v=>{
+          const col = v>70?"#E05C5C":v>40?"#D4A843":"#4CAF8A";
+          return `<div class="spark-bar" style="height:${Math.round(v/100*32)}px;background:${col};opacity:0.8"></div>`;
+        }).join("")}
+      </div>
+    </div>`).join("") + `<button class="btn btn-ghost" style="width:100%;justify-content:center;margin-top:8px" id="btn-nm2">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>New Monitor
+    </button>`;
+
+  document.getElementById("btn-nm2")?.addEventListener("click", () => toast("Monitor configuration — coming soon."));
+}
+
+function renderAlerts() {
+  const feed = document.getElementById("alerts-feed");
+  const unread = ALERTS.filter(a=>!a.read).length;
+  feed.innerHTML = `
+    <div style="margin-bottom:20px">
+      <div class="topbar-title" style="font-size:16px;margin-bottom:4px">Alerts</div>
+      <div style="font-size:12px;color:var(--text-tertiary)">${unread} unread · ${ALERTS.length} total</div>
+    </div>
+    ${ALERTS.map(a=>`
+      <div class="alert-card ${a.severity}${a.read?"":" unread"}">
+        <div class="alert-head">
+          <span class="alert-badge ${a.severity}">${esc(a.label)}</span>
+          <div class="alert-content">
+            <div class="alert-title">${esc(a.title)}</div>
+            <div class="alert-paper">${esc(a.paper)}</div>
+            <div class="alert-authors">${esc(a.authors.join(", "))} · arXiv:${a.arxivId}</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            <div class="alert-ts">${a.detectedAt}</div>
+            ${!a.read?'<div class="unread-dot"></div>':""}
+          </div>
+        </div>
+        <div class="alert-body">
+          ${esc(a.reason)}
+          ${a.similarity?`<div class="sim-bar" style="margin-top:10px">
+            <span class="sim-label">Similarity</span>
+            <div class="sim-track"><div class="sim-fill ${a.similarity>70?"high":"med"}" style="width:${a.similarity}%"></div></div>
+            <span class="sim-val ${a.similarity>70?"high":"med"}">${a.similarity}%</span>
+          </div>`:""}
+          <div style="display:flex;gap:8px;margin-top:12px">
+            <button class="btn btn-primary" style="font-size:11px;padding:5px 10px">Read Paper</button>
+            <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px">Dismiss</button>
+            ${!a.read?'<button class="btn btn-ghost" style="font-size:11px;padding:5px 10px">Mark Read</button>':""}
+          </div>
+        </div>
+      </div>`).join("")}`;
+}
+
+function renderAbstractPanel() {
+  const panel = document.getElementById("abstract-panel");
+  panel.innerHTML = `
+    <div class="sidebar-section-title" style="margin-bottom:12px">ABSTRACT SIMILARITY MONITOR</div>
+    <div style="font-size:12px;color:var(--text-secondary);margin-bottom:12px;line-height:1.55">
+      Paste your draft abstract. It never leaves your browser. Aether scores every new arXiv paper against it daily.
+    </div>
+    <textarea class="abstract-ta" id="abstract-ta" rows="5" placeholder="Paste your draft abstract here…">${esc(S.abstractText)}</textarea>
+    <div class="niche-meter">
+      <div style="font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:10px">NICHE SCORE</div>
+      <div style="display:flex;align-items:flex-end;gap:12px;margin-bottom:8px">
+        <div><div class="niche-score" id="niche-val" style="color:var(--red)">${S.nicheScore}%</div><div class="niche-lbl">max similarity this month</div></div>
+        <div style="flex:1;text-align:right;font-size:11px;color:var(--text-tertiary)">vs 24 papers</div>
+      </div>
+      <div class="niche-badge ${S.nicheScore>=80?"crowded":S.nicheScore>=50?"contested":"clear"}" id="niche-badge">
+        ${S.nicheScore>=80?"🔴 Crowded lane — review immediately":S.nicheScore>=50?"🟡 Contested territory — monitor closely":"🟢 Clear lane — you have room to work"}
+      </div>
+      <div style="margin-top:16px">
+        <div style="font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:8px">7-DAY HISTORY</div>
+        <div class="sparkline" style="height:48px">
+          ${[22,18,31,45,52,48,84].map(v=>{
+            const col = v>70?"#E05C5C":v>40?"#D4A843":"#4CAF8A";
+            return `<div class="spark-bar" style="height:${Math.round(v/100*44)}px;background:${col};opacity:0.8"></div>`;
+          }).join("")}
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-tertiary);margin-top:4px;font-family:var(--font-mono)">
+          <span>7d ago</span><span>Today</span>
+        </div>
+      </div>
+    </div>`;
+
+  document.getElementById("abstract-ta").addEventListener("input", e => {
+    S.abstractText = e.target.value;
+    const len = e.target.value.length;
+    const score = len > 80 ? Math.min(84, Math.max(10, Math.floor(20 + Math.random()*50))) : 0;
+    S.nicheScore = score;
+    const nv = document.getElementById("niche-val");
+    const nb = document.getElementById("niche-badge");
+    if (nv) nv.textContent = score + "%";
+    if (nv) nv.style.color = score>=80?"var(--red)":score>=50?"var(--yellow)":"var(--green)";
+    if (nb) {
+      nb.className = `niche-badge ${score>=80?"crowded":score>=50?"contested":"clear"}`;
+      nb.textContent = score>=80?"🔴 Crowded lane — review immediately":score>=50?"🟡 Contested territory — monitor closely":"🟢 Clear lane — you have room to work";
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// GLOBAL EVENT WIRING
+// ═══════════════════════════════════════════════════════
+function init() {
+  // Nav
+  document.querySelectorAll(".nav-item[data-screen]").forEach(el => {
+    el.addEventListener("click", () => navigateTo(el.dataset.screen));
+  });
+
+  // Back button
+  document.getElementById("btn-back").addEventListener("click", () => navigateTo("feed"));
+  document.getElementById("btn-done").addEventListener("click", () => openModal(S.activePaper));
+  document.getElementById("btn-save").addEventListener("click", () => toast("Saved to library. ✓"));
+
+  // Highlight menu actions
+  document.getElementById("hl-menu").querySelectorAll(".hl-menu-item").forEach(item => {
+    item.addEventListener("click", () => {
+      const action = item.dataset.action;
+      const text = document.getElementById("hl-menu")._text || "";
+      const msgs = {
+        explain: `Explaining: "${text.substring(0,40)}…"`,
+        contradict: "Finding papers that contradict this claim…",
+        litreview: "Added to lit review workspace. ✓",
+        baseline: "Tracked as a baseline comparison. ✓",
+      };
+      toast(msgs[action] || "Done.");
+      hideHlMenu();
+    });
+  });
+
+  // Close highlight menu on outside click
+  document.addEventListener("click", e => {
+    if (!e.target.closest("#hl-menu") && !e.target.closest(".body-text")) hideHlMenu();
+  });
+
+  // Keyboard shortcut: S = toggle all AI summaries
+  document.addEventListener("keydown", e => {
+    if (e.key === "s" || e.key === "S") {
+      if (S.screen !== "reader") return;
+      if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA" || e.target.contentEditable === "true") return;
+      document.querySelectorAll(".ai-summary").forEach(el => el.classList.toggle("hidden"));
+    }
+    if (e.key === "Escape") {
+      document.getElementById("modal-overlay").classList.remove("open");
+      document.getElementById("graph-flyout").classList.remove("open");
+      hideHlMenu();
+    }
+  });
+
+  // Lit review toolbar buttons
+  document.getElementById("btn-bibtex")?.addEventListener("click", exportBibTeX);
+  document.getElementById("btn-latex")?.addEventListener("click", exportLaTeX);
+  document.getElementById("btn-copy-draft")?.addEventListener("click", () => {
+    const all = LIT_CLUSTERS.map(c => S.draftContent[c.id]||"").join("\n\n");
+    navigator.clipboard?.writeText(all).then(() => toast("Draft copied to clipboard. ✓")).catch(() => toast("Copy failed — try manually."));
+  });
+  document.getElementById("btn-add-cluster")?.addEventListener("click", () => toast("Add cluster — coming soon."));
+
+  // Monitor buttons
+  document.getElementById("btn-mark-read")?.addEventListener("click", () => { ALERTS.forEach(a => a.read=true); renderAlerts(); toast("All alerts marked as read."); });
+  document.getElementById("btn-new-monitor")?.addEventListener("click", () => toast("Monitor configuration — coming soon."));
+
+  // Initial renders
+  renderFeed();
+  navigateTo("feed");
+}
+
+document.addEventListener("DOMContentLoaded", init);
+</script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+node_modules/
+.env
+settings.json
+papers_db.json
+temp_runs/
+scratch/

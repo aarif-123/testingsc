@@ -1,0 +1,2400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Aether — Research Assistant</title>
+<meta name="description" content="Smart research assistant — search arXiv, manage your library, chat with papers using AI."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<!-- highlight.js for Python syntax -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark-dimmed.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js" defer></script>
+<!-- marked.js for markdown rendering -->
+<script src="https://cdn.jsdelivr.net/npm/marked@9/marked.min.js" defer></script>
+<style>
+:root{
+  --bg:#0D1117;--bg-card:#161B22;--bg-input:#1C2230;--bg-hover:#1E2636;
+  --border:rgba(255,255,255,0.07);--border-med:rgba(255,255,255,0.12);--border-focus:#4A90E2;
+  --text:#E2E8F0;--muted:#8B97A9;--faint:#4A5568;
+  --blue:#4A90E2;--blue-bg:rgba(74,144,226,0.12);--blue-border:rgba(74,144,226,0.3);
+  --green:#4ADE80;--green-bg:rgba(74,222,128,0.1);
+  --yellow:#FBBF24;--yellow-bg:rgba(251,191,36,0.1);
+  --red:#F87171;--red-bg:rgba(248,113,113,0.1);
+  --purple:#A78BFA;--purple-bg:rgba(167,139,250,0.12);
+  --teal:#22D3EE;--teal-bg:rgba(34,211,238,0.1);
+  --sidebar:228px;--r:10px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100vh;overflow:hidden;font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:14px;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.12);border-radius:2px}
+a{color:var(--blue);text-decoration:none}a:hover{text-decoration:underline}
+code{font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(255,255,255,0.06);padding:1px 5px;border-radius:4px}
+pre code{background:none;padding:0;font-size:13px}
+
+/* ── Layout ── */
+#app{display:flex;height:100vh;overflow:hidden}
+#sidebar{width:var(--sidebar);background:var(--bg-card);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
+#main{flex:1;overflow:hidden;display:flex;flex-direction:column}
+
+/* ── Sidebar ── */
+.logo{padding:18px 16px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.logo-mark{width:30px;height:30px;background:var(--blue);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;flex-shrink:0}
+.logo-name{font-size:15px;font-weight:700;color:var(--text);line-height:1.2}
+.logo-tag{font-size:10px;color:var(--muted)}
+.nav{padding:12px 10px;flex:1;display:flex;flex-direction:column;gap:2px;overflow:auto}
+.nav-group{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--faint);padding:4px 8px;margin-top:6px;margin-bottom:2px}
+.nav-btn{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;cursor:pointer;color:var(--muted);font-size:13px;font-weight:500;transition:all 0.12s;border:none;background:transparent;width:100%;text-align:left;font-family:inherit}
+.nav-btn:hover{background:rgba(255,255,255,0.04);color:var(--text)}.nav-btn.active{background:var(--blue-bg);color:var(--blue)}
+.nav-btn svg{width:16px;height:16px;flex-shrink:0;stroke-width:1.8}
+.nav-badge{margin-left:auto;font-size:11px;font-weight:600;background:var(--blue-bg);color:var(--blue);padding:1px 7px;border-radius:100px;min-width:20px;text-align:center}
+.sidebar-footer{border-top:1px solid var(--border)}
+.stats-block{padding:12px 16px;display:flex;flex-direction:column;gap:7px}
+.stat-row{display:flex;justify-content:space-between}
+.stat-lbl{font-size:12px;color:var(--muted)}
+.stat-val{font-size:12px;font-weight:600;color:var(--text);font-variant-numeric:tabular-nums}
+.user-block{padding:12px 16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+.user-name{font-size:13px;font-weight:600;color:var(--text)}.user-role{font-size:11px;color:var(--muted)}
+.settings-btn{width:100%;display:flex;align-items:center;gap:10px;padding:10px 16px;border:none;background:transparent;color:var(--muted);font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:all 0.12s;border-top:1px solid var(--border)}
+.settings-btn:hover{background:rgba(255,255,255,0.04);color:var(--text)}
+.settings-btn svg{width:15px;height:15px;stroke-width:1.8}
+.settings-key-preview{margin-left:auto;font-size:10px;color:var(--green);font-family:'JetBrains Mono',monospace}
+
+/* ── Views ── */
+.view{display:none;flex:1;flex-direction:column;overflow:hidden}.view.active{display:flex}
+.page-header{padding:22px 28px 18px;border-bottom:1px solid var(--border);flex-shrink:0}
+.page-title{font-size:20px;font-weight:700;color:var(--text);letter-spacing:-0.3px;margin-bottom:3px}
+.page-sub{font-size:13px;color:var(--muted)}
+
+/* ── Buttons ── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--r);font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all 0.12s;font-family:inherit;white-space:nowrap;text-decoration:none}
+.btn-sm{padding:5px 11px;font-size:12px}.btn-xs{padding:3px 9px;font-size:11px}
+.btn-primary{background:var(--blue);color:#fff}.btn-primary:hover{background:#5A9FE8}
+.btn-ghost{background:transparent;color:var(--muted);border:1.5px solid var(--border-med)}.btn-ghost:hover{background:var(--bg-hover);color:var(--text);border-color:var(--border-focus)}
+.btn-danger{background:var(--red-bg);color:var(--red);border:1px solid rgba(248,113,113,0.2)}.btn-danger:hover{background:rgba(248,113,113,0.2)}
+.btn-ai{background:var(--purple-bg);color:var(--purple);border:1.5px solid rgba(167,139,250,0.25)}.btn-ai:hover{background:rgba(167,139,250,0.2);color:var(--purple)}
+.btn svg{width:14px;height:14px;stroke-width:1.8}
+
+/* ── Chips ── */
+.chip{display:inline-flex;align-items:center;padding:2px 8px;border-radius:100px;font-size:11px;font-weight:500;white-space:nowrap}
+.chip-blue{background:var(--blue-bg);color:var(--blue)}.chip-green{background:var(--green-bg);color:var(--green)}.chip-yellow{background:var(--yellow-bg);color:var(--yellow)}.chip-gray{background:var(--bg-input);color:var(--muted)}.chip-purple{background:var(--purple-bg);color:var(--purple)}
+.status-saved{background:var(--blue-bg);color:var(--blue)}.status-reading{background:var(--yellow-bg);color:var(--yellow)}.status-done{background:var(--green-bg);color:var(--green)}
+
+/* ══════ SEARCH VIEW ══════ */
+#view-search .page-header{padding-bottom:14px}
+.search-row{display:flex;gap:10px;margin-bottom:12px;max-width:700px}
+.search-box{position:relative;flex:1}
+.search-input{width:100%;background:var(--bg-input);border:1.5px solid var(--border-med);border-radius:var(--r);padding:12px 44px 12px 16px;color:var(--text);font-size:15px;outline:none;transition:all 0.15s;font-family:inherit}
+.search-input::placeholder{color:var(--faint)}.search-input:focus{border-color:var(--border-focus);background:#1A2035;box-shadow:0 0 0 3px rgba(74,144,226,0.1)}
+.search-icon{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--faint);display:flex;pointer-events:none}.search-icon svg{width:18px;height:18px}
+.search-clear{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--muted);background:none;border:none;cursor:pointer;display:none;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%}
+.search-clear:hover{background:var(--bg-hover);color:var(--text)}.search-clear svg{width:14px;height:14px}.search-clear.show{display:flex}
+.cat-filters{display:flex;gap:6px;flex-wrap:wrap;align-items:center;max-width:720px}
+.cat-pill{padding:5px 12px;border-radius:100px;font-size:12px;font-weight:500;border:1.5px solid var(--border);color:var(--muted);cursor:pointer;background:transparent;transition:all 0.12s;font-family:inherit}
+.cat-pill:hover{border-color:var(--blue);color:var(--blue)}.cat-pill.active{background:var(--blue-bg);border-color:var(--blue);color:var(--blue)}
+.filter-sep{width:1px;height:18px;background:var(--border-med)}
+.sort-sel{background:var(--bg-input);border:1.5px solid var(--border);color:var(--muted);font-size:12px;padding:5px 10px;border-radius:8px;outline:none;cursor:pointer;font-family:inherit}
+.search-body{flex:1;overflow-y:auto;padding:18px 28px 32px}
+.results-bar{display:flex;align-items:center;margin-bottom:14px;font-size:13px;color:var(--muted)}.results-count{color:var(--text);font-weight:600}
+.papers-list{display:flex;flex-direction:column;gap:10px}
+.paper-card{background:var(--bg-card);border:1.5px solid var(--border);border-radius:var(--r);padding:18px 20px;cursor:pointer;transition:all 0.15s}
+.paper-card:hover{border-color:var(--blue-border);box-shadow:0 4px 20px rgba(0,0,0,0.2);transform:translateY(-1px)}
+.pc-row1{display:flex;align-items:flex-start;gap:12px;margin-bottom:6px}
+.pc-title{font-size:14px;font-weight:600;color:var(--text);line-height:1.45;flex:1}
+.pc-actions{display:flex;gap:6px;flex-shrink:0}
+.pc-meta{font-size:12px;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pc-sep{color:var(--faint)}
+.pc-abstract{font-size:13px;color:var(--muted);line-height:1.65;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:11px}
+.pc-footer{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.pc-date{font-size:11px;color:var(--faint);margin-left:auto}
+.pc-saved-tag{font-size:11px;color:var(--blue);background:var(--blue-bg);padding:2px 8px;border-radius:100px;font-weight:500}
+.pagination{display:flex;align-items:center;gap:10px;justify-content:center;padding:24px 0 8px;font-size:13px;color:var(--muted)}
+.skeleton{background:linear-gradient(90deg,var(--bg-input) 25%,var(--bg-hover) 50%,var(--bg-input) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:6px;height:14px}
+@keyframes shimmer{from{background-position:200% 0}to{background-position:-200% 0}}
+
+/* ══════ LIBRARY VIEW ══════ */
+.lib-tabs{display:flex;padding:0 28px;border-bottom:1px solid var(--border);flex-shrink:0}
+.lib-tab{padding:12px 16px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;transition:all 0.12s;font-family:inherit;display:flex;align-items:center;gap:6px}
+.lib-tab:hover{color:var(--text)}.lib-tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+.lib-tab-count{font-size:11px;padding:1px 6px;border-radius:100px;font-weight:600;background:var(--bg-input);color:var(--muted)}
+.lib-tab.active .lib-tab-count{background:var(--blue-bg);color:var(--blue)}
+.lib-body{flex:1;overflow-y:auto;padding:18px 28px 32px}
+.lib-toolbar{display:flex;gap:10px;margin-bottom:16px;align-items:center;max-width:600px}
+.lib-search{flex:1;background:var(--bg-input);border:1.5px solid var(--border);border-radius:8px;padding:8px 14px;color:var(--text);font-size:13px;outline:none;font-family:inherit;transition:border-color 0.12s}
+.lib-search:focus{border-color:var(--border-focus)}.lib-search::placeholder{color:var(--faint)}
+.lib-card{background:var(--bg-card);border:1.5px solid var(--border);border-radius:var(--r);padding:15px 18px;display:flex;gap:16px;transition:all 0.15s;margin-bottom:8px}
+.lib-card:hover{border-color:var(--blue-border)}.lib-card-main{flex:1;min-width:0;cursor:pointer}.lib-card-side{flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.lib-card-title{font-size:14px;font-weight:600;color:var(--text);line-height:1.4;margin-bottom:4px}
+.lib-card-authors{font-size:12px;color:var(--muted);margin-bottom:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:480px}
+.lib-card-cats{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px}
+.lib-card-notes{font-size:12px;color:var(--faint);font-style:italic;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.lib-card-date{font-size:11px;color:var(--faint)}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:64px 20px;text-align:center}
+.empty-state svg{width:40px;height:40px;color:var(--faint);margin-bottom:14px}
+.empty-state h3{font-size:16px;font-weight:600;color:var(--text);margin-bottom:7px}
+.empty-state p{font-size:13px;color:var(--muted);max-width:300px;line-height:1.65;margin-bottom:18px}
+.loading-state{display:flex;align-items:center;justify-content:center;padding:60px 20px;gap:12px;color:var(--muted);font-size:14px}
+.spinner{width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.error-box{background:var(--red-bg);border:1px solid rgba(248,113,113,0.2);border-radius:var(--r);padding:14px 18px;margin:0 0 16px;font-size:13px;color:var(--red);display:flex;gap:10px;align-items:flex-start}
+.error-box svg{width:16px;height:16px;flex-shrink:0;margin-top:1px}
+
+/* ══════ READER VIEW ══════ */
+.reader-header{padding:12px 24px;border-bottom:1px solid var(--border);background:var(--bg-card);display:flex;align-items:center;gap:12px;flex-shrink:0}
+.reader-title-area{flex:1;min-width:0}
+.reader-paper-title{font-size:13px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:2px}
+.reader-paper-meta{font-size:11px;color:var(--muted)}
+.reader-body{flex:1;display:flex;overflow:hidden}
+.reader-main{flex:1;overflow-y:auto;padding:28px 32px}
+.reader-panel{width:340px;border-left:1px solid var(--border);background:var(--bg-card);flex-shrink:0;display:flex;flex-direction:column;overflow:hidden}
+
+/* Reader panel tabs */
+.rp-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
+.rp-tab{flex:1;padding:11px 8px;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;border:none;background:transparent;border-bottom:2px solid transparent;transition:all 0.12s;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:5px}
+.rp-tab:hover{color:var(--text);background:rgba(255,255,255,0.02)}.rp-tab.active{color:var(--blue);border-bottom-color:var(--blue);background:rgba(74,144,226,0.04)}
+.rp-tab.ai-tab.active{color:var(--purple);border-bottom-color:var(--purple);background:var(--purple-bg)}
+.rp-tab.code-tab.active{color:var(--teal);border-bottom-color:var(--teal);background:var(--teal-bg)}
+.rp-content{display:none;flex-direction:column;flex:1;overflow:hidden}.rp-content.active{display:flex}
+
+/* Notes tab */
+.notes-tab-body{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:16px}
+.panel-sec{display:flex;flex-direction:column;gap:7px}
+.panel-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--faint)}
+.panel-select{width:100%;background:var(--bg-input);border:1.5px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:13px;outline:none;font-family:inherit;cursor:pointer;transition:border-color 0.12s}
+.panel-select:focus{border-color:var(--border-focus)}
+.notes-ta{width:100%;background:var(--bg-input);border:1.5px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:13px;line-height:1.65;resize:none;outline:none;font-family:inherit;min-height:120px;transition:border-color 0.12s}
+.notes-ta:focus{border-color:var(--border-focus)}.notes-ta::placeholder{color:var(--faint)}
+.save-hint{font-size:11px;color:var(--green);height:14px}
+.tags-wrap{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.tag-chip{background:var(--bg-input);color:var(--muted);font-size:11px;padding:3px 9px;border-radius:100px;cursor:pointer;transition:all 0.12s;display:flex;align-items:center;gap:4px}
+.tag-chip:hover{background:var(--red-bg);color:var(--red)}.tag-chip svg{width:10px;height:10px}
+.tag-input{background:transparent;border:1px dashed var(--border-med);border-radius:100px;padding:3px 9px;color:var(--muted);font-size:11px;outline:none;font-family:inherit;width:70px;transition:all 0.12s}
+.tag-input:focus{border-color:var(--blue);color:var(--text);background:var(--bg-input);width:100px}
+.s4-card{background:var(--bg-input);border-radius:8px;overflow:hidden;border:1px solid var(--border)}
+.s4-head{padding:7px 12px;background:rgba(255,255,255,0.02);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--faint);border-bottom:1px solid var(--border)}
+.s4-item{padding:8px 12px;border-bottom:1px solid var(--border)}.s4-item:last-child{border-bottom:none}
+.s4-q{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.7px;color:var(--faint);margin-bottom:3px}.s4-a{font-size:12px;color:var(--muted);line-height:1.5}
+.related-item{padding:10px 12px;background:var(--bg-input);border-radius:8px;cursor:pointer;transition:all 0.12s;border:1px solid var(--border);margin-bottom:6px}
+.related-item:hover{border-color:var(--blue-border)}.related-title{font-size:12px;font-weight:500;color:var(--text);line-height:1.4;margin-bottom:2px}.related-meta{font-size:11px;color:var(--faint)}
+
+/* ══════ AI CHAT TAB ══════ */
+.chat-setup{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;gap:12px}
+.chat-setup-icon{width:48px;height:48px;border-radius:50%;background:var(--purple-bg);display:flex;align-items:center;justify-content:center;font-size:22px}
+.chat-setup h3{font-size:15px;font-weight:600;color:var(--text)}
+.chat-setup p{font-size:13px;color:var(--muted);line-height:1.6;max-width:240px}
+.chat-area{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.chat-quick{padding:10px 12px;border-bottom:1px solid var(--border);display:flex;flex-wrap:wrap;gap:6px;flex-shrink:0}
+.quick-pill{padding:5px 11px;border-radius:100px;font-size:11px;font-weight:500;border:1.5px solid var(--border-med);color:var(--muted);cursor:pointer;background:transparent;transition:all 0.12s;font-family:inherit;white-space:nowrap}
+.quick-pill:hover{border-color:var(--purple);color:var(--purple);background:var(--purple-bg)}
+.quick-pill.implement{border-color:rgba(34,211,238,0.25);color:var(--teal)}.quick-pill.implement:hover{background:var(--teal-bg)}
+.chat-msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px}
+.chat-msg{max-width:100%;border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.65;word-break:break-word}
+.chat-user{background:var(--blue-bg);color:var(--text);align-self:flex-end;border-bottom-right-radius:3px;max-width:90%}
+.chat-assistant{background:var(--bg-input);color:var(--muted);border-bottom-left-radius:3px;border:1px solid var(--border)}
+.chat-assistant h1,.chat-assistant h2,.chat-assistant h3{color:var(--text);font-size:13px;margin:8px 0 4px}
+.chat-assistant strong{color:var(--text)}.chat-assistant em{color:var(--yellow)}
+.chat-assistant ul,.chat-assistant ol{padding-left:16px;margin:6px 0}.chat-assistant li{margin-bottom:3px}
+.chat-assistant pre{background:var(--bg);border-radius:6px;padding:10px;overflow-x:auto;margin:8px 0;border:1px solid var(--border)}
+.chat-assistant code{font-family:'JetBrains Mono',monospace;font-size:11px}
+.chat-assistant p{margin-bottom:6px}.chat-assistant p:last-child{margin-bottom:0}
+.chat-assistant blockquote{border-left:3px solid var(--purple);padding-left:10px;color:var(--muted);margin:6px 0}
+.chat-mode-bar{padding:6px 12px;border-bottom:1px solid var(--border);display:flex;gap:5px;flex-shrink:0}
+.mode-pill{padding:3px 10px;border-radius:100px;font-size:11px;font-weight:500;cursor:pointer;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-family:inherit;transition:all 0.12s}
+.mode-pill.active{background:var(--purple-bg);border-color:rgba(167,139,250,0.35);color:var(--purple)}
+.mode-pill:hover{color:var(--purple)}.mode-pill.implement.active{background:var(--teal-bg);border-color:rgba(34,211,238,0.3);color:var(--teal)}
+.mode-pill.analyze.active{background:var(--yellow-bg);border-color:rgba(251,191,36,0.3);color:var(--yellow)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.cursor{display:inline-block;animation:blink 0.8s infinite;color:var(--purple)}
+.chat-input-row{padding:10px 12px;border-top:1px solid var(--border);display:flex;gap:8px;flex-shrink:0;align-items:flex-end}
+.chat-ta{flex:1;background:var(--bg-input);border:1.5px solid var(--border);border-radius:8px;padding:8px 11px;color:var(--text);font-size:13px;line-height:1.5;resize:none;outline:none;font-family:inherit;min-height:36px;max-height:100px;overflow-y:auto;transition:border-color 0.12s}
+.chat-ta:focus{border-color:var(--purple)}.chat-ta::placeholder{color:var(--faint)}
+.chat-send{background:var(--purple);color:#fff;border:none;border-radius:8px;padding:8px 10px;cursor:pointer;transition:all 0.12s;display:flex;align-items:center}
+.chat-send:hover{background:#9270fa}.chat-send svg{width:16px;height:16px}
+.chat-send:disabled{opacity:0.4;cursor:not-allowed}
+.chat-thinking{display:flex;align-items:center;gap:6px;padding:10px 12px;color:var(--muted);font-size:12px}
+.thinking-dots{display:flex;gap:3px}
+.thinking-dots span{width:5px;height:5px;border-radius:50%;background:var(--purple);animation:bounce 1.2s infinite both}
+.thinking-dots span:nth-child(2){animation-delay:0.15s}.thinking-dots span:nth-child(3){animation-delay:0.3s}
+@keyframes bounce{0%,80%,100%{transform:scale(0.7);opacity:0.5}40%{transform:scale(1.1);opacity:1}}
+.chat-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center;color:var(--faint);font-size:12px;gap:6px}
+.chat-empty svg{width:28px;height:28px;opacity:0.5}
+
+/* ══════ CODE TAB ══════ */
+.code-placeholder{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;gap:10px}
+.code-placeholder svg{width:36px;height:36px;color:var(--faint)}
+.code-placeholder h3{font-size:14px;font-weight:600;color:var(--text)}
+.code-placeholder p{font-size:12px;color:var(--muted);max-width:220px;line-height:1.6}
+.code-content{display:none;flex:1;flex-direction:column;overflow:hidden;height:100%}
+.code-toolbar{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0}
+.code-meta{flex:1;font-size:11px;color:var(--muted)}
+.code-meta strong{color:var(--teal)}
+.code-area{flex:1;overflow:auto;background:var(--bg);position:relative}
+.code-area pre{margin:0;padding:16px;min-height:100%;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.6}
+.code-area pre code{background:none;padding:0;font-size:12px}
+.code-editor{width:100%;height:100%;background:var(--bg);color:#E2E8F0;border:none;resize:none;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.6;padding:16px;outline:none;display:none;tab-size:4}
+
+/* Console styling */
+.console-panel {
+  background: #05080C;
+  border-top: 1px solid var(--border);
+  display: none;
+  flex-direction: column;
+  max-height: 220px;
+  min-height: 120px;
+  flex-shrink: 0;
+}
+.console-header {
+  padding: 6px 12px;
+  background: #0B0F17;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.console-actions {
+  display: flex;
+  gap: 8px;
+}
+.console-btn {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 10px;
+  font-family: inherit;
+  outline: none;
+}
+.console-btn:hover {
+  color: var(--text);
+}
+.console-btn.btn-fix-ai {
+  color: var(--purple);
+  font-weight: 600;
+  display: none;
+}
+.console-btn.btn-fix-ai:hover {
+  color: #9270fa;
+}
+.console-output {
+  flex: 1;
+  padding: 10px 12px;
+  overflow-y: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-all;
+  margin: 0;
+  border: none;
+}
+.console-line-stdout {
+  color: #E2E8F0;
+}
+.console-line-stderr {
+  color: #F87171;
+}
+.console-line-sys {
+  color: #4ADE80;
+  font-weight: 500;
+}
+.console-line-warn {
+  color: #FBBF24;
+}
+
+/* Reader main content */
+.r-paper-title{font-size:18px;font-weight:700;color:var(--text);line-height:1.35;letter-spacing:-0.3px;margin-bottom:12px}
+.r-authors{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.author-pill{background:var(--bg-input);color:var(--muted);font-size:12px;padding:4px 10px;border-radius:100px}
+.r-cats{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:16px}
+.r-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.r-info-cell{background:var(--bg-input);border-radius:8px;padding:10px 12px;border:1px solid var(--border)}
+.r-info-label{font-size:10px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;color:var(--faint);margin-bottom:3px}
+.r-info-value{font-size:13px;color:var(--text);font-weight:500}
+.r-links{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.r-abstract-box{background:var(--bg-input);border-radius:var(--r);padding:18px 20px;border:1px solid var(--border);margin-bottom:20px}
+.r-abstract-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--faint);margin-bottom:10px}
+.r-abstract-text{font-size:14px;line-height:1.8;color:var(--muted)}
+.r-ai-hint{background:var(--purple-bg);border:1px solid rgba(167,139,250,0.2);border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:12px;font-size:13px;color:var(--purple)}
+.r-ai-hint svg{width:18px;height:18px;flex-shrink:0}
+
+/* ══════ MODALS ══════ */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(4px);z-index:900;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s}
+.modal-bg.open{opacity:1;pointer-events:all}
+.modal{background:var(--bg-card);border:1.5px solid var(--border-med);border-radius:14px;padding:26px;max-width:480px;width:92%;transform:translateY(16px);transition:transform 0.2s;max-height:90vh;overflow-y:auto}
+.modal-bg.open .modal{transform:translateY(0)}
+.modal-title{font-size:17px;font-weight:700;color:var(--text);margin-bottom:5px}
+.modal-sub{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.5}
+.modal-q{margin-bottom:14px}.modal-q label{display:block;font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.modal-input{width:100%;background:var(--bg-input);border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:13px;font-family:'JetBrains Mono',monospace;outline:none;transition:border-color 0.12s}
+.modal-input:focus{border-color:var(--border-focus)}
+.modal-ta{width:100%;background:var(--bg-input);border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:13px;font-family:inherit;outline:none;resize:none;line-height:1.55;transition:border-color 0.12s}
+.modal-ta:focus{border-color:var(--border-focus)}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
+.key-status{display:flex;align-items:center;gap:8px;margin-bottom:16px;padding:10px 12px;background:var(--green-bg);border:1px solid rgba(74,222,128,0.2);border-radius:8px;font-size:12px;color:var(--green)}
+.key-status svg{width:14px;height:14px}
+
+/* ── Toast ── */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(24px);background:#1E2636;color:var(--text);padding:10px 20px;border-radius:var(--r);border:1px solid var(--border-med);font-size:13px;z-index:9999;opacity:0;transition:all 0.2s;pointer-events:none;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,0.4);display:flex;align-items:center;gap:8px}
+
+/* ── Notebook IDE ── */
+#view-notebook {
+  background: var(--bg);
+}
+.notebook-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+}
+.notebook-cell {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  overflow: hidden;
+}
+.notebook-cell:hover {
+  border-color: var(--border-med);
+}
+.notebook-cell.active-cell {
+  border-color: var(--blue-border);
+  box-shadow: 0 0 0 2px var(--blue-bg);
+}
+.cell-header {
+  padding: 6px 12px;
+  background: rgba(255,255,255,0.02);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: var(--muted);
+}
+.cell-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.cell-type-badge {
+  font-size: 10px;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+.cell-type-code {
+  background: rgba(74,144,226,0.1);
+  color: var(--blue);
+}
+.cell-type-markdown {
+  background: rgba(167,139,250,0.1);
+  color: var(--purple);
+}
+.cell-actions {
+  display: flex;
+  gap: 6px;
+}
+.cell-btn {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: all 0.1s;
+  font-size: 11px;
+  font-family: inherit;
+}
+.cell-btn:hover {
+  background: rgba(255,255,255,0.05);
+  color: var(--text);
+}
+.cell-btn.run-btn {
+  color: var(--green);
+  font-weight: 600;
+}
+.cell-btn.run-btn:hover {
+  background: var(--green-bg);
+  color: var(--green);
+}
+.cell-editor-container {
+  position: relative;
+}
+.cell-textarea {
+  width: 100%;
+  background: transparent;
+  color: var(--text);
+  border: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  padding: 12px 16px;
+  resize: vertical;
+  outline: none;
+  display: block;
+  min-height: 60px;
+}
+.cell-markdown-preview {
+  padding: 12px 16px;
+  min-height: 40px;
+  cursor: pointer;
+  line-height: 1.6;
+}
+.cell-markdown-preview:hover {
+  background: rgba(255,255,255,0.01);
+}
+.cell-markdown-preview.empty-md {
+  color: var(--faint);
+  font-style: italic;
+}
+.cell-markdown-preview p {
+  margin-bottom: 8px;
+}
+.cell-markdown-preview p:last-child {
+  margin-bottom: 0;
+}
+.cell-markdown-preview h1, .cell-markdown-preview h2, .cell-markdown-preview h3 {
+  margin-top: 12px;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+.cell-markdown-preview h1 { font-size: 1.4em; }
+.cell-markdown-preview h2 { font-size: 1.2em; }
+.cell-markdown-preview h3 { font-size: 1.1em; }
+.cell-markdown-preview ul, .cell-markdown-preview ol {
+  margin-left: 20px;
+  margin-bottom: 8px;
+}
+.cell-markdown-preview blockquote {
+  border-left: 3px solid var(--purple);
+  padding-left: 10px;
+  color: var(--muted);
+  margin: 8px 0;
+}
+.cell-output-container {
+  background: #05080C;
+  border-top: 1px solid var(--border);
+  padding: 10px 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 250px;
+  overflow-y: auto;
+}
+.cell-output-stdout {
+  color: #E2E8F0;
+}
+.cell-output-stderr {
+  color: #F87171;
+}
+.cell-output-sys {
+  color: var(--muted);
+  font-size: 11px;
+  border-bottom: 1px dashed var(--border);
+  padding-bottom: 4px;
+  margin-bottom: 4px;
+}
+
+/* ── Datasets panel ── */
+.r-datasets-box {
+  background: var(--bg-input);
+  border-radius: var(--r);
+  padding: 18px 20px;
+  border: 1px solid var(--border);
+  margin-bottom: 20px;
+}
+.r-datasets-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.dataset-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.dataset-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.dataset-card-header {
+  padding: 10px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+.dataset-card-header:hover {
+  background: rgba(255,255,255,0.02);
+}
+.dataset-name-task {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.dataset-name {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 13px;
+}
+.dataset-task-badge {
+  font-size: 10px;
+  background: var(--blue-bg);
+  color: var(--blue);
+  padding: 1px 6px;
+  border-radius: 100px;
+  font-weight: 500;
+}
+.dataset-card-toggle {
+  color: var(--muted);
+  font-size: 12px;
+}
+.dataset-card-body {
+  padding: 12px 14px;
+  border-top: 1px solid var(--border);
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+  background: rgba(0,0,0,0.15);
+}
+.dataset-card-body.open {
+  display: flex;
+}
+.dataset-link-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.dataset-link-row a {
+  color: var(--teal);
+  font-weight: 500;
+}
+.dataset-code-container {
+  position: relative;
+  margin-top: 4px;
+}
+.dataset-code-header {
+  font-size: 10px;
+  color: var(--faint);
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+.dataset-code-pre {
+  background: #05080C;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 12px;
+  overflow-x: auto;
+  margin: 0;
+}
+.dataset-code-pre code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  background: none;
+  padding: 0;
+  color: #E2E8F0;
+}
+.btn-dataset-copy {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.btn-dataset-copy:hover {
+  background: rgba(255,255,255,0.08);
+  color: var(--text);
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ═══ SIDEBAR ═══ -->
+<nav id="sidebar">
+  <div class="logo">
+    <div class="logo-mark">Æ</div>
+    <div><div class="logo-name">Aether</div><div class="logo-tag">Research Assistant</div></div>
+  </div>
+  <div class="nav">
+    <div class="nav-group">Discover</div>
+    <button class="nav-btn active" data-view="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35" stroke-linecap="round"/></svg>
+      Search arXiv
+    </button>
+    <div class="nav-group">My Research</div>
+    <button class="nav-btn" data-view="library">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      My Library
+      <span class="nav-badge" id="lib-badge">0</span>
+    </button>
+    <button class="nav-btn" data-view="notebook">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 9h6M9 13h6M9 17h6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Notebook IDE
+    </button>
+  </div>
+  <div class="sidebar-footer">
+    <div class="stats-block" id="sidebar-stats">
+      <div class="stat-row"><span class="stat-lbl">📚 Total saved</span><span class="stat-val" id="stat-total">0</span></div>
+      <div class="stat-row"><span class="stat-lbl">📖 Reading</span><span class="stat-val" id="stat-reading">0</span></div>
+      <div class="stat-row"><span class="stat-lbl">✅ Finished</span><span class="stat-val" id="stat-done">0</span></div>
+    </div>
+    <button class="settings-btn" id="settings-trigger">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      ⚙ AI Settings
+      <span class="settings-key-preview" id="key-preview"></span>
+    </button>
+    <div class="user-block">
+      <div class="avatar">AC</div>
+      <div><div class="user-name">Alex Chen</div><div class="user-role">PhD Researcher</div></div>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══ MAIN ═══ -->
+<main id="main">
+
+  <!-- ─── SEARCH ─── -->
+  <div class="view active" id="view-search">
+    <div class="page-header">
+      <div class="page-title">Search arXiv</div>
+      <div class="page-sub">Search millions of papers — live from arXiv.org</div>
+      <div style="margin-top:14px">
+        <div class="search-row">
+          <div class="search-box">
+            <input class="search-input" id="search-input" type="text" placeholder='e.g. "attention all you need" or ti:"diffusion model"' autocomplete="off"/>
+            <div class="search-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35" stroke-linecap="round"/></svg></div>
+            <button class="search-clear" id="search-clear"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg></button>
+          </div>
+          <button class="btn btn-primary" id="search-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35" stroke-linecap="round"/></svg>Search</button>
+        </div>
+        <div class="cat-filters">
+          <button class="cat-pill active" data-cat="all">All</button>
+          <button class="cat-pill" data-cat="cs.AI">cs.AI</button>
+          <button class="cat-pill" data-cat="cs.LG">cs.LG — ML</button>
+          <button class="cat-pill" data-cat="cs.CL">cs.CL — NLP</button>
+          <button class="cat-pill" data-cat="cs.CV">cs.CV — Vision</button>
+          <button class="cat-pill" data-cat="cs.RO">cs.RO — Robotics</button>
+          <button class="cat-pill" data-cat="cs.MA">cs.MA — Multi-Agent</button>
+          <div class="filter-sep"></div>
+          <select class="sort-sel" id="sort-select"><option value="relevance">Relevance</option><option value="newest">Newest</option></select>
+        </div>
+      </div>
+    </div>
+    <div class="search-body" id="search-body">
+      <div class="empty-state" id="search-welcome">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35" stroke-linecap="round"/></svg>
+        <h3>Search arXiv papers</h3>
+        <p>Find any paper, then open it to chat with AI, get Python implementations, and deep analysis.</p>
+        <button class="btn btn-primary" onclick="quickSearch('attention is all you need transformer')">Try: Attention Is All You Need</button>
+      </div>
+      <div id="search-results" style="display:none">
+        <div class="results-bar"><span id="results-label"></span></div>
+        <div class="papers-list" id="papers-list"></div>
+        <div class="pagination" id="pagination" style="display:none">
+          <button class="btn btn-ghost btn-sm" id="prev-page">← Prev</button>
+          <span id="page-info">Page 1</span>
+          <button class="btn btn-ghost btn-sm" id="next-page">Next →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── LIBRARY ─── -->
+  <div class="view" id="view-library">
+    <div class="page-header">
+      <div class="page-title">My Library</div>
+      <div class="page-sub">Manage your saved research papers</div>
+    </div>
+    <div class="lib-tabs">
+      <button class="lib-tab active" data-status="all">All <span class="lib-tab-count" id="tab-all">0</span></button>
+      <button class="lib-tab" data-status="saved">Saved <span class="lib-tab-count" id="tab-saved">0</span></button>
+      <button class="lib-tab" data-status="reading">Reading <span class="lib-tab-count" id="tab-reading">0</span></button>
+      <button class="lib-tab" data-status="done">Done <span class="lib-tab-count" id="tab-done">0</span></button>
+    </div>
+    <div class="lib-body">
+      <div class="lib-toolbar">
+        <input class="lib-search" id="lib-search" type="text" placeholder="Search your library…" autocomplete="off"/>
+        <button class="btn btn-ghost btn-sm" onclick="navigateTo('search')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>Add papers</button>
+      </div>
+      <div id="library-list"></div>
+    </div>
+  </div>
+
+  <!-- ─── NOTEBOOK IDE ─── -->
+  <div class="view" id="view-notebook">
+    <div class="page-header">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+        <div>
+          <div class="page-title">Notebook IDE</div>
+          <div class="page-sub">Interactive Python playground for model implementations</div>
+        </div>
+        <div class="notebook-actions" style="display:flex; gap:8px;">
+          <button class="btn btn-ghost btn-sm" id="btn-nb-add-code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:14px;height:14px;stroke-width:2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>+ Code Cell</button>
+          <button class="btn btn-ghost btn-sm" id="btn-nb-add-md"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:14px;height:14px;stroke-width:2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>+ Markdown Cell</button>
+          <button class="btn btn-primary btn-sm" id="btn-nb-run-all">▶ Run All</button>
+          <button class="btn btn-ghost btn-sm" id="btn-nb-clear">Clear Outputs</button>
+          <button class="btn btn-ghost btn-sm" id="btn-nb-download">⬇ .ipynb</button>
+        </div>
+      </div>
+    </div>
+    <div class="notebook-body" id="notebook-body" style="flex:1; overflow-y:auto; padding:20px 28px;">
+      <div id="notebook-cells-list" class="notebook-body"></div>
+    </div>
+  </div>
+
+  <!-- ─── READER ─── -->
+  <div class="view" id="view-reader">
+    <div class="reader-header">
+      <button class="btn btn-ghost btn-sm" id="reader-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M19 12H5M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"/></svg>Back</button>
+      <div class="reader-title-area">
+        <div class="reader-paper-title" id="reader-title">—</div>
+        <div class="reader-paper-meta" id="reader-meta">—</div>
+      </div>
+      <button class="btn btn-ghost btn-sm" id="btn-4q"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round"/></svg>4-Q</button>
+      <button class="btn btn-primary btn-sm" id="btn-save-paper"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" stroke-linecap="round" stroke-linejoin="round"/></svg>Save</button>
+    </div>
+    <div class="reader-body">
+      <!-- Left: paper content -->
+      <div class="reader-main" id="reader-main"></div>
+
+      <!-- Right: tabbed panel -->
+      <div class="reader-panel">
+        <div class="rp-tabs">
+          <button class="rp-tab active" data-tab="notes">📝 Notes</button>
+          <button class="rp-tab ai-tab" data-tab="chat">✦ AI Chat</button>
+          <button class="rp-tab code-tab" data-tab="code">⌥ Code</button>
+        </div>
+
+        <!-- ── Notes Tab ── -->
+        <div class="rp-content active" id="rp-notes">
+          <div class="notes-tab-body">
+            <div class="panel-sec">
+              <div class="panel-label">Reading Status</div>
+              <select class="panel-select" id="reader-status">
+                <option value="saved">📌 Saved</option>
+                <option value="reading">📖 Currently Reading</option>
+                <option value="done">✅ Done</option>
+              </select>
+            </div>
+            <div class="panel-sec">
+              <div class="panel-label">My Notes</div>
+              <textarea class="notes-ta" id="reader-notes" placeholder="Write your notes…&#10;&#10;Key findings, questions, connections to your work."></textarea>
+              <div class="save-hint" id="save-hint"></div>
+            </div>
+            <div class="panel-sec">
+              <div class="panel-label">Tags</div>
+              <div class="tags-wrap" id="tags-wrap"><input class="tag-input" id="tag-input" type="text" placeholder="add tag…" maxlength="20"/></div>
+            </div>
+            <div class="panel-sec" id="s4-panel"></div>
+            <div class="panel-sec" id="related-panel"></div>
+          </div>
+        </div>
+
+        <!-- ── AI Chat Tab ── -->
+        <div class="rp-content" id="rp-chat">
+          <!-- Shown when no API key -->
+          <div class="chat-setup" id="chat-setup" style="display:none">
+            <div class="chat-setup-icon">✦</div>
+            <h3>AI Chat</h3>
+            <p>Chat with this paper, get Python implementations, and deep analysis using Groq LLaMA 70B.</p>
+            <button class="btn btn-ai btn-sm" id="setup-key-btn">⚙ Add Groq API Key</button>
+            <p style="font-size:11px;color:var(--faint)">Free at <a href="https://console.groq.com" target="_blank">console.groq.com</a></p>
+          </div>
+
+          <!-- Shown when key is set -->
+          <div class="chat-area" id="chat-area" style="display:none">
+            <div class="chat-mode-bar">
+              <span style="font-size:10px;color:var(--faint);margin-right:4px">Mode:</span>
+              <button class="mode-pill active" data-mode="chat">💬 Chat</button>
+              <button class="mode-pill implement" data-mode="implement">🐍 Implement</button>
+              <button class="mode-pill analyze" data-mode="analyze">🔍 Analyze</button>
+            </div>
+            <div class="chat-quick" id="chat-quick">
+              <button class="quick-pill" data-prompt="Explain the core contribution of this paper in simple terms">💡 Explain</button>
+              <button class="quick-pill" data-prompt="Walk me through the key equations and what they represent mathematically">🔢 Equations</button>
+              <button class="quick-pill implement" data-prompt="__IMPLEMENT__">🐍 Python Code</button>
+              <button class="quick-pill" data-prompt="What are the key limitations and failure modes of this approach?">⚠️ Limits</button>
+              <button class="quick-pill" data-prompt="What are the most promising research directions that build on this paper?">🚀 Extensions</button>
+            </div>
+            <div class="chat-msgs" id="chat-msgs">
+              <div class="chat-empty" id="chat-empty">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span>Ask anything about this paper</span>
+              </div>
+            </div>
+            <div class="chat-input-row">
+              <textarea class="chat-ta" id="chat-ta" placeholder="Ask about this paper…" rows="1"></textarea>
+              <button class="chat-send" id="chat-send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Code Tab ── -->
+        <div class="rp-content" id="rp-code">
+          <div class="code-placeholder" id="code-placeholder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6" stroke-linecap="round" stroke-linejoin="round"/><polyline points="8 6 2 12 8 18" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <h3>Python Implementation</h3>
+            <p>Click <strong>🐍 Python Code</strong> in the AI Chat tab to generate a runnable implementation of this paper.</p>
+            <button class="btn btn-xs" style="background:var(--teal-bg);color:var(--teal);border:1px solid rgba(34,211,238,0.2)" id="btn-gen-code">Generate Now</button>
+          </div>
+          <div class="code-content" id="code-content">
+            <div class="code-toolbar">
+              <span class="code-meta">Python · <strong id="code-title-label">Implementation</strong></span>
+              <button class="btn btn-xs btn-ghost" id="btn-toggle-edit">✏️ Edit</button>
+              <button class="btn btn-xs btn-ghost" id="btn-copy-code">📋 Copy</button>
+              <button class="btn btn-xs btn-ghost" id="btn-download-code">⬇ .py</button>
+              <button class="btn btn-xs btn-ghost" id="btn-regen-code" title="Regenerate">↺</button>
+              <button class="btn btn-xs btn-ai" id="btn-run-code" style="background:var(--blue-bg);color:var(--blue);border:1.5px solid var(--blue-border);font-weight:600">▶ Run Code</button>
+              <button class="btn btn-xs btn-ghost" id="btn-load-notebook" style="color:var(--teal)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:12px;height:12px;vertical-align:middle;margin-right:2px"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke-linecap="round" stroke-linejoin="round"/></svg>⚡ Load into Notebook</button>
+            </div>
+            <div class="code-area">
+              <pre><code class="language-python" id="code-display"></code></pre>
+              <textarea class="code-editor" id="code-editor" spellcheck="false" placeholder="Edit Python code here..."></textarea>
+            </div>
+            <div class="console-panel" id="console-panel">
+              <div class="console-header">
+                <span>TERMINAL OUTPUT</span>
+                <div class="console-actions">
+                  <button class="console-btn btn-fix-ai" id="btn-fix-ai">⚙️ Fix with AI</button>
+                  <button class="console-btn" id="btn-clear-console">Clear</button>
+                </div>
+              </div>
+              <pre class="console-output" id="console-output"></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+</div>
+
+<!-- ═══ 4-Q SUMMARY MODAL ═══ -->
+<div class="modal-bg" id="modal-4q">
+  <div class="modal">
+    <div class="modal-title">4-Question Summary</div>
+    <div class="modal-sub" id="modal-4q-name">Capture the key insights in 4 questions.</div>
+    <div class="modal-q"><label>Core Claim</label><textarea class="modal-ta" id="mq-claim" rows="2" placeholder="The central contribution in one sentence…"></textarea></div>
+    <div class="modal-q"><label>Method / Approach</label><textarea class="modal-ta" id="mq-method" rows="2" placeholder="The key technique or approach…"></textarea></div>
+    <div class="modal-q"><label>Dataset / Benchmark</label><textarea class="modal-ta" id="mq-dataset" rows="1" placeholder="How was it evaluated?"></textarea></div>
+    <div class="modal-q"><label>Key Limitation</label><textarea class="modal-ta" id="mq-limitation" rows="2" placeholder="What problem does this NOT solve?"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="modal-4q-cancel">Cancel</button>
+      <button class="btn btn-primary" id="modal-4q-save">Save ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SETTINGS MODAL ═══ -->
+<div class="modal-bg" id="modal-settings">
+  <div class="modal">
+    <div class="modal-title">⚙ AI Settings</div>
+    <div class="modal-sub">Configure your Groq API key to enable AI chat, code generation, and analysis. Free at <a href="https://console.groq.com" target="_blank">console.groq.com</a>.</div>
+    <div class="key-status" id="key-status-bar" style="display:none">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>API key configured: <span id="key-preview-modal" style="font-family:'JetBrains Mono',monospace;font-size:11px"></span></span>
+    </div>
+    <div class="modal-q">
+      <label>Groq API Key</label>
+      <input class="modal-input" id="groq-key-input" type="password" placeholder="gsk_..." autocomplete="off"/>
+    </div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:4px">Model: <code>llama-3.3-70b-versatile</code> (fast, high-quality)</div>
+    <div class="modal-actions">
+      <button class="btn btn-danger btn-sm" id="btn-clear-key">Clear Key</button>
+      <button class="btn btn-ghost" id="modal-settings-cancel">Cancel</button>
+      <button class="btn btn-primary" id="btn-save-key">Save Key</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// Wait for CDN scripts to load
+window.addEventListener('load', initApp);
+
+function initApp() {
+  // Configure marked
+  if (typeof marked !== 'undefined') {
+    marked.setOptions({ breaks: true, gfm: true });
+  }
+
+// ══════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════
+const App = {
+  view: 'search',
+  searchQuery: '', searchCat: 'all', searchSort: 'relevance',
+  searchPage: 0, searchTotal: 0, searchResults: [],
+  libStatus: 'all', libQuery: '',
+  library: [],
+  currentPaper: null,
+  hasGroqKey: false,
+  chatMessages: [],
+  chatMode: 'chat',
+  currentCode: '',
+  _prevView: 'search',
+  _streaming: false,
+  notebookCells: [],
+  currentPaperDatasets: [],
+};
+const PAGE_SIZE = 15;
+
+// ══════════════════════════════════════════════════════════
+// NAV
+// ══════════════════════════════════════════════════════════
+function navigateTo(viewId) {
+  App._prevView = App.view;
+  App.view = viewId;
+  document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + viewId));
+  document.querySelectorAll('.nav-btn[data-view]').forEach(b => b.classList.toggle('active', b.dataset.view === viewId));
+  if (viewId === 'library') loadLibrary();
+  if (viewId === 'search') refreshStats();
+  if (viewId === 'notebook') {
+    initNotebook();
+    renderNotebook();
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════════════════
+let _toastTimer;
+function toast(msg, icon = '✓') {
+  const t = document.getElementById('toast');
+  t.innerHTML = `<span>${icon}</span><span>${msg}</span>`;
+  t.style.opacity = '1'; t.style.transform = 'translateX(-50%) translateY(0)';
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => { t.style.opacity='0'; t.style.transform='translateX(-50%) translateY(24px)'; }, 2800);
+}
+
+// ══════════════════════════════════════════════════════════
+// API
+// ══════════════════════════════════════════════════════════
+async function api(path, opts = {}) {
+  const r = await fetch(path, { headers: { 'Content-Type': 'application/json' }, ...opts });
+  if (!r.ok) { const e = await r.json().catch(() => ({ error: r.statusText })); throw new Error(e.error || r.statusText); }
+  return r.json();
+}
+
+// ══════════════════════════════════════════════════════════
+// SEARCH
+// ══════════════════════════════════════════════════════════
+async function doSearch(resetPage = true) {
+  const q = document.getElementById('search-input').value.trim();
+  if (!q) { toast('Enter a search query', '⚠️'); return; }
+  if (resetPage) App.searchPage = 0;
+  App.searchQuery = q;
+  document.getElementById('search-welcome').style.display = 'none';
+  document.getElementById('search-results').style.display = 'block';
+  document.getElementById('papers-list').innerHTML = loadingSkeleton(4);
+  document.getElementById('results-label').innerHTML = '<div class="spinner" style="display:inline-block;vertical-align:middle;margin-right:8px"></div> Searching arXiv…';
+  document.getElementById('pagination').style.display = 'none';
+  try {
+    const params = new URLSearchParams({ q, cat: App.searchCat, max: PAGE_SIZE, start: App.searchPage * PAGE_SIZE, sort: App.searchSort });
+    const data = await api('/api/search?' + params);
+    App.searchResults = data.papers || [];
+    App.searchTotal = data.total || 0;
+    renderSearchResults(App.searchResults, App.searchTotal);
+  } catch (err) {
+    document.getElementById('papers-list').innerHTML = `<div class="error-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01" stroke-linecap="round"/></svg><div><strong>Search failed</strong><br><span style="font-size:12px">${escH(err.message)}</span></div></div>`;
+    document.getElementById('results-label').textContent = '';
+  }
+}
+
+function renderSearchResults(papers, total) {
+  const countHTML = total > 0
+    ? `<span class="results-count">${total.toLocaleString()}</span> results · "${escH(App.searchQuery)}"`
+    : 'No results found';
+  document.getElementById('results-label').innerHTML = countHTML;
+  const list = document.getElementById('papers-list');
+  if (!papers.length) {
+    list.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35" stroke-linecap="round"/></svg><h3>No papers found</h3><p>Try different keywords, remove category filters, or use broader terms.</p></div>`;
+    return;
+  }
+  list.innerHTML = papers.map(p => paperCardHTML(p)).join('');
+  list.querySelectorAll('.pc-title').forEach((el, i) => el.addEventListener('click', () => openReader(papers[i])));
+  list.querySelectorAll('.btn-read-card').forEach((el, i) => el.addEventListener('click', e => { e.stopPropagation(); openReader(papers[i]); }));
+  list.querySelectorAll('.btn-save-card').forEach((el, i) => el.addEventListener('click', e => { e.stopPropagation(); saveToLibrary(papers[i], el); }));
+  const totalPages = Math.ceil(total / PAGE_SIZE);
+  if (totalPages > 1) {
+    const pg = document.getElementById('pagination');
+    pg.style.display = 'flex';
+    document.getElementById('page-info').textContent = `Page ${App.searchPage + 1} of ${Math.min(totalPages, 50)}`;
+    document.getElementById('prev-page').disabled = App.searchPage === 0;
+    document.getElementById('next-page').disabled = App.searchPage >= Math.min(totalPages, 50) - 1;
+  }
+}
+
+function paperCardHTML(p) {
+  const authors = (p.authors || []).slice(0, 3).join(', ') + ((p.authors || []).length > 3 ? ' et al.' : '');
+  const cats = (p.categories || []).slice(0, 3).map(c => `<span class="chip chip-gray">${escH(c)}</span>`).join('');
+  const saveBtn = p.saved
+    ? `<button class="btn btn-ghost btn-sm" style="color:var(--blue)" disabled>✓ Saved</button>`
+    : `<button class="btn btn-primary btn-sm btn-save-card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" stroke-linecap="round" stroke-linejoin="round"/></svg>Save</button>`;
+  return `<div class="paper-card">
+    <div class="pc-row1">
+      <div class="pc-title">${escH(p.title)}</div>
+      <div class="pc-actions">
+        <button class="btn btn-ghost btn-sm btn-read-card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z" stroke-linecap="round" stroke-linejoin="round"/></svg>Read</button>
+        ${saveBtn}
+      </div>
+    </div>
+    <div class="pc-meta">
+      <span>${escH(authors)}</span>
+      ${p.published ? `<span class="pc-sep">·</span><span>${p.published.substring(0,7)}</span>` : ''}
+      ${p.arxivUrl ? `<span class="pc-sep">·</span><a href="${p.arxivUrl}" target="_blank" style="font-size:11px" onclick="event.stopPropagation()">arXiv ↗</a>` : ''}
+    </div>
+    <div class="pc-abstract">${escH(p.abstract)}</div>
+    <div class="pc-footer">${cats}${p.saved ? '<span class="pc-saved-tag">In library</span>' : ''}<span class="pc-date">${p.published || ''}</span></div>
+  </div>`;
+}
+
+function loadingSkeleton(n) {
+  return Array.from({length:n}, () => `<div class="paper-card" style="pointer-events:none"><div class="skeleton" style="width:70%;height:18px;margin-bottom:10px"></div><div class="skeleton" style="width:40%;height:12px;margin-bottom:12px"></div><div class="skeleton" style="width:100%;height:12px;margin-bottom:5px"></div><div class="skeleton" style="width:80%;height:12px"></div></div>`).join('');
+}
+
+function quickSearch(q) {
+  document.getElementById('search-input').value = q;
+  document.getElementById('search-clear').classList.add('show');
+  doSearch();
+}
+
+// ══════════════════════════════════════════════════════════
+// LIBRARY
+// ══════════════════════════════════════════════════════════
+async function loadLibrary() {
+  try {
+    const params = new URLSearchParams({ status: App.libStatus, q: App.libQuery });
+    const data = await api('/api/papers?' + params);
+    App.library = data.papers || [];
+    renderLibrary(App.library);
+    await refreshStats();
+  } catch (err) {
+    document.getElementById('library-list').innerHTML = `<div class="error-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01" stroke-linecap="round"/></svg><span>${escH(err.message)}</span></div>`;
+  }
+}
+
+async function refreshStats() {
+  try {
+    const data = await api('/api/stats');
+    document.getElementById('stat-total').textContent = data.total;
+    document.getElementById('stat-reading').textContent = data.reading;
+    document.getElementById('stat-done').textContent = data.done;
+    document.getElementById('lib-badge').textContent = data.total;
+    document.getElementById('tab-all').textContent = data.total;
+    document.getElementById('tab-saved').textContent = data.saved;
+    document.getElementById('tab-reading').textContent = data.reading;
+    document.getElementById('tab-done').textContent = data.done;
+  } catch {}
+}
+
+function renderLibrary(papers) {
+  const el = document.getElementById('library-list');
+  if (!papers.length) {
+    el.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19.5A2.5 2.5 0 016.5 17H20" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" stroke-linecap="round" stroke-linejoin="round"/></svg><h3>${App.libQuery ? 'No matches' : 'Library is empty'}</h3><p>${App.libQuery ? `No papers matching "${escH(App.libQuery)}"` : 'Search for papers and save them to your library.'}</p><button class="btn btn-primary" onclick="navigateTo('search')">Search papers</button></div>`;
+    return;
+  }
+  el.innerHTML = papers.map(p => libCardHTML(p)).join('');
+  el.querySelectorAll('.lib-card-main').forEach((el2, i) => el2.addEventListener('click', () => openReader(papers[i])));
+  el.querySelectorAll('.btn-del-lib').forEach((el2, i) => el2.addEventListener('click', async e => {
+    e.stopPropagation();
+    if (!confirm(`Remove "${papers[i].title.substring(0,50)}…"?`)) return;
+    await api(`/api/papers/${encodeURIComponent(papers[i].id)}`, { method: 'DELETE' });
+    toast('Removed from library', '🗑️');
+    loadLibrary();
+  }));
+}
+
+function libCardHTML(p) {
+  const authors = (p.authors||[]).slice(0,2).join(', ') + ((p.authors||[]).length>2?' et al.':'');
+  const cats = (p.categories||[]).slice(0,2).map(c => `<span class="chip chip-gray">${escH(c)}</span>`).join('');
+  const tags = (p.tags||[]).slice(0,3).map(t => `<span class="chip chip-purple" style="font-size:10px">${escH(t)}</span>`).join('');
+  const savedDate = p.savedAt ? new Date(p.savedAt).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '';
+  return `<div class="lib-card">
+    <div class="lib-card-main">
+      <div class="lib-card-title">${escH(p.title)}</div>
+      <div class="lib-card-authors">${escH(authors)} · ${p.published||''}</div>
+      <div class="lib-card-cats">${cats}${tags}</div>
+      ${p.notes?`<div class="lib-card-notes">📝 ${escH(p.notes)}</div>`:''}
+      ${p.summary4?`<div class="lib-card-notes">✦ Has AI summary</div>`:''}
+    </div>
+    <div class="lib-card-side">
+      <span class="chip status-${p.status||'saved'}">${statusLabel(p.status)}</span>
+      <span class="lib-card-date">${savedDate}</span>
+      <button class="btn btn-danger btn-sm btn-del-lib" title="Remove"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 6h18M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6M10 11v6M14 11v6M9 6V4h6v2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+  </div>`;
+}
+
+function statusLabel(s) {
+  if (s==='reading') return '📖 Reading';
+  if (s==='done') return '✅ Done';
+  return '📌 Saved';
+}
+
+// ══════════════════════════════════════════════════════════
+// SAVE TO LIBRARY
+// ══════════════════════════════════════════════════════════
+async function saveToLibrary(paper, btnEl) {
+  try {
+    await api('/api/papers', { method: 'POST', body: JSON.stringify(paper) });
+    paper.saved = true;
+    if (btnEl) { btnEl.textContent = '✓ Saved'; btnEl.disabled = true; btnEl.className = 'btn btn-ghost btn-sm'; btnEl.style.color = 'var(--blue)'; }
+    toast('Saved to library ✓');
+    refreshStats();
+  } catch (err) { toast('Save failed: ' + err.message, '⚠️'); }
+}
+
+// ══════════════════════════════════════════════════════════
+// READER
+// ══════════════════════════════════════════════════════════
+function openReader(paper) {
+  App.currentPaper = paper;
+  App.chatMessages = [];
+  App.currentCode = '';
+  navigateTo('reader');
+
+  document.getElementById('reader-title').textContent = paper.title;
+  document.getElementById('reader-meta').textContent = [
+    (paper.authors||[]).slice(0,3).join(', ') + ((paper.authors||[]).length>3?' et al.':''),
+    paper.categories?.[0]||'',
+    paper.published?.substring(0,7)||'',
+    `arXiv:${paper.id}`,
+  ].filter(Boolean).join(' · ');
+
+  // Reset panel to Notes tab
+  switchPanelTab('notes');
+
+  // Reset notes panel
+  document.getElementById('reader-status').value = paper.status || 'saved';
+  document.getElementById('reader-notes').value = paper.notes || '';
+  document.getElementById('save-hint').textContent = '';
+  renderTags(paper.tags || []);
+
+  // Reset chat
+  document.getElementById('chat-msgs').innerHTML = `<div class="chat-empty" id="chat-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Ask anything about this paper</span></div>`;
+
+  // Reset code tab
+  document.getElementById('code-placeholder').style.display = 'flex';
+  document.getElementById('code-content').style.display = 'none';
+  document.getElementById('code-display').textContent = '';
+
+  // Save button
+  const saveBtn = document.getElementById('btn-save-paper');
+  if (paper.saved) {
+    saveBtn.innerHTML = '✓ Saved'; saveBtn.disabled = true; saveBtn.className = 'btn btn-ghost btn-sm';
+  } else {
+    saveBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" stroke-linecap="round" stroke-linejoin="round"/></svg> Save';
+    saveBtn.disabled = false; saveBtn.className = 'btn btn-primary btn-sm';
+  }
+
+  renderReaderMain(paper);
+  render4QPanel(paper);
+  loadRelated(paper);
+  loadDatasets(paper);
+
+  // Load full local data if in library
+  if (paper.id) {
+    api(`/api/papers/${encodeURIComponent(paper.id)}`).then(d => {
+      if (d && !d.error) {
+        App.currentPaper = { ...paper, ...d };
+        document.getElementById('reader-status').value = d.status || 'saved';
+        document.getElementById('reader-notes').value = d.notes || '';
+        renderTags(d.tags || []);
+        render4QPanel(App.currentPaper);
+      }
+    }).catch(() => {});
+  }
+
+  // Check Groq key and update chat panel
+  checkGroqKeyStatus();
+}
+
+function renderReaderMain(paper) {
+  const authors = (paper.authors||[]).map(a => `<span class="author-pill">${escH(a)}</span>`).join('');
+  const cats = (paper.categories||[]).map(c => `<span class="chip chip-blue">${escH(c)}</span>`).join('');
+  document.getElementById('reader-main').innerHTML = `
+    <h1 class="r-paper-title">${escH(paper.title)}</h1>
+    ${authors ? `<div class="r-authors">${authors}</div>` : ''}
+    <div class="r-cats">${cats}</div>
+    <div class="r-info-grid">
+      ${paper.published ? `<div class="r-info-cell"><div class="r-info-label">Published</div><div class="r-info-value">${paper.published}</div></div>` : ''}
+      <div class="r-info-cell"><div class="r-info-label">arXiv ID</div><div class="r-info-value" style="font-family:'JetBrains Mono',monospace;font-size:12px">${escH(paper.id||'')}</div></div>
+      ${paper.updated ? `<div class="r-info-cell"><div class="r-info-label">Updated</div><div class="r-info-value">${paper.updated}</div></div>` : ''}
+    </div>
+    <div class="r-links">
+      ${paper.arxivUrl ? `<a class="btn btn-ghost btn-sm" href="${paper.arxivUrl}" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" stroke-linecap="round" stroke-linejoin="round"/></svg>arXiv Page</a>` : ''}
+      ${paper.pdfUrl ? `<a class="btn btn-ghost btn-sm" href="${paper.pdfUrl}" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 2v6h6" stroke-linecap="round" stroke-linejoin="round"/></svg>PDF</a>` : ''}
+      ${paper.htmlUrl ? `<a class="btn btn-ghost btn-sm" href="${paper.htmlUrl}" target="_blank">HTML</a>` : ''}
+    </div>
+    <div class="r-abstract-box">
+      <div class="r-abstract-label">Abstract</div>
+      <div class="r-abstract-text">${escH(paper.abstract||'No abstract available.')}</div>
+    </div>
+    <div id="reader-datasets-container"></div>
+    <div class="r-ai-hint">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5z" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Open the <strong style="color:var(--purple)">✦ AI Chat</strong> panel to ask questions, get a Python implementation, or deep analysis of this paper.
+    </div>`;
+}
+
+function render4QPanel(paper) {
+  const el = document.getElementById('s4-panel');
+  if (!paper.summary4) {
+    el.innerHTML = `<div class="panel-label">4-Q Summary</div><button class="btn btn-ghost btn-xs" id="btn-4q-inline" style="width:100%;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>Add Summary</button>`;
+    document.getElementById('btn-4q-inline')?.addEventListener('click', open4QModal);
+    return;
+  }
+  const s = paper.summary4;
+  el.innerHTML = `<div class="panel-label">4-Q Summary <button class="btn btn-ghost btn-xs" id="btn-4q-edit" style="margin-left:4px">Edit</button></div>
+    <div class="s4-card">
+      <div class="s4-head">Summary</div>
+      ${s.claim?`<div class="s4-item"><div class="s4-q">Core Claim</div><div class="s4-a">${escH(s.claim)}</div></div>`:''}
+      ${s.method?`<div class="s4-item"><div class="s4-q">Method</div><div class="s4-a">${escH(s.method)}</div></div>`:''}
+      ${s.dataset?`<div class="s4-item"><div class="s4-q">Benchmark</div><div class="s4-a">${escH(s.dataset)}</div></div>`:''}
+      ${s.limitation?`<div class="s4-item"><div class="s4-q">Limitation</div><div class="s4-a">${escH(s.limitation)}</div></div>`:''}
+    </div>`;
+  document.getElementById('btn-4q-edit')?.addEventListener('click', open4QModal);
+}
+
+async function loadRelated(paper) {
+  const el = document.getElementById('related-panel');
+  if (!paper.categories?.length) { el.innerHTML = ''; return; }
+  el.innerHTML = `<div class="panel-label">Related Papers</div><div style="color:var(--faint);font-size:12px">Loading…</div>`;
+  try {
+    const titleWords = paper.title.split(' ').slice(0,3).join(' ');
+    const data = await api(`/api/search?q=${encodeURIComponent(titleWords)}&cat=${paper.categories[0]}&max=4`);
+    const related = (data.papers||[]).filter(r => r.id !== paper.id).slice(0,3);
+    if (!related.length) { el.innerHTML = ''; return; }
+    el.innerHTML = `<div class="panel-label">Related Papers</div>${related.map(r=>`<div class="related-item" data-id="${r.id}"><div class="related-title">${escH(r.title)}</div><div class="related-meta">${escH(r.authors?.[0]||'')} · ${r.published?.substring(0,4)||''}</div></div>`).join('')}`;
+    el.querySelectorAll('.related-item').forEach((item,i) => item.addEventListener('click', () => openReader(related[i])));
+  } catch { el.innerHTML = ''; }
+}
+
+// Tags
+function renderTags(tags) {
+  const wrap = document.getElementById('tags-wrap');
+  const input = document.getElementById('tag-input');
+  const chips = (tags||[]).map(t=>`<span class="tag-chip" data-tag="${escH(t)}">${escH(t)}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg></span>`).join('');
+  wrap.innerHTML = chips;
+  wrap.appendChild(input);
+  wrap.querySelectorAll('.tag-chip').forEach(chip => chip.addEventListener('click', () => {
+    const newTags = (App.currentPaper.tags||[]).filter(t=>t!==chip.dataset.tag);
+    App.currentPaper.tags = newTags;
+    renderTags(newTags);
+    savePaperField({ tags: newTags });
+  }));
+}
+
+let _notesTimer;
+document.getElementById('reader-notes').addEventListener('input', e => {
+  clearTimeout(_notesTimer);
+  document.getElementById('save-hint').textContent = 'Saving…';
+  _notesTimer = setTimeout(async () => {
+    if (!App.currentPaper) return;
+    App.currentPaper.notes = e.target.value;
+    await savePaperField({ notes: e.target.value });
+    document.getElementById('save-hint').textContent = 'Saved ✓';
+    setTimeout(() => { document.getElementById('save-hint').textContent=''; }, 2000);
+  }, 800);
+});
+
+document.getElementById('reader-status').addEventListener('change', async e => {
+  if (!App.currentPaper) return;
+  App.currentPaper.status = e.target.value;
+  await savePaperField({ status: e.target.value });
+  toast(`Status: ${statusLabel(e.target.value)}`);
+  refreshStats();
+});
+
+document.getElementById('tag-input').addEventListener('keydown', async e => {
+  if (e.key !== 'Enter') return;
+  const tag = e.target.value.trim(); if (!tag || !App.currentPaper) return;
+  const tags = [...new Set([...(App.currentPaper.tags||[]), tag])];
+  App.currentPaper.tags = tags; e.target.value = '';
+  renderTags(tags);
+  await savePaperField({ tags });
+});
+
+async function savePaperField(fields) {
+  if (!App.currentPaper?.id) return;
+  try {
+    if (!App.currentPaper.saved) {
+      await api('/api/papers', { method: 'POST', body: JSON.stringify({ ...App.currentPaper, ...fields }) });
+      App.currentPaper.saved = true;
+      const btn = document.getElementById('btn-save-paper');
+      if (btn) { btn.innerHTML='✓ Saved'; btn.disabled=true; btn.className='btn btn-ghost btn-sm'; }
+    } else {
+      await api(`/api/papers/${encodeURIComponent(App.currentPaper.id)}`, { method:'PATCH', body:JSON.stringify(fields) });
+    }
+    refreshStats();
+  } catch {}
+}
+
+// Save from header button
+document.getElementById('btn-save-paper').addEventListener('click', async () => {
+  const p = App.currentPaper; if (!p || p.saved) return;
+  await saveToLibrary(p, null);
+  const btn = document.getElementById('btn-save-paper');
+  btn.innerHTML='✓ Saved'; btn.disabled=true; btn.className='btn btn-ghost btn-sm';
+  App.currentPaper.saved = true;
+});
+
+// Panel tabs
+function switchPanelTab(tab) {
+  document.querySelectorAll('.rp-tab').forEach(t => t.classList.toggle('active', t.dataset.tab===tab));
+  document.querySelectorAll('.rp-content').forEach(c => c.classList.toggle('active', c.id==='rp-'+tab));
+  if (tab==='chat') { scrollChatBottom(); }
+}
+document.querySelectorAll('.rp-tab').forEach(tab => tab.addEventListener('click', () => switchPanelTab(tab.dataset.tab)));
+
+function scrollChatBottom() {
+  const msgs = document.getElementById('chat-msgs');
+  if (msgs) msgs.scrollTop = msgs.scrollHeight;
+}
+
+// ══════════════════════════════════════════════════════════
+// 4-Q MODAL
+// ══════════════════════════════════════════════════════════
+function open4QModal() {
+  const p = App.currentPaper; if (!p) return;
+  const s = p.summary4 || {};
+  document.getElementById('modal-4q-name').textContent = (p.title||'').substring(0,80)+'…';
+  document.getElementById('mq-claim').value = s.claim||'';
+  document.getElementById('mq-method').value = s.method||'';
+  document.getElementById('mq-dataset').value = s.dataset||'';
+  document.getElementById('mq-limitation').value = s.limitation||'';
+  document.getElementById('modal-4q').classList.add('open');
+}
+document.getElementById('modal-4q-save').addEventListener('click', async () => {
+  const s4 = { claim:document.getElementById('mq-claim').value.trim(), method:document.getElementById('mq-method').value.trim(), dataset:document.getElementById('mq-dataset').value.trim(), limitation:document.getElementById('mq-limitation').value.trim() };
+  App.currentPaper.summary4 = s4;
+  document.getElementById('modal-4q').classList.remove('open');
+  await savePaperField({ summary4: s4 });
+  render4QPanel(App.currentPaper);
+  toast('Summary saved ✓');
+});
+document.getElementById('modal-4q-cancel').addEventListener('click', () => document.getElementById('modal-4q').classList.remove('open'));
+document.getElementById('btn-4q').addEventListener('click', open4QModal);
+
+// ══════════════════════════════════════════════════════════
+// GROQ / AI SETTINGS
+// ══════════════════════════════════════════════════════════
+async function checkGroqKeyStatus() {
+  try {
+    const data = await api('/api/settings');
+    App.hasGroqKey = data.hasGroqKey;
+    const preview = data.keyPreview;
+    document.getElementById('key-preview').textContent = App.hasGroqKey ? '●' : '';
+    document.getElementById('chat-setup').style.display = App.hasGroqKey ? 'none' : 'flex';
+    document.getElementById('chat-area').style.display = App.hasGroqKey ? 'flex' : 'none';
+    if (preview) {
+      document.getElementById('key-status-bar').style.display = 'flex';
+      document.getElementById('key-preview-modal').textContent = preview;
+    } else {
+      document.getElementById('key-status-bar').style.display = 'none';
+    }
+  } catch {}
+}
+
+function openSettingsModal() {
+  checkGroqKeyStatus();
+  document.getElementById('modal-settings').classList.add('open');
+}
+document.getElementById('settings-trigger').addEventListener('click', openSettingsModal);
+document.getElementById('setup-key-btn').addEventListener('click', openSettingsModal);
+document.getElementById('modal-settings-cancel').addEventListener('click', () => document.getElementById('modal-settings').classList.remove('open'));
+document.getElementById('btn-save-key').addEventListener('click', async () => {
+  const key = document.getElementById('groq-key-input').value.trim();
+  if (!key) { toast('Please enter your API key', '⚠️'); return; }
+  try {
+    const data = await api('/api/settings', { method:'POST', body:JSON.stringify({ groqApiKey:key }) });
+    document.getElementById('groq-key-input').value = '';
+    document.getElementById('modal-settings').classList.remove('open');
+    App.hasGroqKey = true;
+    await checkGroqKeyStatus();
+    // Update chat UI if reader is open
+    document.getElementById('chat-setup').style.display = 'none';
+    document.getElementById('chat-area').style.display = 'flex';
+    toast('Groq API key saved ✓');
+  } catch (err) { toast('Save failed: ' + err.message, '⚠️'); }
+});
+document.getElementById('btn-clear-key').addEventListener('click', async () => {
+  if (!confirm('Remove the API key?')) return;
+  await api('/api/settings', { method:'POST', body:JSON.stringify({ groqApiKey:'' }) });
+  App.hasGroqKey = false;
+  document.getElementById('key-status-bar').style.display = 'none';
+  document.getElementById('modal-settings').classList.remove('open');
+  document.getElementById('chat-setup').style.display = 'flex';
+  document.getElementById('chat-area').style.display = 'none';
+  document.getElementById('key-preview').textContent = '';
+  toast('API key removed', '🗑️');
+});
+
+// ══════════════════════════════════════════════════════════
+// AI CHAT STREAMING
+// ══════════════════════════════════════════════════════════
+// Chat mode selection
+document.querySelectorAll('.mode-pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    document.querySelectorAll('.mode-pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    App.chatMode = pill.dataset.mode;
+    // Update placeholder
+    const placeholder = { chat:'Ask about this paper…', implement:'Describe what to implement…', analyze:'Ask for analysis…' };
+    document.getElementById('chat-ta').placeholder = placeholder[App.chatMode] || 'Ask…';
+  });
+});
+
+// Quick prompts
+document.querySelectorAll('.quick-pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    if (App._streaming) return;
+    const prompt = pill.dataset.prompt;
+    if (prompt === '__IMPLEMENT__') {
+      // Switch to implement mode and trigger
+      document.querySelectorAll('.mode-pill').forEach(p => p.classList.toggle('active', p.dataset.mode==='implement'));
+      App.chatMode = 'implement';
+      switchPanelTab('chat');
+      startStream('Implement the core algorithm of this paper in Python with detailed comments and a working demonstration.');
+    } else {
+      switchPanelTab('chat');
+      startStream(prompt);
+    }
+  });
+});
+
+// Chat input
+const chatTA = document.getElementById('chat-ta');
+chatTA.addEventListener('input', () => {
+  chatTA.style.height = 'auto';
+  chatTA.style.height = Math.min(chatTA.scrollHeight, 100) + 'px';
+});
+chatTA.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    if (!App._streaming) sendChat();
+  }
+});
+document.getElementById('chat-send').addEventListener('click', () => { if (!App._streaming) sendChat(); });
+
+function sendChat() {
+  const msg = chatTA.value.trim(); if (!msg) return;
+  chatTA.value = ''; chatTA.style.height = 'auto';
+  startStream(msg);
+}
+
+async function startStream(userMessage) {
+  if (!App.hasGroqKey) { openSettingsModal(); return; }
+  if (App._streaming) return;
+  App._streaming = true;
+  document.getElementById('chat-send').disabled = true;
+
+  // Remove empty state
+  document.getElementById('chat-empty')?.remove();
+
+  // Add user bubble
+  App.chatMessages.push({ role:'user', content:userMessage });
+  appendBubble('user', userMessage);
+
+  // Thinking indicator
+  const thinkingEl = document.createElement('div');
+  thinkingEl.className = 'chat-thinking';
+  thinkingEl.innerHTML = '<div class="thinking-dots"><span></span><span></span><span></span></div><span style="font-size:11px">LLaMA 70B thinking…</span>';
+  document.getElementById('chat-msgs').appendChild(thinkingEl);
+  scrollChatBottom();
+
+  let fullText = '';
+  let assistantEl = null;
+
+  try {
+    const resp = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: App.chatMessages, paper: App.currentPaper, mode: App.chatMode }),
+    });
+
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({ error: resp.statusText }));
+      throw new Error(err.error || resp.statusText);
+    }
+
+    thinkingEl.remove();
+    assistantEl = appendBubble('assistant', '');
+
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let buf = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buf += decoder.decode(value, { stream: true });
+      const parts = buf.split('\n\n');
+      buf = parts.pop();
+      for (const part of parts) {
+        const line = part.trim();
+        if (!line.startsWith('data: ')) continue;
+        const data = line.slice(6);
+        if (data === '[DONE]') {
+          App.chatMessages.push({ role:'assistant', content:fullText });
+          if (assistantEl) {
+            assistantEl.innerHTML = renderMd(fullText);
+            // Highlight code blocks
+            assistantEl.querySelectorAll('pre code').forEach(block => {
+              if (typeof hljs !== 'undefined') hljs.highlightElement(block);
+            });
+            // If implement mode, extract and show code
+            if (App.chatMode === 'implement') extractCode(fullText);
+          }
+          break;
+        }
+        try {
+          const json = JSON.parse(data);
+          const chunk = json.choices?.[0]?.delta?.content || '';
+          if (chunk && assistantEl) {
+            fullText += chunk;
+            assistantEl.innerHTML = renderMd(fullText) + '<span class="cursor">▋</span>';
+            scrollChatBottom();
+          }
+        } catch {}
+      }
+    }
+  } catch (err) {
+    thinkingEl.remove();
+    if (assistantEl) {
+      assistantEl.innerHTML = `<span style="color:var(--red)">⚠ ${escH(err.message)}</span>`;
+    } else {
+      appendBubble('assistant', '').innerHTML = `<span style="color:var(--red)">⚠ ${escH(err.message)}</span>`;
+    }
+  } finally {
+    App._streaming = false;
+    document.getElementById('chat-send').disabled = false;
+    scrollChatBottom();
+  }
+}
+
+function appendBubble(role, content) {
+  const msgs = document.getElementById('chat-msgs');
+  const div = document.createElement('div');
+  div.className = `chat-msg chat-${role}`;
+  div.innerHTML = content ? renderMd(content) : '';
+  msgs.appendChild(div);
+  scrollChatBottom();
+  return div;
+}
+
+function renderMd(text) {
+  if (typeof marked !== 'undefined') {
+    try { return marked.parse(text, { breaks: true, gfm: true }); } catch {}
+  }
+  // Fallback
+  return escH(text)
+    .replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => `<pre><code class="language-${lang}">${code}</code></pre>`)
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>');
+}
+
+// ══════════════════════════════════════════════════════════
+// CODE TAB
+// ══════════════════════════════════════════════════════════
+function extractCode(text) {
+  const match = text.match(/```(?:python)?\n?([\s\S]+?)```/);
+  if (match) {
+    App.currentCode = match[1].trim();
+    showCode(App.currentCode);
+  }
+}
+
+function showCode(code) {
+  const codeEl = document.getElementById('code-display');
+  codeEl.textContent = code;
+  if (typeof hljs !== 'undefined') hljs.highlightElement(codeEl);
+  
+  // Sync editor value
+  document.getElementById('code-editor').value = code;
+
+  // Reset view/edit state to View mode by default
+  document.getElementById('btn-toggle-edit').textContent = '✏️ Edit';
+  codeEl.parentElement.style.display = 'block';
+  document.getElementById('code-editor').style.display = 'none';
+
+  document.getElementById('code-placeholder').style.display = 'none';
+  document.getElementById('code-content').style.display = 'flex';
+  
+  // Reset console panel
+  document.getElementById('console-panel').style.display = 'none';
+  document.getElementById('console-output').textContent = '';
+  document.getElementById('btn-fix-ai').style.display = 'none';
+
+  const title = App.currentPaper?.title?.split(':')[0]?.substring(0,40) || 'Implementation';
+  document.getElementById('code-title-label').textContent = title;
+}
+
+// Toggle edit mode
+function toggleEditMode() {
+  const toggleBtn = document.getElementById('btn-toggle-edit');
+  const codeEl = document.getElementById('code-display');
+  const preEl = codeEl.parentElement;
+  const editorEl = document.getElementById('code-editor');
+
+  if (toggleBtn.textContent === '✏️ Edit') {
+    editorEl.value = App.currentCode;
+    preEl.style.display = 'none';
+    editorEl.style.display = 'block';
+    toggleBtn.textContent = '👁️ View';
+    editorEl.focus();
+  } else {
+    App.currentCode = editorEl.value;
+    codeEl.textContent = App.currentCode;
+    if (typeof hljs !== 'undefined') hljs.highlightElement(codeEl);
+    editorEl.style.display = 'none';
+    preEl.style.display = 'block';
+    toggleBtn.textContent = '✏️ Edit';
+  }
+}
+document.getElementById('btn-toggle-edit').addEventListener('click', toggleEditMode);
+
+// Run code execution
+async function runCode() {
+  const toggleBtn = document.getElementById('btn-toggle-edit');
+  const isEditing = toggleBtn.textContent === '👁️ View';
+  const editor = document.getElementById('code-editor');
+  
+  if (isEditing) {
+    App.currentCode = editor.value;
+  }
+  
+  const codeToRun = App.currentCode;
+  if (!codeToRun) {
+    toast('No code to run', '⚠️');
+    return;
+  }
+
+  const runBtn = document.getElementById('btn-run-code');
+  runBtn.disabled = true;
+  runBtn.innerHTML = '<span class="spinner" style="display:inline-block;width:10px;height:10px;vertical-align:middle;margin-right:4px"></span> Running...';
+
+  const consolePanel = document.getElementById('console-panel');
+  const consoleOut = document.getElementById('console-output');
+  const fixBtn = document.getElementById('btn-fix-ai');
+
+  consolePanel.style.display = 'flex';
+  consoleOut.innerHTML = `<span class="console-line-sys">>>> Running Python script...</span>\n`;
+  fixBtn.style.display = 'none';
+
+  try {
+    const res = await fetch('/api/run-code', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code: codeToRun }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: res.statusText }));
+      throw new Error(err.error || res.statusText);
+    }
+
+    const data = await res.json();
+    let outHtml = '';
+
+    if (data.stdout) {
+      outHtml += `<span class="console-line-stdout">${escH(data.stdout)}</span>`;
+    }
+    if (data.stderr) {
+      outHtml += `<span class="console-line-stderr">${escH(data.stderr)}</span>`;
+    }
+
+    if (data.timeout) {
+      outHtml += `\n<span class="console-line-stderr">>>> Execution timed out (exceeded 10-second limit).</span>`;
+      fixBtn.style.display = 'inline-block';
+    } else if (data.exitCode === 0) {
+      outHtml += `\n<span class="console-line-sys">>>> Process finished successfully in ${data.duration}s.</span>`;
+    } else {
+      outHtml += `\n<span class="console-line-stderr">>>> Process exited with error code ${data.exitCode} in ${data.duration}s.</span>`;
+      fixBtn.style.display = 'inline-block';
+    }
+
+    consoleOut.innerHTML = outHtml;
+    consoleOut.scrollTop = consoleOut.scrollHeight;
+    App._lastError = data.stderr || 'Timeout/Exit Code Error';
+  } catch (err) {
+    consoleOut.innerHTML += `\n<span class="console-line-stderr">>>> Request failed: ${escH(err.message)}</span>`;
+  } finally {
+    runBtn.disabled = false;
+    runBtn.textContent = '▶ Run Code';
+  }
+}
+document.getElementById('btn-run-code').addEventListener('click', runCode);
+
+// Clear console
+document.getElementById('btn-clear-console').addEventListener('click', () => {
+  document.getElementById('console-output').textContent = '';
+  document.getElementById('console-panel').style.display = 'none';
+  document.getElementById('btn-fix-ai').style.display = 'none';
+});
+
+// AI Fixer
+function fixCodeWithAI() {
+  const errorText = App._lastError || 'Unknown runtime error';
+  const currentCode = App.currentCode;
+  
+  if (!currentCode) return;
+  
+  switchPanelTab('chat');
+  document.querySelectorAll('.mode-pill').forEach(p => p.classList.toggle('active', p.dataset.mode==='implement'));
+  App.chatMode = 'implement';
+
+  const userPrompt = `The implementation I tried to run encountered the following execution error:\n\n\`\`\`\n${errorText}\n\`\`\`\n\nHere is the code I ran:\n\n\`\`\`python\n${currentCode}\n\`\`\`\n\nPlease find the bug (e.g. check tensor shape mismatches, import errors, or syntax issues), explain what is wrong, and provide a fully corrected implementation.`;
+  
+  startStream(userPrompt);
+}
+document.getElementById('btn-fix-ai').addEventListener('click', fixCodeWithAI);
+
+document.getElementById('btn-gen-code').addEventListener('click', () => {
+  switchPanelTab('chat');
+  document.querySelectorAll('.mode-pill').forEach(p => p.classList.toggle('active', p.dataset.mode==='implement'));
+  App.chatMode = 'implement';
+  startStream('Implement the core algorithm of this paper in Python with detailed comments and a working demonstration.');
+});
+
+document.getElementById('btn-regen-code').addEventListener('click', () => {
+  switchPanelTab('chat');
+  document.querySelectorAll('.mode-pill').forEach(p => p.classList.toggle('active', p.dataset.mode==='implement'));
+  App.chatMode = 'implement';
+  startStream('Regenerate the Python implementation with more detail and better comments. Include more complete functionality.');
+});
+
+document.getElementById('btn-copy-code').addEventListener('click', () => {
+  const toggleBtn = document.getElementById('btn-toggle-edit');
+  if (toggleBtn.textContent === '👁️ View') {
+    App.currentCode = document.getElementById('code-editor').value;
+  }
+  if (!App.currentCode) return;
+  navigator.clipboard.writeText(App.currentCode).then(() => toast('Code copied ✓')).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = App.currentCode; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+    toast('Code copied ✓');
+  });
+});
+
+document.getElementById('btn-download-code').addEventListener('click', () => {
+  const toggleBtn = document.getElementById('btn-toggle-edit');
+  if (toggleBtn.textContent === '👁️ View') {
+    App.currentCode = document.getElementById('code-editor').value;
+  }
+  if (!App.currentCode) return;
+  const filename = (App.currentPaper?.title||'implementation').toLowerCase().replace(/[^a-z0-9]+/g,'_').substring(0,40) + '.py';
+  const blob = new Blob([App.currentCode], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download=filename;
+  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  toast(`Downloaded ${filename}`);
+});
+
+// ══════════════════════════════════════════════════════════
+// KEYBOARD SHORTCUTS
+// ══════════════════════════════════════════════════════════
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-bg.open').forEach(m => m.classList.remove('open'));
+    if (App.view === 'reader' && !document.querySelector('.modal-bg.open')) navigateTo(App._prevView||'search');
+  }
+  if ((e.metaKey||e.ctrlKey) && e.key==='k') {
+    e.preventDefault(); navigateTo('search');
+    setTimeout(() => document.getElementById('search-input').focus(), 100);
+  }
+});
+
+// ══════════════════════════════════════════════════════════
+// WIRE EVENTS
+// ══════════════════════════════════════════════════════════
+document.querySelectorAll('.nav-btn[data-view]').forEach(btn => btn.addEventListener('click', () => navigateTo(btn.dataset.view)));
+
+document.getElementById('search-btn').addEventListener('click', () => doSearch());
+document.getElementById('search-input').addEventListener('keydown', e => { if(e.key==='Enter') doSearch(); });
+document.getElementById('search-input').addEventListener('input', e => {
+  document.getElementById('search-clear').classList.toggle('show', !!e.target.value);
+});
+document.getElementById('search-clear').addEventListener('click', () => {
+  document.getElementById('search-input').value='';
+  document.getElementById('search-clear').classList.remove('show');
+  document.getElementById('search-welcome').style.display='';
+  document.getElementById('search-results').style.display='none';
+});
+
+document.querySelectorAll('.cat-pill').forEach(pill => pill.addEventListener('click', () => {
+  document.querySelectorAll('.cat-pill').forEach(p=>p.classList.remove('active'));
+  pill.classList.add('active');
+  App.searchCat = pill.dataset.cat;
+  if (App.searchQuery) doSearch();
+}));
+
+document.getElementById('sort-select').addEventListener('change', e => {
+  App.searchSort = e.target.value; if (App.searchQuery) doSearch();
+});
+
+document.getElementById('prev-page').addEventListener('click', () => { App.searchPage--; doSearch(false); });
+document.getElementById('next-page').addEventListener('click', () => { App.searchPage++; doSearch(false); });
+
+document.querySelectorAll('.lib-tab').forEach(tab => tab.addEventListener('click', () => {
+  document.querySelectorAll('.lib-tab').forEach(t=>t.classList.remove('active'));
+  tab.classList.add('active');
+  App.libStatus = tab.dataset.status;
+  loadLibrary();
+}));
+
+let _libTimer;
+document.getElementById('lib-search').addEventListener('input', e => {
+  clearTimeout(_libTimer);
+  _libTimer = setTimeout(() => { App.libQuery=e.target.value.trim(); loadLibrary(); }, 350);
+});
+
+document.getElementById('reader-back').addEventListener('click', () => navigateTo(App._prevView||'search'));
+document.querySelectorAll('.modal-bg').forEach(bg => bg.addEventListener('click', e => { if(e.target===e.currentTarget) e.currentTarget.classList.remove('open'); }));
+
+  // Notebook IDE Actions
+  document.getElementById('btn-nb-add-code').addEventListener('click', () => addNotebookCell('code'));
+  document.getElementById('btn-nb-add-md').addEventListener('click', () => addNotebookCell('markdown'));
+  document.getElementById('btn-nb-clear').addEventListener('click', () => {
+    App.notebookCells.forEach(c => { c.output = null; c.running = false; });
+    renderNotebook();
+    toast('Cleared all cell outputs');
+  });
+  document.getElementById('btn-nb-download').addEventListener('click', exportNotebook);
+  document.getElementById('btn-nb-run-all').addEventListener('click', async () => {
+    const runBtn = document.getElementById('btn-nb-run-all');
+    runBtn.disabled = true;
+    runBtn.textContent = 'Running...';
+    try {
+      for (const cell of App.notebookCells) {
+        if (cell.type === 'code') {
+          await runNotebookCell(cell.id);
+        }
+      }
+      toast('Run all cells completed');
+    } finally {
+      runBtn.disabled = false;
+      runBtn.textContent = '▶ Run All';
+    }
+  });
+
+  // Code Tab load into notebook bridge
+  document.getElementById('btn-load-notebook').addEventListener('click', () => {
+    const toggleBtn = document.getElementById('btn-toggle-edit');
+    if (toggleBtn && toggleBtn.textContent === '👁️ View') {
+      App.currentCode = document.getElementById('code-editor').value;
+    }
+    
+    if (!App.currentCode) {
+      toast('No code to load into notebook', '⚠️');
+      return;
+    }
+
+    initNotebook();
+    addNotebookCell('code', App.currentCode);
+    navigateTo('notebook');
+    toast('Loaded code into Notebook playground!');
+  });
+
+// ══════════════════════════════════════════════════════════
+// NOTEBOOK IDE LOGIC
+// ══════════════════════════════════════════════════════════
+function initNotebook() {
+  if (!App.notebookCells || App.notebookCells.length === 0) {
+    App.notebookCells = [
+      {
+        id: generateCellId(),
+        type: 'code',
+        content: '# Write Python code here\nimport torch\nprint("PyTorch version:", torch.__version__)\nprint("CUDA available:", torch.cuda.is_available())\n\n# Let\'s do a simple tensor check\nx = torch.rand(5, 3)\nprint("Random Tensor:\\n", x)',
+        output: null,
+        running: false
+      }
+    ];
+  }
+}
+
+function generateCellId() {
+  return 'cell_' + Math.random().toString(36).substring(2, 11);
+}
+
+function renderNotebook() {
+  const container = document.getElementById('notebook-cells-list');
+  if (!container) return;
+
+  if (App.notebookCells.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:36px;height:36px;color:var(--faint);margin-bottom:8px"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 9h6M9 13h6M9 17h6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <h3>Notebook is empty</h3>
+        <p>Add a code or markdown cell to get started.</p>
+      </div>
+    `;
+    return;
+  }
+
+  let codeCellCounter = 1;
+
+  container.innerHTML = App.notebookCells.map((c, index) => {
+    let executionIndicator = ' ';
+    if (c.type === 'code') {
+      if (c.running) {
+        executionIndicator = '*';
+      } else if (c.output) {
+        executionIndicator = codeCellCounter++;
+      } else {
+        executionIndicator = ' ';
+      }
+    }
+
+    const typeBadge = c.type === 'code' 
+      ? `<span class="cell-type-badge cell-type-code">Code</span>` 
+      : `<span class="cell-type-badge cell-type-markdown">Markdown</span>`;
+
+    const isFirst = index === 0;
+    const isLast = index === App.notebookCells.length - 1;
+
+    let bodyHtml = '';
+    if (c.type === 'code') {
+      bodyHtml = `
+        <div class="cell-editor-container">
+          <textarea class="cell-textarea" id="textarea-${c.id}" placeholder="Write python code..." rows="4">${escH(c.content)}</textarea>
+        </div>
+      `;
+    } else {
+      // Markdown cell
+      if (c.editing) {
+        bodyHtml = `
+          <div class="cell-editor-container">
+            <textarea class="cell-textarea" id="textarea-${c.id}" placeholder="Write markdown..." rows="3">${escH(c.content)}</textarea>
+          </div>
+        `;
+      } else {
+        const rendered = c.content.trim() 
+          ? renderMd(c.content) 
+          : `<div class="cell-markdown-preview empty-md">Double click to edit markdown...</div>`;
+        bodyHtml = `
+          <div class="cell-markdown-preview" id="preview-${c.id}">${rendered}</div>
+        `;
+      }
+    }
+
+    let outputHtml = '';
+    if (c.type === 'code' && (c.output || c.running)) {
+      let content = '';
+      if (c.running) {
+        content = `<div class="cell-output-sys">Executing on local Python runner...</div>`;
+      } else if (c.output) {
+        const out = c.output;
+        let sysInfo = `Exit code: ${out.exitCode} · Duration: ${out.duration}s`;
+        if (out.timeout) sysInfo += ' · TIMEOUT (10s limit)';
+        content = `<div class="cell-output-sys">${sysInfo}</div>`;
+        if (out.stdout) content += `<span class="cell-output-stdout">${escH(out.stdout)}</span>`;
+        if (out.stderr) content += `<span class="cell-output-stderr">${escH(out.stderr)}</span>`;
+      }
+      outputHtml = `<div class="cell-output-container">${content}</div>`;
+    }
+
+    return `
+      <div class="notebook-cell" id="cell-container-${c.id}" data-id="${c.id}">
+        <div class="cell-header">
+          <div class="cell-info">
+            <span style="font-family:'JetBrains Mono',monospace; font-weight:600; width:45px; display:inline-block">
+              ${c.type === 'code' ? `In [${executionIndicator}]:` : 'Md:'}
+            </span>
+            ${typeBadge}
+          </div>
+          <div class="cell-actions">
+            ${c.type === 'code' 
+              ? `<button class="cell-btn run-btn" onclick="runNotebookCell('${c.id}')">▶ Run</button>` 
+              : `<button class="cell-btn" onclick="toggleMarkdownEditing('${c.id}')">${c.editing ? '👁 Preview' : '✏ Edit'}</button>`
+            }
+            <button class="cell-btn" onclick="moveNotebookCell('${c.id}', -1)" ${isFirst ? 'disabled style="opacity:0.3"' : ''}>▲</button>
+            <button class="cell-btn" onclick="moveNotebookCell('${c.id}', 1)" ${isLast ? 'disabled style="opacity:0.3"' : ''}>▼</button>
+            <button class="cell-btn" style="color:var(--red)" onclick="deleteNotebookCell('${c.id}')">🗑</button>
+          </div>
+        </div>
+        <div class="cell-body-wrap">
+          ${bodyHtml}
+        </div>
+        ${outputHtml}
+      </div>
+    `;
+  }).join('');
+
+  // Attach event listeners for inputs
+  App.notebookCells.forEach(c => {
+    const textarea = document.getElementById(`textarea-${c.id}`);
+    if (textarea) {
+      textarea.style.height = 'auto';
+      textarea.style.height = textarea.scrollHeight + 'px';
+
+      textarea.addEventListener('input', e => {
+        c.content = e.target.value;
+        textarea.style.height = 'auto';
+        textarea.style.height = textarea.scrollHeight + 'px';
+      });
+
+      // Support Ctrl+Enter to run cell
+      textarea.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+          e.preventDefault();
+          runNotebookCell(c.id);
+        }
+      });
+
+      // For markdown cells, toggle preview on blur
+      if (c.type === 'markdown') {
+        textarea.addEventListener('blur', () => {
+          setTimeout(() => {
+            if (c.editing) {
+              c.editing = false;
+              renderNotebook();
+            }
+          }, 200);
+        });
+      }
+    }
+
+    const preview = document.getElementById(`preview-${c.id}`);
+    if (preview) {
+      preview.addEventListener('dblclick', () => {
+        c.editing = true;
+        renderNotebook();
+        setTimeout(() => {
+          const ta = document.getElementById(`textarea-${c.id}`);
+          if (ta) ta.focus();
+        }, 50);
+      });
+    }
+  });
+}
+
+window.runNotebookCell = async function(id) {
+  const cell = App.notebookCells.find(c => c.id === id);
+  if (!cell) return;
+
+  if (cell.type === 'markdown') {
+    cell.editing = false;
+    renderNotebook();
+    return;
+  }
+
+  cell.running = true;
+  cell.output = null;
+  renderNotebook();
+
+  try {
+    const res = await fetch('/api/run-code', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code: cell.content }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: res.statusText }));
+      throw new Error(err.error || res.statusText);
+    }
+
+    const data = await res.json();
+    cell.output = data;
+  } catch (err) {
+    cell.output = {
+      stdout: '',
+      stderr: 'Failed to execute: ' + err.message,
+      exitCode: 1,
+      duration: '0.00',
+      timeout: false
+    };
+  } finally {
+    cell.running = false;
+    renderNotebook();
+  }
+};
+
+window.toggleMarkdownEditing = function(id) {
+  const cell = App.notebookCells.find(c => c.id === id);
+  if (!cell) return;
+  cell.editing = !cell.editing;
+  renderNotebook();
+  if (cell.editing) {
+    setTimeout(() => {
+      const ta = document.getElementById(`textarea-${id}`);
+      if (ta) ta.focus();
+    }, 50);
+  }
+};
+
+window.deleteNotebookCell = function(id) {
+  App.notebookCells = App.notebookCells.filter(c => c.id !== id);
+  renderNotebook();
+};
+
+window.moveNotebookCell = function(id, direction) {
+  const index = App.notebookCells.findIndex(c => c.id === id);
+  if (index === -1) return;
+  const newIndex = index + direction;
+  if (newIndex < 0 || newIndex >= App.notebookCells.length) return;
+
+  const temp = App.notebookCells[index];
+  App.notebookCells[index] = App.notebookCells[newIndex];
+  App.notebookCells[newIndex] = temp;
+
+  renderNotebook();
+};
+
+window.addNotebookCell = function(type, content = '') {
+  initNotebook();
+  App.notebookCells.push({
+    id: generateCellId(),
+    type: type,
+    content: content,
+    output: null,
+    running: false,
+    editing: content === ''
+  });
+  renderNotebook();
+  const body = document.getElementById('notebook-body');
+  if (body) {
+    setTimeout(() => {
+      body.scrollTop = body.scrollHeight;
+    }, 50);
+  }
+};
+
+function exportNotebook() {
+  let executionCount = 1;
+  const ipynbCells = App.notebookCells.map(c => {
+    const sourceLines = c.content.split('\n').map((line, i, arr) => line + (i < arr.length - 1 ? '\n' : ''));
+    if (c.type === 'code') {
+      const outputs = [];
+      if (c.output) {
+        if (c.output.stdout) {
+          outputs.push({
+            name: 'stdout',
+            output_type: 'stream',
+            text: c.output.stdout.split('\n').map((line, i, arr) => line + (i < arr.length - 1 ? '\n' : ''))
+          });
+        }
+        if (c.output.stderr) {
+          outputs.push({
+            name: 'stderr',
+            output_type: 'stream',
+            text: c.output.stderr.split('\n').map((line, i, arr) => line + (i < arr.length - 1 ? '\n' : ''))
+          });
+        }
+      }
+      return {
+        cell_type: 'code',
+        execution_count: executionCount++,
+        metadata: {},
+        outputs: outputs,
+        source: sourceLines
+      };
+    } else {
+      return {
+        cell_type: 'markdown',
+        metadata: {},
+        source: sourceLines
+      };
+    }
+  });
+
+  const ipynb = {
+    cells: ipynbCells,
+    metadata: {
+      kernelspec: {
+        display_name: "Python 3",
+        language: "python",
+        name: "python3"
+      },
+      language_info: {
+        name: "python"
+      }
+    },
+    nbformat: 4,
+    nbformat_minor: 2
+  };
+
+  const filename = (App.currentPaper?.title || 'notebook').toLowerCase().replace(/[^a-z0-9]+/g, '_').substring(0, 40) + '.ipynb';
+  const blob = new Blob([JSON.stringify(ipynb, null, 2)], { type: 'application/x-ipynb+json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  toast(`Downloaded ${filename}`);
+}
+
+// ══════════════════════════════════════════════════════════
+// DATASET EXTRACTION LOGIC
+// ══════════════════════════════════════════════════════════
+async function loadDatasets(paper) {
+  const container = document.getElementById('reader-datasets-container');
+  if (!container) return;
+
+  container.innerHTML = `
+    <div class="r-datasets-box">
+      <div class="r-datasets-label">📊 Datasets & Benchmarks</div>
+      <div class="skeleton" style="width:100%;height:30px;margin-bottom:8px;border-radius:6px"></div>
+      <div class="skeleton" style="width:100%;height:30px;border-radius:6px"></div>
+    </div>
+  `;
+
+  try {
+    const data = await api('/api/datasets', {
+      method: 'POST',
+      body: JSON.stringify({ title: paper.title, abstract: paper.abstract })
+    });
+
+    const datasets = data.datasets || [];
+    if (datasets.length === 0) {
+      container.innerHTML = `
+        <div class="r-datasets-box">
+          <div class="r-datasets-label">📊 Datasets & Benchmarks</div>
+          <div style="font-size:13px;color:var(--muted)">No specific datasets or benchmarks were identified in this paper abstract.</div>
+        </div>
+      `;
+      return;
+    }
+
+    let listHtml = datasets.map((d, index) => {
+      const codeHtml = d.pythonCode ? d.pythonCode.trim() : '';
+      return `
+        <div class="dataset-card" data-index="${index}">
+          <div class="dataset-card-header">
+            <div class="dataset-name-task">
+              <span class="dataset-name">${escH(d.name)}</span>
+              ${d.task ? `<span class="dataset-task-badge">${escH(d.task)}</span>` : ''}
+            </div>
+            <span class="dataset-card-toggle">▼ Expand</span>
+          </div>
+          <div class="dataset-card-body">
+            ${d.url ? `
+              <div class="dataset-link-row">
+                <span>Repository:</span>
+                <a href="${escH(d.url)}" target="_blank">${escH(d.url)} ↗</a>
+              </div>
+            ` : ''}
+            ${codeHtml ? `
+              <div class="dataset-code-header">Python Load Snippet</div>
+              <div class="dataset-code-container">
+                <button class="btn-dataset-copy" onclick="event.stopPropagation(); copyDatasetCode(${index})">Copy</button>
+                <pre class="dataset-code-pre"><code class="language-python" id="dataset-code-${index}">${escH(codeHtml)}</code></pre>
+              </div>
+              <button class="btn btn-xs btn-ghost" style="margin-top:6px; background:var(--blue-bg); border-color:var(--blue-border); color:var(--blue)" onclick="event.stopPropagation(); loadDatasetIntoNotebook(${index})">⚡ Load into Notebook</button>
+            ` : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    container.innerHTML = `
+      <div class="r-datasets-box">
+        <div class="r-datasets-label">📊 Datasets & Benchmarks</div>
+        <div class="dataset-list">${listHtml}</div>
+      </div>
+    `;
+
+    // Highlight code blocks
+    container.querySelectorAll('pre code').forEach(block => {
+      if (typeof hljs !== 'undefined') hljs.highlightElement(block);
+    });
+
+    // Wire toggle event
+    container.querySelectorAll('.dataset-card-header').forEach(hdr => {
+      hdr.addEventListener('click', () => {
+        const body = hdr.nextElementSibling;
+        const toggle = hdr.querySelector('.dataset-card-toggle');
+        const isOpen = body.classList.contains('open');
+        body.classList.toggle('open', !isOpen);
+        toggle.textContent = isOpen ? '▼ Expand' : '▲ Collapse';
+      });
+    });
+
+    App.currentPaperDatasets = datasets;
+
+  } catch (err) {
+    container.innerHTML = `
+      <div class="r-datasets-box">
+        <div class="r-datasets-label">📊 Datasets & Benchmarks</div>
+        <div style="font-size:13px;color:var(--red)">⚠ Failed to extract datasets: ${escH(err.message)}</div>
+      </div>
+    `;
+  }
+}
+
+window.copyDatasetCode = function(index) {
+  const code = App.currentPaperDatasets?.[index]?.pythonCode;
+  if (!code) return;
+  navigator.clipboard.writeText(code).then(() => toast('Code copied ✓')).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = code; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+    toast('Code copied ✓');
+  });
+};
+
+window.loadDatasetIntoNotebook = function(index) {
+  const code = App.currentPaperDatasets?.[index]?.pythonCode;
+  if (!code) return;
+  initNotebook();
+  addNotebookCell('code', code);
+  navigateTo('notebook');
+  toast('Loaded dataset code into Notebook playground!');
+};
+
+// ══════════════════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════════════════
+function escH(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ══════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════
+refreshStats();
+checkGroqKeyStatus();
+
+} // end initApp
+</script>
+</body>
+</html>
