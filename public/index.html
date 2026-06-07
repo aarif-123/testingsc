@@ -2453,11 +2453,11 @@ h1, h2, h3, h4, .brand-title, .logo-name, .page-title, .r-paper-title, .reader-p
   </div>
 
   <!-- ─── AURUM PYTHON IDE ─── -->
-  <div class="view" id="view-notebook" style="display:none; flex-direction:column; height:100%; overflow:hidden;">
+  <div class="view" id="view-notebook" style="flex-direction:column; height:100%; overflow:hidden;">
     
     <!-- IDE Header Area with Metrics -->
-    <div class="page-header" style="margin-bottom: 12px; flex-shrink:0;">
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:12px;">
+    <div class="page-header" style="padding: 16px 32px; flex-shrink:0;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
         <div>
           <div class="page-title" style="color:var(--blue); font-size:23px;">Aurum Python IDE</div>
           <div class="page-sub">Interactive AI-enabled development workspace with integrated dataset loading guidance</div>
@@ -2469,58 +2469,10 @@ h1, h2, h3, h4, .brand-title, .logo-name, .page-title, .r-paper-title, .reader-p
           </div>
         </div>
       </div>
-      
-      <!-- KPI Metrics Grid -->
-      <div class="kpi-grid" style="margin-bottom:0px; gap:12px;">
-        <div class="kpi-card" style="padding:12px 16px;">
-          <div class="kpi-label-row" style="margin-bottom:4px;">
-            <span class="kpi-label" style="font-size:9.5px;">CUDA VRAM Occupancy</span>
-            <span class="kpi-badge kpi-badge-gold" style="font-size:8.5px; padding:1px 5px;">VRAM</span>
-          </div>
-          <div class="kpi-val" style="font-size:20px;" id="kpi-vram-val">18.4 GB / 80GB</div>
-          <div class="kpi-progress-bar" style="margin-top:8px;">
-            <div class="kpi-progress-fill" style="width: 23%"></div>
-          </div>
-          <div class="kpi-spark" style="margin-top:6px; font-size:10px;">Partition: GPU-0 (Aurelia Inference)</div>
-        </div>
-        <div class="kpi-card" style="padding:12px 16px;">
-          <div class="kpi-label-row" style="margin-bottom:4px;">
-            <span class="kpi-label" style="font-size:9.5px;">Avg Step Latency</span>
-            <span class="kpi-badge kpi-badge-green" style="font-size:8.5px; padding:1px 5px;">Latency</span>
-          </div>
-          <div class="kpi-val" style="font-size:20px;" id="kpi-latency-val">14.1 ms</div>
-          <div class="kpi-progress-bar" style="margin-top:8px;">
-            <div class="kpi-progress-fill" style="width: 14%; background:linear-gradient(90deg, #10b981, #34d399); box-shadow:0 0 8px #10b981;"></div>
-          </div>
-          <div class="kpi-spark" style="margin-top:6px; font-size:10px;">Autotune compilation enabled</div>
-        </div>
-        <div class="kpi-card" style="padding:12px 16px;">
-          <div class="kpi-label-row" style="margin-bottom:4px;">
-            <span class="kpi-label" style="font-size:9.5px;">Interactive Runs</span>
-            <span class="kpi-badge kpi-badge-gold" style="font-size:8.5px; padding:1px 5px;">Execution</span>
-          </div>
-          <div class="kpi-val" style="font-size:20px;" id="kpi-runs-val">42</div>
-          <div class="kpi-progress-bar" style="margin-top:8px;">
-            <div class="kpi-progress-fill" style="width: 45%"></div>
-          </div>
-          <div class="kpi-spark" style="margin-top:6px; font-size:10px;">Interactive code run metrics</div>
-        </div>
-        <div class="kpi-card" style="padding:12px 16px;">
-          <div class="kpi-label-row" style="margin-bottom:4px;">
-            <span class="kpi-label" style="font-size:9.5px;">Triton Compiler</span>
-            <span class="kpi-badge kpi-badge-gold" style="font-size:8.5px; padding:1px 5px; background:rgba(34,211,238,0.08); color:hsl(190, 90%, 60%); border-color:rgba(34,211,238,0.2);">COMPILER</span>
-          </div>
-          <div class="kpi-val" style="font-size:20px;">READY</div>
-          <div class="kpi-progress-bar" style="margin-top:8px;">
-            <div class="kpi-progress-fill" style="width: 100%; background:linear-gradient(90deg, #06b6d4, #22d3ee); box-shadow: 0 0 8px #22d3ee;"></div>
-          </div>
-          <div class="kpi-spark" style="margin-top:6px; font-size:10px;">Backend runtime active</div>
-        </div>
-      </div>
     </div>
     
     <!-- 3-Pane Split Grid Layout -->
-    <div class="ide-workspace-layout" style="display:flex; flex:1; overflow:hidden; gap:16px; min-height:0; margin-bottom: 24px;">
+    <div class="ide-workspace-layout" style="display:flex; flex:1; overflow:hidden; gap:16px; min-height:0; padding: 0 32px 16px 32px;">
       
       <!-- Left Column: Workspace Files & Dataset Guidance (Width: 260px) -->
       <div class="ide-left-pane" style="width:260px; display:flex; flex-direction:column; gap:16px; flex-shrink:0; overflow:hidden; min-height:0;">
