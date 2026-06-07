@@ -1,0 +1,1852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Aurum — Premium Python Environment</title>
+<meta name="description" content="High-end developer workspace for Python pipelines and ML execution."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+<!-- highlight.js for syntax highlighting -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/yaml.min.js"></script>
+<style>
+:root {
+  /* Palette: Luxury Dark (Deep Obsidian, Brushed Gold, Charcoal Carbon, Warm Ivory) */
+  --bg-primary: #060608;
+  --bg-secondary: #0b0b0f;
+  --bg-tertiary: #111116;
+  --bg-input: #08080b;
+  --bg-hover: rgba(212, 175, 55, 0.04);
+  --bg-active: rgba(212, 175, 55, 0.08);
+  
+  --gold-primary: #d4af37;
+  --gold-secondary: #aa8416;
+  --gold-light: #f3e5ab;
+  --gold-dark: #6e5512;
+  --gold-fade: rgba(212, 175, 55, 0.06);
+  --gold-border: rgba(212, 175, 55, 0.15);
+  --gold-border-glow: rgba(212, 175, 55, 0.35);
+  
+  --text-primary: #f5f5f8;
+  --text-secondary: #9a9ab0;
+  --text-muted: #575769;
+  
+  --border: rgba(255, 255, 255, 0.04);
+  --border-gold: rgba(212, 175, 55, 0.08);
+  
+  /* Fonts */
+  --font-editorial: 'Cormorant Garamond', serif;
+  --font-ui: 'Space Grotesk', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  
+  /* Layout constraints */
+  --sidebar-w: 240px;
+  --navbar-h: 70px;
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 16px;
+  
+  /* Transition curve */
+  --transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100vh;
+  overflow: hidden;
+  font-family: var(--font-ui);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 13.5px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom Sleek Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 55, 0.15);
+  border-radius: 99px;
+  transition: var(--transition);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gold-primary);
+}
+
+/* ── Typography & Headings ── */
+h1, h2, h3, h4, .brand-title {
+  font-family: var(--font-editorial);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+a {
+  color: var(--gold-primary);
+  text-decoration: none;
+  transition: var(--transition);
+}
+a:hover {
+  color: var(--gold-light);
+  text-shadow: 0 0 8px rgba(212, 175, 55, 0.3);
+}
+
+/* ── App Layout ── */
+#app {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ── Background Glow Blobs (SaaS Aurora Nebula) ── */
+.bg-glow {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(160px);
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.08;
+  mix-blend-mode: screen;
+  animation: floatGlow 25s infinite alternate ease-in-out;
+}
+.bg-glow-1 {
+  top: -15%;
+  left: 20%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, var(--gold-primary) 0%, transparent 80%);
+}
+.bg-glow-2 {
+  bottom: -10%;
+  right: -5%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, var(--gold-secondary) 0%, transparent 80%);
+  animation-delay: -8s;
+}
+@keyframes floatGlow {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(40px, 30px) scale(1.1); }
+  100% { transform: translate(-20px, -40px) scale(0.95); }
+}
+
+/* ── Sidebar Nav ── */
+#sidebar {
+  width: var(--sidebar-w);
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--gold-border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  z-index: 10;
+  box-shadow: 10px 0 40px rgba(0,0,0,0.5);
+  position: relative;
+}
+.sidebar-brand {
+  height: var(--navbar-h);
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+.brand-mark {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--gold-primary);
+  background: radial-gradient(circle, var(--bg-tertiary) 0%, var(--bg-primary) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--gold-primary);
+  box-shadow: 0 0 15px rgba(212,175,55,0.15);
+  position: relative;
+  overflow: hidden;
+}
+.brand-mark::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(to bottom, rgba(255,255,255,0.1), transparent);
+  transform: rotate(45deg);
+}
+.brand-title {
+  font-size: 20px;
+  letter-spacing: 0.12em;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.brand-subtitle {
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  color: var(--gold-primary);
+  text-transform: uppercase;
+  margin-top: 1px;
+}
+.sidebar-nav {
+  padding: 24px 14px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+}
+.nav-group-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 8px 14px 4px;
+  margin-top: 10px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: var(--r-md);
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 13px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+  transition: var(--transition);
+  position: relative;
+}
+.nav-item:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: rgba(212, 175, 55, 0.05);
+}
+.nav-item.active {
+  background: rgba(212, 175, 55, 0.03);
+  color: var(--gold-light);
+  border-color: rgba(212, 175, 55, 0.18);
+  box-shadow: inset 0 0 10px rgba(212,175,55,0.02);
+}
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 30%;
+  height: 40%;
+  width: 2px;
+  background: var(--gold-primary);
+  border-radius: 0 4px 4px 0;
+  box-shadow: 0 0 8px var(--gold-primary);
+}
+.nav-item svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  color: inherit;
+  transition: transform 0.2s;
+}
+.nav-item:hover svg {
+  transform: scale(1.08);
+}
+.nav-badge {
+  margin-left: auto;
+  font-size: 10px;
+  font-weight: 700;
+  background: var(--gold-fade);
+  color: var(--gold-primary);
+  padding: 2px 7px;
+  border-radius: 100px;
+  border: 1px solid var(--gold-border);
+}
+.sidebar-footer {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  background: rgba(0,0,0,0.15);
+}
+.compute-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--gold-border);
+  border-radius: var(--r-md);
+  padding: 10px 14px;
+}
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gold-primary);
+  box-shadow: 0 0 8px var(--gold-primary);
+  animation: pulseGlow 2s infinite alternate;
+}
+@keyframes pulseGlow {
+  0% { transform: scale(0.9); opacity: 0.6; }
+  100% { transform: scale(1.1); opacity: 1; }
+}
+.status-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.status-desc {
+  font-size: 9px;
+  color: var(--text-secondary);
+}
+
+/* ── Main Panel Container ── */
+#main-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 1;
+}
+
+/* ── Top Navbar ── */
+#navbar {
+  height: var(--navbar-h);
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.25);
+  position: relative;
+}
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+.breadcrumb-sep {
+  color: var(--text-muted);
+  font-size: 11px;
+}
+.breadcrumb-file {
+  color: var(--text-primary);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.breadcrumb-file svg {
+  width: 13px;
+  height: 13px;
+  color: var(--gold-primary);
+}
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.search-wrapper {
+  position: relative;
+  width: 200px;
+  display: none; /* Keep layout clean or display if needed */
+}
+@media(min-width: 900px) {
+  .search-wrapper { display: block; }
+}
+.search-input {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 8px 12px 8px 32px;
+  color: var(--text-primary);
+  outline: none;
+  font-size: 12px;
+  transition: var(--transition);
+}
+.search-input:focus {
+  border-color: var(--gold-border);
+  box-shadow: 0 0 10px rgba(212,175,55,0.05);
+}
+.search-wrapper svg {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  color: var(--text-muted);
+}
+.search-kbd {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 9px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  padding: 1px 4px;
+  border-radius: 3px;
+  color: var(--text-muted);
+}
+
+/* Notification & Avatar controls */
+.nav-icon-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: var(--transition);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.nav-icon-btn:hover {
+  background: var(--bg-hover);
+  color: var(--gold-primary);
+}
+.nav-icon-btn svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  fill: none;
+}
+.nav-badge-dot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--gold-primary);
+  box-shadow: 0 0 6px var(--gold-primary);
+}
+.avatar-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 8px;
+  border-radius: var(--r-md);
+  transition: var(--transition);
+}
+.avatar-btn:hover {
+  background: var(--bg-hover);
+}
+.avatar-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--gold-border);
+  background: radial-gradient(circle, var(--gold-primary) 0%, var(--gold-secondary) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 12px;
+  color: #fff;
+  box-shadow: 0 0 10px rgba(212,175,55,0.1);
+}
+.avatar-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: none;
+}
+@media(min-width: 768px) {
+  .avatar-name { display: block; }
+}
+
+/* ── Interactive Dropdowns ── */
+.dropdown-panel {
+  position: absolute;
+  top: 100%;
+  right: 32px;
+  margin-top: 8px;
+  background: rgba(11, 11, 15, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--gold-border);
+  border-radius: var(--r-md);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.03);
+  z-index: 100;
+  display: none;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: var(--transition);
+}
+.dropdown-panel.open {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+.notifications-dropdown {
+  width: 340px;
+}
+.dropdown-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.dropdown-header h4 {
+  font-size: 14px;
+  color: var(--text-primary);
+}
+.dropdown-header .clear-link {
+  font-size: 11px;
+  color: var(--gold-primary);
+  cursor: pointer;
+}
+.dropdown-list {
+  max-height: 280px;
+  overflow-y: auto;
+}
+.dropdown-item {
+  padding: 14px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.02);
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.dropdown-item:last-child {
+  border-bottom: none;
+}
+.dropdown-item:hover {
+  background: rgba(255,255,255,0.015);
+}
+.item-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.item-title {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.item-time {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+.item-desc {
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+.avatar-dropdown {
+  width: 220px;
+}
+.user-info-section {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.user-info-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.user-info-role {
+  font-size: 11px;
+  color: var(--gold-primary);
+  font-weight: 500;
+}
+.dropdown-action-item {
+  padding: 12px 20px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: var(--transition);
+}
+.dropdown-action-item:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+.dropdown-action-item svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2;
+}
+
+/* ── Content Viewport ── */
+#viewport {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 24px 32px 32px;
+}
+
+/* ── Metric KPIs Grid ── */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.kpi-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--gold-border);
+  border-radius: var(--r-md);
+  padding: 18px 22px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  transition: var(--transition);
+}
+.kpi-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--gold-border-glow);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.25), 0 0 15px rgba(212,175,55,0.02);
+}
+.kpi-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.kpi-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+.kpi-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+.kpi-badge-gold {
+  background: var(--gold-fade);
+  color: var(--gold-primary);
+  border: 1px solid var(--gold-border);
+}
+.kpi-badge-green {
+  background: rgba(34, 197, 94, 0.06);
+  color: var(--green);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+.kpi-val {
+  font-family: var(--font-editorial);
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+.kpi-spark {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11.5px;
+  color: var(--text-secondary);
+}
+.spark-delta {
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+.spark-delta.positive {
+  color: var(--gold-primary);
+}
+.spark-delta.neutral {
+  color: var(--text-secondary);
+}
+.kpi-progress-bar {
+  margin-top: 12px;
+  height: 3px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 9px;
+  overflow: hidden;
+}
+.kpi-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold-secondary), var(--gold-primary));
+  border-radius: 9px;
+  box-shadow: 0 0 8px var(--gold-primary);
+}
+
+/* ── Workspace Editor Grid ── */
+.workspace-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  min-height: 500px;
+}
+@media(min-width: 1024px) {
+  .workspace-grid {
+    grid-template-columns: 1fr 360px;
+  }
+}
+@media(min-width: 1280px) {
+  .workspace-grid {
+    grid-template-columns: 1fr 400px;
+  }
+}
+
+/* ── Left Editor Column ── */
+.editor-column {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-secondary);
+  border: 1px solid var(--gold-border);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+}
+
+/* File Tab bar */
+.tab-bar {
+  background: rgba(0,0,0,0.15);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  flex-shrink: 0;
+}
+.tab-list {
+  display: flex;
+  gap: 2px;
+}
+.tab-item {
+  padding: 14px 20px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tab-item:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.01);
+}
+.tab-item.active {
+  color: var(--gold-primary);
+  border-bottom-color: var(--gold-primary);
+  background: var(--gold-fade);
+  text-shadow: 0 0 6px rgba(212, 175, 55, 0.15);
+}
+.tab-item svg {
+  width: 12px;
+  height: 12px;
+  color: var(--gold-primary);
+}
+.tab-item .tab-close {
+  color: var(--text-muted);
+  font-size: 10px;
+  margin-left: 4px;
+  border-radius: 50%;
+  width: 14px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+.tab-item:hover .tab-close {
+  color: var(--text-secondary);
+}
+.tab-item .tab-close:hover {
+  background: rgba(255,255,255,0.08);
+  color: var(--red);
+}
+.editor-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.btn-run {
+  background: transparent;
+  border: 1px solid var(--gold-primary);
+  color: var(--gold-primary);
+  border-radius: var(--r-sm);
+  padding: 5px 12px;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: var(--transition);
+  box-shadow: 0 0 10px rgba(212,175,55,0.05);
+}
+.btn-run:hover {
+  background: var(--gold-fade);
+  color: var(--gold-light);
+  border-color: var(--gold-light);
+  transform: translateY(-0.5px);
+  box-shadow: 0 0 12px rgba(212,175,55,0.15);
+}
+.btn-run svg {
+  width: 11px;
+  height: 11px;
+  fill: currentColor;
+}
+
+/* Custom Editor Workspace */
+.editor-workspace {
+  flex: 1;
+  display: flex;
+  background: var(--bg-primary);
+  position: relative;
+  min-height: 280px;
+  overflow: hidden;
+}
+.editor-gutter {
+  width: 45px;
+  border-right: 1px solid var(--border);
+  background: rgba(0,0,0,0.12);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: 16px 10px 16px 0;
+  user-select: none;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--text-muted);
+  line-height: 1.8;
+}
+.editor-textarea-wrap {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+.editor-textarea {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: none;
+  resize: none;
+  outline: none;
+  color: transparent;
+  caret-color: var(--gold-primary);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.8;
+  padding: 16px 20px;
+  white-space: pre;
+  overflow: auto;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+}
+.editor-highlight {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 16px 20px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.8;
+  white-space: pre;
+  overflow: auto;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.editor-highlight code {
+  background: none;
+  padding: 0;
+  border: none;
+  display: block;
+}
+
+/* Overriding highlight.js palette to Gold and Carbon */
+.hljs-keyword, .hljs-selector-tag {
+  color: var(--gold-primary) !important;
+  font-weight: 600;
+}
+.hljs-string, .hljs-title, .hljs-section {
+  color: var(--gold-light) !important;
+}
+.hljs-comment {
+  color: var(--text-muted) !important;
+  font-style: italic;
+}
+.hljs-number, .hljs-literal {
+  color: #ffffff !important;
+}
+.hljs-built_in, .hljs-bullet {
+  color: #e5c158 !important;
+}
+.hljs-params {
+  color: var(--text-primary) !important;
+}
+
+/* Console Terminal Panel */
+.terminal-panel {
+  height: 220px;
+  background: var(--bg-tertiary);
+  border-top: 1px solid var(--gold-border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+.terminal-header {
+  padding: 10px 20px;
+  background: rgba(0,0,0,0.15);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.terminal-header-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+.terminal-actions {
+  display: flex;
+  gap: 12px;
+}
+.terminal-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: inherit;
+  transition: var(--transition);
+}
+.terminal-btn:hover {
+  color: var(--gold-primary);
+}
+.terminal-console {
+  flex: 1;
+  padding: 14px 20px;
+  overflow-y: auto;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.65;
+  margin: 0;
+  border: none;
+  background: transparent;
+  color: #e2e8f0;
+}
+.log-sys {
+  color: var(--gold-primary);
+  font-weight: 600;
+}
+.log-stdout {
+  color: #cbd5e1;
+}
+.log-stderr {
+  color: var(--red);
+}
+.log-warn {
+  color: var(--yellow);
+}
+
+/* ── AI Chat Assistant Panel ── */
+.ai-panel {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-secondary);
+  border: 1px solid var(--gold-border);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+}
+.ai-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(0,0,0,0.15);
+}
+.ai-logo {
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--gold-primary);
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-editorial);
+  font-size: 11px;
+  color: var(--gold-primary);
+  box-shadow: 0 0 10px rgba(212,175,55,0.15);
+}
+.ai-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.ai-status-badge {
+  margin-left: auto;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  background: var(--gold-fade);
+  color: var(--gold-primary);
+  border: 1px solid var(--gold-border);
+  padding: 2px 8px;
+  border-radius: 100px;
+}
+.ai-chat-body {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.chat-bubble {
+  max-width: 90%;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.chat-bubble-user {
+  align-self: flex-end;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--gold-border);
+  border-bottom-right-radius: 3px;
+  color: var(--text-primary);
+}
+.chat-bubble-ai {
+  align-self: flex-start;
+  background: var(--gold-fade);
+  border: 1px solid rgba(212, 175, 55, 0.1);
+  border-bottom-left-radius: 3px;
+  color: #cbd5e1;
+}
+.chat-bubble-ai p {
+  margin-bottom: 8px;
+}
+.chat-bubble-ai p:last-child {
+  margin-bottom: 0;
+}
+.chat-bubble-ai code {
+  background: rgba(0,0,0,0.2);
+  border: 1px solid rgba(212,175,55,0.08);
+}
+.ai-chat-input-area {
+  padding: 14px 16px;
+  border-top: 1px solid var(--border);
+  background: rgba(0,0,0,0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.quick-pills {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.quick-pill {
+  padding: 5px 10px;
+  border-radius: 100px;
+  border: 1px solid var(--border-gold);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 11px;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: inherit;
+}
+.quick-pill:hover {
+  border-color: var(--gold-primary);
+  color: var(--gold-light);
+  background: var(--gold-fade);
+}
+.ai-input-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.ai-chat-ta {
+  flex: 1;
+  background: var(--bg-input);
+  border: 1px solid var(--gold-border);
+  border-radius: var(--r-sm);
+  padding: 10px 14px;
+  color: var(--text-primary);
+  outline: none;
+  font-family: inherit;
+  font-size: 12.5px;
+  resize: none;
+  min-height: 38px;
+  max-height: 100px;
+  line-height: 1.5;
+  transition: var(--transition);
+}
+.ai-chat-ta:focus {
+  border-color: var(--gold-border-glow);
+  box-shadow: 0 0 15px rgba(212,175,55,0.05);
+}
+.btn-send-ai {
+  background: var(--gold-primary);
+  color: var(--bg-primary);
+  border: none;
+  border-radius: var(--r-sm);
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: 0 0 10px rgba(212,175,55,0.2);
+}
+.btn-send-ai:hover {
+  background: var(--gold-light);
+  transform: translateY(-0.5px);
+}
+.btn-send-ai svg {
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+}
+</style>
+</head>
+<body>
+<!-- Premium Background Glows -->
+<div class="bg-glow bg-glow-1"></div>
+<div class="bg-glow bg-glow-2"></div>
+
+<div id="app">
+
+  <!-- ─── SIDEBAR NAV ─── -->
+  <aside id="sidebar">
+    <div class="sidebar-brand" onclick="window.location.href='/'">
+      <div class="brand-mark">A</div>
+      <div>
+        <div class="brand-title">Aurum</div>
+        <div class="brand-subtitle">Python Runtime</div>
+      </div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-group-label">Core IDE</div>
+      <button class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" stroke-linecap="round"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="9" y1="9" x2="21" y2="9"/></svg>
+        Workspace
+      </button>
+      <button class="nav-item" onclick="alert('Compute clusters view integrates resource logs, TPU/GPU allocation, and live node scaling.')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="2" width="20" height="8" rx="2" ry="2" stroke-linecap="round"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2" stroke-linecap="round"/><line x1="6" y1="6" x2="6" y2="6" stroke-linecap="round"/><line x1="6" y1="18" x2="6" y2="18" stroke-linecap="round"/></svg>
+        Compute Cluster
+        <span class="nav-badge">Live</span>
+      </button>
+      <button class="nav-item" onclick="alert('Model Pipelines manages pipeline executions, Triton server endpoints, and checkpoint version files.')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Model Pipelines
+      </button>
+      <button class="nav-item" onclick="alert('Data catalog registers workspace database files, Hugging Face loaders, and quantitative datasets.')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Data Catalog
+      </button>
+      
+      <div class="nav-group-label">Configuration</div>
+      <button class="nav-item" onclick="alert('Manage secrets, credentials, and custom path environment variables.')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" stroke-linecap="round"/></svg>
+        Environment Variables
+      </button>
+      <button class="nav-item" onclick="alert('Aurum platform settings')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke-linecap="round"/></svg>
+        Security & Access
+      </button>
+    </div>
+    <div class="sidebar-footer">
+      <div class="compute-status">
+        <div class="status-indicator"></div>
+        <div>
+          <div class="status-title">CUDA Node: Active</div>
+          <div class="status-desc">A100-SXM4 · 80GB VRAM</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ─── MAIN CONTAINER ─── -->
+  <main id="main-container">
+    
+    <!-- ── NAVBAR ── -->
+    <header id="navbar">
+      <div class="navbar-left">
+        <div class="breadcrumb">
+          <span>workspace</span>
+          <span class="breadcrumb-sep">/</span>
+          <span>aurelia_core</span>
+          <span class="breadcrumb-sep">/</span>
+          <span class="breadcrumb-file">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke-linecap="round"/><polyline points="14 2 14 8 20 8" stroke-linecap="round"/></svg>
+            <span id="active-file-breadcrumb">triton_inference.py</span>
+          </span>
+        </div>
+      </div>
+      <div class="navbar-right">
+        <div class="search-wrapper">
+          <input class="search-input" type="text" placeholder="Search files..."/>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <span class="search-kbd">⌘K</span>
+        </div>
+
+        <!-- Notification Bell -->
+        <button class="nav-icon-btn" id="bell-btn" aria-label="View notifications">
+          <svg viewBox="0 0 24 24" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <div class="nav-badge-dot"></div>
+        </button>
+
+        <!-- Avatar -->
+        <button class="avatar-btn" id="avatar-btn" aria-label="View account profile">
+          <div class="avatar-img">AC</div>
+          <span class="avatar-name">Alex Chen</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;color:var(--text-muted)"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+      </div>
+
+      <!-- Notifications Dropdown Panel -->
+      <div class="dropdown-panel notifications-dropdown" id="bell-dropdown">
+        <div class="dropdown-header">
+          <h4>System Events</h4>
+          <span class="clear-link" onclick="dismissNotifications()">Mark all read</span>
+        </div>
+        <div class="dropdown-list">
+          <div class="dropdown-item">
+            <div class="item-title-row">
+              <span class="item-title" style="color:var(--gold-primary)">✓ Pipeline Deploy Success</span>
+              <span class="item-time">10m ago</span>
+            </div>
+            <p class="item-desc">aurelia_core loaded successfully onto production Triton Cluster.</p>
+          </div>
+          <div class="dropdown-item">
+            <div class="item-title-row">
+              <span class="item-title">⚡ Compute Nodes Scaled</span>
+              <span class="item-time">2h ago</span>
+            </div>
+            <p class="item-desc">A100-SXM4 cluster auto-scaled +1 active GPU instance.</p>
+          </div>
+          <div class="dropdown-item" style="border-bottom:none">
+            <div class="item-title-row">
+              <span class="item-title" style="color:var(--yellow)">⚠️ Compute Occupancy Warning</span>
+              <span class="item-time">1d ago</span>
+            </div>
+            <p class="item-desc">Memory occupancy peaked at 89% during Triton checkpoint serialization.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Avatar Dropdown Panel -->
+      <div class="dropdown-panel avatar-dropdown" id="avatar-dropdown">
+        <div class="user-info-section">
+          <span class="user-info-name">Alex Chen</span>
+          <span class="user-info-role">PHD RESEARCHER</span>
+        </div>
+        <div class="dropdown-action-item" onclick="alert('API credentials panel')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" stroke-linecap="round"/><path d="M7 11V7a5 5 0 0 1 10 0v4" stroke-linecap="round"/></svg>
+          API Credentials
+        </div>
+        <div class="dropdown-action-item" onclick="window.location.href='/'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z" stroke-linecap="round"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke-linecap="round"/></svg>
+          Return to Aether
+        </div>
+        <div class="dropdown-action-item" style="border-top:1px solid rgba(255,255,255,0.03)" onclick="alert('Session logged out')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke-linecap="round"/><polyline points="16 17 21 12 16 7" stroke-linecap="round"/><line x1="21" y1="12" x2="9" y2="12" stroke-linecap="round"/></svg>
+          End Session
+        </div>
+      </div>
+    </header>
+
+    <!-- ── CONTENT VIEWPORT ── -->
+    <div id="viewport">
+      
+      <!-- ── KPI Metrics Cards ── -->
+      <section class="kpi-grid">
+        <!-- VRAM Occupancy -->
+        <div class="kpi-card">
+          <div class="kpi-label-row">
+            <span class="kpi-label">VRAM Occupancy</span>
+            <span class="kpi-badge kpi-badge-gold">OPTIMAL</span>
+          </div>
+          <div class="kpi-val" id="kpi-vram-text">18.4 GB</div>
+          <div class="kpi-spark">of 80.0 GB SXM4 memory</div>
+          <div class="kpi-progress-bar">
+            <div class="kpi-progress-fill" id="kpi-vram-bar" style="width: 23%"></div>
+          </div>
+        </div>
+
+        <!-- Latency -->
+        <div class="kpi-card">
+          <div class="kpi-label-row">
+            <span class="kpi-label">Avg Pipeline Latency</span>
+            <span class="kpi-badge kpi-badge-gold" style="color:var(--teal); border-color:rgba(20,184,166,0.2)">2.4ms</span>
+          </div>
+          <div class="kpi-val">14.2ms</div>
+          <div class="kpi-spark">
+            <span class="spark-delta positive">↓ -3.1ms</span> vs benchmark baseline
+          </div>
+        </div>
+
+        <!-- Pipeline Runs -->
+        <div class="kpi-card">
+          <div class="kpi-label-row">
+            <span class="kpi-label">Pipeline Runs</span>
+            <span class="kpi-badge kpi-badge-gold">SECURED</span>
+          </div>
+          <div class="kpi-val" id="kpi-runs-text">1,240</div>
+          <div class="kpi-spark">
+            <span class="spark-delta positive">99.8%</span> successful executions
+          </div>
+        </div>
+
+        <!-- Deploy status -->
+        <div class="kpi-card">
+          <div class="kpi-label-row">
+            <span class="kpi-label">Triton Cluster Node</span>
+            <span class="kpi-badge kpi-badge-green">ACTIVE</span>
+          </div>
+          <div class="kpi-val">4 / 4 Nodes</div>
+          <div class="kpi-spark">
+            <span class="spark-delta positive" style="color:var(--green)">● 100% online</span> compute availability
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Workspace Split ── -->
+      <section class="workspace-grid">
+        
+        <!-- Left: Code Editor and Console -->
+        <div class="editor-column">
+          <div class="tab-bar">
+            <div class="tab-list">
+              <div class="tab-item active" data-file="triton_inference.py">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke-linecap="round"/><polyline points="14 2 14 8 20 8" stroke-linecap="round"/></svg>
+                <span>triton_inference.py</span>
+                <span class="tab-close" onclick="event.stopPropagation(); alert('Cannot close core file')">×</span>
+              </div>
+              <div class="tab-item" data-file="config.yaml">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke-linecap="round"/><polyline points="14 2 14 8 20 8" stroke-linecap="round"/></svg>
+                <span>config.yaml</span>
+                <span class="tab-close" onclick="event.stopPropagation(); alert('Cannot close config file')">×</span>
+              </div>
+              <div class="tab-item" data-file="dataset_loader.py">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke-linecap="round"/><polyline points="14 2 14 8 20 8" stroke-linecap="round"/></svg>
+                <span>dataset_loader.py</span>
+                <span class="tab-close" onclick="event.stopPropagation(); alert('Cannot close loader file')">×</span>
+              </div>
+            </div>
+            <div class="editor-actions">
+              <button class="btn-run" id="btn-run-code">
+                <svg viewBox="0 0 24 24" stroke="none"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                Run Code
+              </button>
+            </div>
+          </div>
+
+          <div class="editor-workspace">
+            <div class="editor-gutter" id="editor-gutter"></div>
+            <div class="editor-textarea-wrap">
+              <textarea class="editor-textarea" id="editor-input" spellcheck="false" autocomplete="off"></textarea>
+              <pre class="editor-highlight" id="editor-pre"><code class="language-python" id="editor-code"></code></pre>
+            </div>
+          </div>
+
+          <!-- Console Terminal -->
+          <div class="terminal-panel">
+            <div class="terminal-header">
+              <span class="terminal-header-title">Runtime Console</span>
+              <div class="terminal-actions">
+                <button class="terminal-btn" onclick="clearConsole()">Clear</button>
+              </div>
+            </div>
+            <pre class="terminal-console" id="terminal-console"><span class="log-sys">>>> Aurum Local Sandbox runtime ready.</span>
+<span class="log-sys">>>> Compute cluster target: Triton:0 (CUDA:0 A100-SXM4)</span></pre>
+          </div>
+        </div>
+
+        <!-- Right: AI Chat Panel -->
+        <div class="ai-panel">
+          <div class="ai-header">
+            <div class="ai-logo">✦</div>
+            <div class="ai-title">Aurelius Architect</div>
+            <span class="ai-status-badge">AI Assistant</span>
+          </div>
+          <div class="ai-chat-body" id="ai-chat-body">
+            <div class="chat-bubble chat-bubble-ai">
+              <p>Welcome back, Alex. I am <strong>Aurelius</strong>, your AI Engineering Architect. I am synchronized with your current workspace context and CUDA runtime configurations.</p>
+              <p>How shall we optimize your inference pipeline today?</p>
+            </div>
+          </div>
+          <div class="ai-chat-input-area">
+            <div class="quick-pills">
+              <button class="quick-pill" data-prompt="/optimize: Refactor pipeline loops to speed up execution">⚡ Optimize</button>
+              <button class="quick-pill" data-prompt="/profile: Analyze tensor memory layout for SXM4 GPU cache">🔍 Profile Memory</button>
+              <button class="quick-pill" data-prompt="/test: Write unittest files for validation">🧪 Write Tests</button>
+            </div>
+            <div class="ai-input-row">
+              <textarea class="ai-chat-ta" id="ai-input" placeholder="Instruct Aurelius..." rows="1"></textarea>
+              <button class="btn-send-ai" id="btn-send-ai" aria-label="Send message">
+                <svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<script>
+// File content data
+const files = {
+  'triton_inference.py': `# triton_inference.py
+# High-end Triton server model pipeline.
+import time
+import torch
+import torch.nn as nn
+
+class TritonPipeline(nn.Module):
+    def __init__(self, d_model=512, nhead=8):
+        super().__init__()
+        print("[System] Allocating model weights on CUDA:0...")
+        self.encoder = nn.TransformerEncoderLayer(d_model=d_model, nhead=nhead)
+        self.linear = nn.Linear(d_model, 1)
+
+    def forward(self, src):
+        # Tensor Parallel distribution routing
+        x = self.encoder(src)
+        return self.linear(x)
+
+# Run benchmark pipeline execution
+if __name__ == '__main__':
+    pipeline = TritonPipeline().cuda()
+    inputs = torch.randn(64, 10, 512).cuda()
+    
+    # Warup execution
+    _ = pipeline(inputs)
+    
+    # Profiling epochs
+    start = time.perf_counter()
+    for epoch in range(1, 4):
+        outputs = pipeline(inputs)
+        duration_ms = (time.perf_counter() - start) * 1000 / epoch
+        print(f"Epoch {epoch}/3 - Latency: {duration_ms:.2f}ms - CUDA Occupancy: 18.4GB")
+    
+    print("[Success] Triton Pipeline verification check complete.")`,
+
+  'config.yaml': `# config.yaml
+# High-performance pipeline execution parameters.
+model:
+  name: "aurelia-core-llm"
+  version: "1.0.4"
+  parameters:
+    d_model: 512
+    nhead: 8
+    num_layers: 6
+    precision: "float16"
+
+cluster:
+  target: "Triton-Cluster-0"
+  partition: "GPU-SXM4"
+  node_count: 4
+  gpu_occupancy_limit: 0.85
+  checkpointing:
+    enabled: true
+    interval_epochs: 5
+    path: "/mnt/storage/checkpoints/"
+
+latency_threshold_ms: 25.0`,
+
+  'dataset_loader.py': `# dataset_loader.py
+# Pytorch dataset loaders with shared CUDA memory.
+import torch
+from torch.utils.data import Dataset, DataLoader
+
+class SharedTensorDataset(Dataset):
+    def __init__(self, size=1000, seq_len=10, d_model=512):
+        print("[System] Generating CUDA pinned data loader...")
+        self.data = torch.randn(size, seq_len, d_model)
+        self.labels = torch.randint(0, 2, (size, 1)).float()
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, idx):
+        return self.data[idx], self.labels[idx]
+
+if __name__ == '__main__':
+    dataset = SharedTensorDataset()
+    loader = DataLoader(dataset, batch_size=32, shuffle=True)
+    for x, y in loader:
+        print(f"Batch loaded - Tensors shape: {list(x.shape)}")
+        break
+    print("[System] Data loader verification completed.")`
+};
+
+let activeFile = 'triton_inference.py';
+
+// DOM Elements
+const editorInput = document.getElementById('editor-input');
+const editorCode = document.getElementById('editor-code');
+const editorPre = document.getElementById('editor-pre');
+const editorGutter = document.getElementById('editor-gutter');
+const activeFileBreadcrumb = document.getElementById('active-file-breadcrumb');
+
+// Initialize editor content
+function setEditorContent(filename) {
+  activeFile = filename;
+  const content = files[filename];
+  editorInput.value = content;
+  
+  // Set language extension
+  editorCode.className = filename.endsWith('.py') ? 'language-python' : 'language-yaml';
+  updateHighlighter(content);
+  activeFileBreadcrumb.textContent = filename;
+}
+
+function updateHighlighter(text) {
+  editorCode.textContent = text;
+  if (typeof hljs !== 'undefined') {
+    hljs.highlightElement(editorCode);
+  }
+  
+  // Update Gutter numbers
+  const linesCount = text.split('\n').length;
+  let gutterHTML = '';
+  for(let i = 1; i <= linesCount; i++) {
+    gutterHTML += `<div>${i}</div>`;
+  }
+  editorGutter.innerHTML = gutterHTML;
+}
+
+// Event Listeners for Editor
+editorInput.addEventListener('input', (e) => {
+  const text = e.target.value;
+  files[activeFile] = text;
+  updateHighlighter(text);
+});
+
+// Sync scroll
+editorInput.addEventListener('scroll', () => {
+  editorPre.scrollTop = editorInput.scrollTop;
+  editorPre.scrollLeft = editorInput.scrollLeft;
+  editorGutter.scrollTop = editorInput.scrollTop;
+});
+
+// File Tab Switching
+document.querySelectorAll('.tab-item').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    setEditorContent(tab.dataset.file);
+  });
+});
+
+// Clear console
+function clearConsole() {
+  document.getElementById('terminal-console').innerHTML = '';
+}
+
+// Notification & Avatar dropdown toggling
+const bellBtn = document.getElementById('bell-btn');
+const bellDropdown = document.getElementById('bell-dropdown');
+const avatarBtn = document.getElementById('avatar-btn');
+const avatarDropdown = document.getElementById('avatar-dropdown');
+
+bellBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  avatarDropdown.classList.remove('open');
+  bellDropdown.classList.toggle('open');
+});
+
+avatarBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  bellDropdown.classList.remove('open');
+  avatarDropdown.classList.toggle('open');
+});
+
+document.addEventListener('click', () => {
+  bellDropdown.classList.remove('open');
+  avatarDropdown.classList.remove('open');
+});
+
+bellDropdown.addEventListener('click', (e) => e.stopPropagation());
+avatarDropdown.addEventListener('click', (e) => e.stopPropagation());
+
+function dismissNotifications() {
+  const dot = document.querySelector('.nav-badge-dot');
+  if(dot) dot.remove();
+  alert('All notification items marked as read.');
+  bellDropdown.classList.remove('open');
+}
+
+// ── Run Python code from Editor ──
+const runBtn = document.getElementById('btn-run-code');
+const terminalConsole = document.getElementById('terminal-console');
+
+runBtn.addEventListener('click', async () => {
+  runBtn.disabled = true;
+  runBtn.innerHTML = `<span style="display:inline-block;width:10px;height:10px;border:2px solid transparent;border-top-color:var(--gold-primary);border-radius:50%;animation:spin 0.6s linear infinite;margin-right:6px"></span> Running...`;
+  
+  terminalConsole.innerHTML += `\n<span class="log-sys">[System] Running script ${activeFile} on CUDA engine...</span>\n`;
+  terminalConsole.scrollTop = terminalConsole.scrollHeight;
+
+  // Let's add simulated run logic as a fast, atmospheric fallback 
+  // but call the server's real execution if it completes within time!
+  try {
+    const code = editorInput.value;
+    const response = await fetch('/api/run-code', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code })
+    });
+
+    if (!response.ok) {
+      throw new Error('API Execution Failed');
+    }
+
+    const data = await response.json();
+    let out = '';
+    
+    if (data.stdout) {
+      out += `<span class="log-stdout">${escapeHTML(data.stdout)}</span>`;
+    }
+    if (data.stderr) {
+      out += `<span class="log-stderr">${escapeHTML(data.stderr)}</span>`;
+    }
+
+    if (data.timeout) {
+      out += `\n<span class="log-stderr">[System Error] Execution exceeded 10-second timeout.</span>`;
+    } else if (data.exitCode === 0) {
+      out += `\n<span class="log-sys">[System Success] Run finished in ${data.duration}s. Exit Code: 0</span>`;
+      
+      // Update KPIs dynamically as user runs code successfully
+      incrementKPIRuns();
+    } else {
+      out += `\n<span class="log-stderr">[System Error] Process exited with code ${data.exitCode} in ${data.duration}s.</span>`;
+    }
+
+    terminalConsole.innerHTML += out;
+  } catch (err) {
+    // Simulated output fallback if python isn't installed locally
+    terminalConsole.innerHTML += getMockExecutionOutput(activeFile);
+  } finally {
+    runBtn.disabled = false;
+    runBtn.innerHTML = `<svg viewBox="0 0 24 24" style="width:11px;height:11px;fill:currentColor;margin-right:6px"><polygon points="5 3 19 12 5 21 5 3"/></svg> Run Code`;
+    terminalConsole.scrollTop = terminalConsole.scrollHeight;
+  }
+});
+
+// Helper functions
+function escapeHTML(str) {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function incrementKPIRuns() {
+  const runsText = document.getElementById('kpi-runs-text');
+  let currentRuns = parseInt(runsText.textContent.replace(/,/g, ''));
+  currentRuns += 1;
+  runsText.textContent = currentRuns.toLocaleString();
+}
+
+function getMockExecutionOutput(filename) {
+  if (filename === 'config.yaml') {
+    return `\n<span class="log-stdout">Parsed YAML configurations:
+  model_name: "aurelia-core-llm"
+  version: "1.0.4"
+  target_partition: "GPU-SXM4" (Optimal)
+  precision: "float16" (FP16 activated)</span>
+<span class="log-sys">[System Success] Configurations successfully validated on cluster.</span>`;
+  }
+  if (filename === 'dataset_loader.py') {
+    return `\n<span class="log-stdout">[System] Generating CUDA pinned data loader...
+Batch loaded - Tensors shape: [32, 10, 512]
+[System] Data loader verification completed.</span>
+<span class="log-sys">[System Success] Dataset execution complete. Exit Code: 0</span>`;
+  }
+  
+  // Default python execution fallback
+  return `\n<span class="log-stdout">[System] Allocating model weights on CUDA:0...
+Epoch 1/3 - Latency: 14.15ms - CUDA Occupancy: 18.4GB
+Epoch 2/3 - Latency: 13.92ms - CUDA Occupancy: 18.4GB
+Epoch 3/3 - Latency: 14.10ms - CUDA Occupancy: 18.4GB
+[Success] Triton Pipeline verification check complete.</span>
+<span class="log-sys">[System Success] Simulation run finished. Exit Code: 0</span>`;
+}
+
+// ── AI Chat Assistant Aurelius ──
+const aiInput = document.getElementById('ai-input');
+const sendAiBtn = document.getElementById('btn-send-ai');
+const aiChatBody = document.getElementById('ai-chat-body');
+
+aiInput.addEventListener('keydown', (e) => {
+  if(e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendAiMessage();
+  }
+});
+
+sendAiBtn.addEventListener('click', sendAiMessage);
+
+function sendAiMessage() {
+  const query = aiInput.value.trim();
+  if(!query) return;
+
+  aiInput.value = '';
+  aiInput.style.height = 'auto';
+
+  // Append User message
+  appendChatBubble('user', query);
+
+  // Loading indicator from AI
+  const typingBubble = appendChatBubble('ai', `<span style="display:inline-block;width:10px;height:10px;border:2px solid transparent;border-top-color:var(--gold-primary);border-radius:50%;animation:spin 0.6s linear infinite"></span> Aurelius is writing...`);
+  
+  // Simulated streaming AI response
+  setTimeout(() => {
+    typingBubble.remove();
+    const responseText = getAIResponse(query);
+    appendChatBubble('ai', responseText);
+  }, 1200);
+}
+
+function appendChatBubble(sender, htmlContent) {
+  const div = document.createElement('div');
+  div.className = `chat-bubble chat-bubble-${sender}`;
+  div.innerHTML = htmlContent;
+  aiChatBody.appendChild(div);
+  aiChatBody.scrollTop = aiChatBody.scrollHeight;
+  return div;
+}
+
+// Quick prompts action clicks
+document.querySelectorAll('.quick-pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    const prompt = pill.dataset.prompt;
+    aiInput.value = prompt;
+    aiInput.focus();
+  });
+});
+
+function getAIResponse(query) {
+  const qLower = query.toLowerCase();
+  
+  if (qLower.includes('optimize') || qLower.includes('/optimize')) {
+    return `<p>Aurelius here. I recommend wrapping your Triton pipeline encoder operations inside a <code>torch.compile(..., mode="max-autotune")</code> block to execute kernel fusion.</p>
+<pre><code class="language-python"># Recommended optimization
+import torch
+
+class OptimizedPipeline(TritonPipeline):
+    def __init__(self):
+        super().__init__()
+        # Compile Triton kernels
+        self.encoder = torch.compile(self.encoder)
+</code></pre>
+<p>This will fuse multiple memory-bound elementwise operations on the A100 SXM4 cores, decreasing latency by approximately 18%.</p>`;
+  }
+  
+  if (qLower.includes('profile') || qLower.includes('/profile')) {
+    return `<p>Analyzing CUDA tensor cache and memory footprint...</p>
+<p><strong>A100-80GB Profiler Metrics:</strong></p>
+<ul>
+  <li>CUDA Core Occupancy: <strong>23%</strong> (18.4 GB)</li>
+  <li>L2 Cache Hit Rate: <strong>92.4%</strong></li>
+  <li>Shared Memory / Thread block allocation: <strong>48 KB</strong> (Optimal)</li>
+  <li>Bandwidth Occupancy: <strong>1.6 TB/s</strong></li>
+</ul>
+<p>Your model batch dimension size of 64 aligns with warps. To optimize compute occupancy, consider scaling the batch size to <strong>128</strong> to maximize GPU stream processor utilization.</p>`;
+  }
+  
+  if (qLower.includes('test') || qLower.includes('/test')) {
+    return `<p>Generating test suite for <code>TritonPipeline</code> logic:</p>
+<pre><code class="language-python"># test_pipeline.py
+import unittest
+import torch
+
+class TestTriton(unittest.TestCase):
+    def test_forward_shape(self):
+        model = TritonPipeline().cuda()
+        x = torch.randn(2, 10, 512).cuda()
+        out = model(x)
+        self.assertEqual(list(out.shape), [2, 10, 1])
+
+if __name__ == '__main__':
+    unittest.main()
+</code></pre>
+<p>Execute this file inside the runtime console to ensure mathematical correctness of tensor parallels.</p>`;
+  }
+
+  // Generic luxury assistant replies
+  return `<p>I have processed your query: <em>"${escapeHTML(query)}"</em>.</p>
+<p>To implement this in your high-performance sandbox workspace, synchronize your pipeline environment variables with Triton server instances, or update the model parameters inside <code>config.yaml</code>.</p>
+<p>Let me know if you want me to write code to automate this migration.</p>`;
+}
+
+// Initialize workspace
+setEditorContent('triton_inference.py');
+</script>
+
+<style>
+/* Spinner & extra styles */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+</style>
+</body>
+</html>
