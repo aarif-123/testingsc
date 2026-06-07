@@ -7,7 +7,7 @@
 <meta name="description" content="Smart research assistant — search arXiv, manage your library, chat with papers using AI."/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
 <!-- highlight.js for Python syntax -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark-dimmed.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer></script>
@@ -16,28 +16,28 @@
 <script src="https://cdn.jsdelivr.net/npm/marked@9/marked.min.js" defer></script>
 <style>
 :root{
-  /* Premium Obsidian & Dark Slate Palette */
-  --bg: #04060a;
-  --bg-card: rgba(10, 14, 23, 0.45);
-  --bg-panel: rgba(7, 9, 15, 0.82);
-  --bg-input: #0b0e17;
-  --bg-hover: rgba(255, 255, 255, 0.04);
-  --bg-active: rgba(59, 130, 246, 0.06);
+  /* Premium Obsidian & Luxury Gold Palette */
+  --bg: #060608;
+  --bg-card: rgba(16, 16, 22, 0.45);
+  --bg-panel: rgba(11, 11, 15, 0.85);
+  --bg-input: #08080b;
+  --bg-hover: rgba(212, 175, 55, 0.04);
+  --bg-active: rgba(212, 175, 55, 0.08);
   
   /* Modern Translucent Slate Borders */
-  --border: rgba(255, 255, 255, 0.05);
-  --border-med: rgba(255, 255, 255, 0.09);
-  --border-focus: hsl(217, 100%, 61%);
+  --border: rgba(255, 255, 255, 0.04);
+  --border-med: rgba(212, 175, 55, 0.09);
+  --border-focus: hsl(45, 70%, 53%);
   
   /* Premium Typography Colors */
-  --text: #f8fafc;
-  --muted: #94a3b8;
-  --faint: #4b5563;
+  --text: #f5f5f8;
+  --muted: #9494a8;
+  --faint: #575769;
   
-  /* Tailored SaaS Accents (HSL) */
-  --blue: hsl(217, 100%, 61%);
-  --blue-bg: rgba(59, 130, 246, 0.08);
-  --blue-border: rgba(59, 130, 246, 0.25);
+  /* Gold SaaS Accents (HSL) */
+  --blue: hsl(45, 70%, 53%);
+  --blue-bg: rgba(212, 175, 55, 0.08);
+  --blue-border: rgba(212, 175, 55, 0.25);
   
   --green: hsl(142, 76%, 46%);
   --green-bg: rgba(34, 197, 94, 0.08);
@@ -48,15 +48,20 @@
   --red: hsl(350, 89%, 60%);
   --red-bg: rgba(239, 68, 68, 0.08);
   
-  --purple: hsl(265, 90%, 66%);
-  --purple-bg: rgba(139, 92, 246, 0.08);
+  --purple: hsl(48, 80%, 72%);
+  --purple-bg: rgba(243, 229, 171, 0.08);
   
-  --teal: hsl(175, 86%, 43%);
-  --teal-bg: rgba(20, 184, 166, 0.08);
+  --teal: hsl(38, 80%, 48%);
+  --teal-bg: rgba(229, 193, 88, 0.08);
   
   --sidebar: 240px;
   --r: 14px;
   --r-lg: 18px;
+  
+  /* Typography Variables */
+  --font-editorial: 'Cormorant Garamond', serif;
+  --font-ui: 'Space Grotesk', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
 }
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -64,7 +69,7 @@
 html,body{
   height:100vh;
   overflow:hidden;
-  font-family:'Plus Jakarta Sans','Inter',system-ui,-apple-system,sans-serif;
+  font-family: var(--font-ui), system-ui, -apple-system, sans-serif;
   background:var(--bg);
   color:var(--text);
   font-size:13.5px;
@@ -78,7 +83,7 @@ html,body{
   filter: blur(140px);
   z-index: 0;
   pointer-events: none;
-  opacity: 0.14;
+  opacity: 0.12;
   mix-blend-mode: screen;
   animation: floatGlow 25s infinite alternate ease-in-out;
 }
@@ -114,14 +119,14 @@ html,body{
 /* Custom Sleek Scrollbar */
 ::-webkit-scrollbar{width:6px;height:6px}
 ::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:99px;transition:background 0.2s}
-::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,0.18)}
+::-webkit-scrollbar-thumb{background:rgba(212, 175, 55, 0.12);border-radius:99px;transition:background 0.2s}
+::-webkit-scrollbar-thumb:hover{background:rgba(212, 175, 55, 0.25)}
 
 a{color:var(--blue);text-decoration:none;transition:all 0.2s ease}
-a:hover{color:hsl(217, 100%, 72%);text-shadow: 0 0 10px rgba(59,130,246,0.25)}
+a:hover{color:var(--purple);text-shadow: 0 0 10px rgba(212,175,55,0.25)}
 
 code{
-  font-family:'JetBrains Mono',monospace;
+  font-family: var(--font-mono), monospace;
   font-size:12px;
   background:rgba(255,255,255,0.05);
   padding:3px 7px;
@@ -130,6 +135,35 @@ code{
   color: #e2e8f0;
 }
 pre code{background:none;padding:0;font-size:12.5px;border:none}
+
+/* ── Heading Overrides (Editorial Luxury Font Pairing) ── */
+h1, h2, h3, h4, .brand-title, .logo-name, .page-title, .r-paper-title, .reader-paper-title, .modal-title, .empty-state h3 {
+  font-family: var(--font-editorial), serif !important;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* ── Syntax Highlighting Customization for Python IDE ── */
+.hljs-keyword, .hljs-selector-tag {
+  color: var(--blue) !important;
+  font-weight: 600;
+}
+.hljs-string, .hljs-title, .hljs-section {
+  color: var(--purple) !important;
+}
+.hljs-comment {
+  color: var(--faint) !important;
+  font-style: italic;
+}
+.hljs-number, .hljs-literal {
+  color: #ffffff !important;
+}
+.hljs-built_in, .hljs-bullet {
+  color: #e5c158 !important;
+}
+.hljs-params {
+  color: var(--text) !important;
+}
 
 /* ── Layout ── */
 #app{
@@ -144,7 +178,7 @@ pre code{background:none;padding:0;font-size:12.5px;border:none}
   background:var(--bg-panel);
   backdrop-filter: blur(25px);
   -webkit-backdrop-filter: blur(25px);
-  border-right:1px solid var(--border);
+  border-right:1px solid var(--border-med);
   display:flex;
   flex-direction:column;
   flex-shrink:0;
@@ -180,8 +214,8 @@ pre code{background:none;padding:0;font-size:12.5px;border:none}
   font-size:16px;
   color:#fff;
   flex-shrink:0;
-  box-shadow:0 0 20px rgba(139,92,246,0.3);
-  font-family:'Outfit',sans-serif;
+  box-shadow:0 0 20px rgba(212,175,55,0.22);
+  font-family: var(--font-editorial), serif;
   position: relative;
   overflow: hidden;
   transition: all 0.3s ease;
@@ -194,7 +228,7 @@ pre code{background:none;padding:0;font-size:12.5px;border:none}
 }
 .logo:hover .logo-mark {
   transform: rotate(6deg) scale(1.06);
-  box-shadow: 0 0 25px rgba(139,92,246,0.45);
+  box-shadow: 0 0 25px rgba(212,175,55,0.35);
 }
 .logo-name{
   font-family:'Outfit',sans-serif;
@@ -1713,6 +1747,396 @@ pre code{background:none;padding:0;font-size:12.5px;border:none}
   background: rgba(255,255,255,0.08);
   color: var(--text);
 }
+
+/* ── Aurum Integrated IDE Styles ── */
+.ide-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--border-med);
+  border-radius: var(--r);
+  box-shadow: 0 4px 25px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.02);
+  transition: var(--transition);
+  overflow: hidden;
+}
+.ide-card:hover {
+  border-color: rgba(212, 175, 55, 0.2);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+.ide-card-header {
+  padding: 12px 16px;
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--border);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ide-files-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.ide-file-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  color: var(--muted);
+  font-size: 12px;
+  cursor: pointer;
+  transition: var(--transition);
+  user-select: none;
+}
+.ide-file-item:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+.ide-file-item.active {
+  background: var(--bg-active);
+  color: var(--blue);
+  font-weight: 600;
+  border-left: 2px solid var(--blue);
+}
+.ide-file-item svg {
+  width: 14px;
+  height: 14px;
+  color: inherit;
+}
+.ide-file-item-close {
+  margin-left: auto;
+  font-size: 10px;
+  opacity: 0;
+  transition: opacity 0.2s;
+  width: 14px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+.ide-file-item:hover .ide-file-item-close {
+  opacity: 0.6;
+}
+.ide-file-item-close:hover {
+  opacity: 1 !important;
+  background: rgba(255,255,255,0.08);
+  color: var(--red);
+}
+.ide-tab-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  font-size: 12px;
+  color: var(--muted);
+  border-right: 1px solid var(--border);
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: var(--transition);
+  background: rgba(0,0,0,0.1);
+  user-select: none;
+}
+.ide-tab-item:hover {
+  background: rgba(255,255,255,0.01);
+  color: var(--text);
+}
+.ide-tab-item.active {
+  color: var(--blue);
+  background: rgba(212, 175, 55, 0.03);
+  border-bottom-color: var(--blue);
+  text-shadow: 0 0 6px rgba(212, 175, 55, 0.1);
+  font-weight: 500;
+}
+.ide-tab-close {
+  font-size: 9px;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+  width: 12px;
+  height: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  margin-left: 6px;
+}
+.ide-tab-close:hover {
+  opacity: 1;
+  background: rgba(255,255,255,0.08);
+  color: var(--red);
+}
+.ide-editor-wrapper {
+  flex: 1;
+  display: flex;
+  position: relative;
+  background: #020305;
+  overflow: hidden;
+}
+.ide-gutter {
+  width: 44px;
+  border-right: 1px solid var(--border);
+  background: rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: 16px 8px 16px 0;
+  user-select: none;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--muted);
+  line-height: 1.8;
+  overflow: hidden;
+}
+.ide-gutter div {
+  height: 22.5px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+}
+.ide-editor-pre {
+  margin: 0;
+  padding: 16px 20px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.8;
+  white-space: pre;
+  overflow: auto;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  background: transparent;
+  border: none;
+}
+.ide-editor-pre code {
+  background: none !important;
+  padding: 0 !important;
+  border: none !important;
+  font-family: inherit !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
+  color: inherit;
+}
+.ide-editor-textarea {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: none;
+  resize: none;
+  outline: none;
+  color: transparent;
+  caret-color: var(--blue);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.8;
+  padding: 16px 20px;
+  white-space: pre;
+  overflow: auto;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+}
+.ide-terminal-output {
+  flex: 1;
+  padding: 12px 16px;
+  overflow-y: auto;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.65;
+  background: rgba(0,0,0,0.15);
+  color: #e2e8f0;
+  border-top: 1px solid var(--border);
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+.ide-terminal-btn {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: var(--font-ui);
+}
+.ide-terminal-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+  border-color: var(--border-med);
+}
+.ide-terminal-btn.btn-ai {
+  box-shadow: 0 0 10px rgba(212,175,55,0.08);
+}
+.ide-terminal-btn.btn-ai:hover {
+  border-color: var(--blue);
+  color: var(--text);
+  box-shadow: 0 0 14px rgba(212,175,55,0.18);
+}
+.console-line-sys {
+  color: var(--blue);
+  font-weight: 600;
+}
+.console-line-stdout {
+  color: #cbd5e1;
+}
+.console-line-stderr {
+  color: var(--red);
+}
+.ide-ai-quick {
+  padding: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  background: rgba(0,0,0,0.15);
+  border-bottom: 1px solid var(--border);
+}
+.ide-quick-pill {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 10.5px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: var(--font-ui);
+  font-weight: 500;
+  transition: var(--transition);
+}
+.ide-quick-pill:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+  border-color: var(--border-med);
+}
+.ide-ai-msgs {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: rgba(0,0,0,0.08);
+}
+.ide-ai-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--faint);
+  text-align: center;
+  font-size: 12px;
+  padding: 0 20px;
+  line-height: 1.6;
+  margin: auto 0;
+}
+.ide-chat-bubble {
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  max-width: 88%;
+}
+.ide-chat-bubble-user {
+  background: var(--bg-active);
+  color: var(--text);
+  border: 1px solid var(--border-med);
+  align-self: flex-end;
+  border-bottom-right-radius: 2px;
+}
+.ide-chat-bubble-ai {
+  background: rgba(16, 16, 22, 0.6);
+  color: #e2e8f0;
+  border: 1px solid var(--border);
+  align-self: flex-start;
+  border-bottom-left-radius: 2px;
+}
+.ide-chat-bubble-ai p {
+  margin-bottom: 8px;
+}
+.ide-chat-bubble-ai p:last-child {
+  margin-bottom: 0;
+}
+.ide-chat-bubble-ai pre {
+  background: #020305;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  margin: 8px 0;
+  overflow-x: auto;
+}
+.ide-chat-bubble-ai code {
+  background: none;
+  padding: 0;
+  border: none;
+}
+.ide-ai-ta:focus {
+  border-color: var(--blue) !important;
+  box-shadow: 0 0 10px rgba(212,175,55,0.05);
+}
+.ide-ai-send:hover {
+  background: var(--bg-active) !important;
+  border-color: var(--blue) !important;
+  box-shadow: 0 0 8px rgba(212,175,55,0.15);
+}
+.ide-datasets-content .dataset-card {
+  background: rgba(0,0,0,0.2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  transition: var(--transition);
+}
+.ide-datasets-content .dataset-card:hover {
+  border-color: var(--border-med);
+  background: rgba(0,0,0,0.3);
+}
+.ide-datasets-content .dataset-name {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 12px;
+}
+.ide-datasets-content .dataset-task {
+  color: var(--blue);
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-top: 2px;
+  letter-spacing: 0.5px;
+}
+.ide-datasets-content .dataset-load-btn {
+  background: transparent;
+  border: 1px solid var(--border-med);
+  color: var(--blue);
+  padding: 3px 8px;
+  border-radius: 5px;
+  font-size: 10.5px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 6px;
+  transition: var(--transition);
+  display: inline-block;
+  font-family: var(--font-ui);
+}
+.ide-datasets-content .dataset-load-btn:hover {
+  background: var(--bg-active);
+  border-color: var(--blue);
+}
+.compute-status-mini, .badge-ai-model {
+  user-select: none;
+}
 </style>
 </head>
 <body>
@@ -1737,12 +2161,8 @@ pre code{background:none;padding:0;font-size:12.5px;border:none}
       <span class="nav-badge" id="lib-badge">0</span>
     </button>
     <button class="nav-btn" data-view="notebook">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 9h6M9 13h6M9 17h6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      Notebook IDE
-    </button>
-    <button class="nav-btn" onclick="window.location.href='/ide.html'">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="color:var(--gold-primary)"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-      Aurum Python IDE ↗
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="color:var(--blue)"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      Aurum Python IDE
     </button>
   </div>
   <div class="sidebar-footer">
@@ -1833,26 +2253,190 @@ pre code{background:none;padding:0;font-size:12.5px;border:none}
     </div>
   </div>
 
-  <!-- ─── NOTEBOOK IDE ─── -->
-  <div class="view" id="view-notebook">
-    <div class="page-header">
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+  <!-- ─── AURUM PYTHON IDE ─── -->
+  <div class="view" id="view-notebook" style="display:none; flex-direction:column; height:100%; overflow:hidden;">
+    
+    <!-- IDE Header Area with Metrics -->
+    <div class="page-header" style="margin-bottom: 12px; flex-shrink:0;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:12px;">
         <div>
-          <div class="page-title">Notebook IDE</div>
-          <div class="page-sub">Interactive Python playground for model implementations</div>
+          <div class="page-title" style="color:var(--blue); font-size:23px;">Aurum Python IDE</div>
+          <div class="page-sub">Interactive AI-enabled development workspace with integrated dataset loading guidance</div>
         </div>
-        <div class="notebook-actions" style="display:flex; gap:8px;">
-          <button class="btn btn-ghost btn-sm" id="btn-nb-add-code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:14px;height:14px;stroke-width:2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>+ Code Cell</button>
-          <button class="btn btn-ghost btn-sm" id="btn-nb-add-md"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:14px;height:14px;stroke-width:2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>+ Markdown Cell</button>
-          <button class="btn btn-primary btn-sm" id="btn-nb-run-all">▶ Run All</button>
-          <button class="btn btn-ghost btn-sm" id="btn-nb-clear">Clear Outputs</button>
-          <button class="btn btn-ghost btn-sm" id="btn-nb-download">⬇ .ipynb</button>
+        <div class="ide-global-actions" style="display:flex; gap:8px;">
+          <div class="compute-status-mini" style="display:flex; align-items:center; gap:8px; background:rgba(0,0,0,0.2); border:1px solid var(--border-med); padding:6px 12px; border-radius:8px; font-size:11px;">
+            <span class="status-indicator-mini" style="width:6px; height:6px; border-radius:50%; background:var(--blue); box-shadow:0 0 6px var(--blue); animation:pulseGlow 2s infinite alternate;"></span>
+            <span style="color:var(--muted)">Cluster status:</span> <strong style="color:var(--text)">A100 SXM4 Node</strong>
+          </div>
+        </div>
+      </div>
+      
+      <!-- KPI Metrics Grid -->
+      <div class="kpi-grid" style="margin-bottom:0px; gap:12px;">
+        <div class="kpi-card" style="padding:12px 16px;">
+          <div class="kpi-label-row" style="margin-bottom:4px;">
+            <span class="kpi-label" style="font-size:9.5px;">CUDA VRAM Occupancy</span>
+            <span class="kpi-badge kpi-badge-gold" style="font-size:8.5px; padding:1px 5px;">VRAM</span>
+          </div>
+          <div class="kpi-val" style="font-size:20px;" id="kpi-vram-val">18.4 GB / 80GB</div>
+          <div class="kpi-progress-bar" style="margin-top:8px;">
+            <div class="kpi-progress-fill" style="width: 23%"></div>
+          </div>
+          <div class="kpi-spark" style="margin-top:6px; font-size:10px;">Partition: GPU-0 (Aurelia Inference)</div>
+        </div>
+        <div class="kpi-card" style="padding:12px 16px;">
+          <div class="kpi-label-row" style="margin-bottom:4px;">
+            <span class="kpi-label" style="font-size:9.5px;">Avg Step Latency</span>
+            <span class="kpi-badge kpi-badge-green" style="font-size:8.5px; padding:1px 5px;">Latency</span>
+          </div>
+          <div class="kpi-val" style="font-size:20px;" id="kpi-latency-val">14.1 ms</div>
+          <div class="kpi-progress-bar" style="margin-top:8px;">
+            <div class="kpi-progress-fill" style="width: 14%; background:linear-gradient(90deg, #10b981, #34d399); box-shadow:0 0 8px #10b981;"></div>
+          </div>
+          <div class="kpi-spark" style="margin-top:6px; font-size:10px;">Autotune compilation enabled</div>
+        </div>
+        <div class="kpi-card" style="padding:12px 16px;">
+          <div class="kpi-label-row" style="margin-bottom:4px;">
+            <span class="kpi-label" style="font-size:9.5px;">Interactive Runs</span>
+            <span class="kpi-badge kpi-badge-gold" style="font-size:8.5px; padding:1px 5px;">Execution</span>
+          </div>
+          <div class="kpi-val" style="font-size:20px;" id="kpi-runs-val">42</div>
+          <div class="kpi-progress-bar" style="margin-top:8px;">
+            <div class="kpi-progress-fill" style="width: 45%"></div>
+          </div>
+          <div class="kpi-spark" style="margin-top:6px; font-size:10px;">Interactive code run metrics</div>
+        </div>
+        <div class="kpi-card" style="padding:12px 16px;">
+          <div class="kpi-label-row" style="margin-bottom:4px;">
+            <span class="kpi-label" style="font-size:9.5px;">Triton Compiler</span>
+            <span class="kpi-badge kpi-badge-gold" style="font-size:8.5px; padding:1px 5px; background:rgba(34,211,238,0.08); color:hsl(190, 90%, 60%); border-color:rgba(34,211,238,0.2);">COMPILER</span>
+          </div>
+          <div class="kpi-val" style="font-size:20px;">READY</div>
+          <div class="kpi-progress-bar" style="margin-top:8px;">
+            <div class="kpi-progress-fill" style="width: 100%; background:linear-gradient(90deg, #06b6d4, #22d3ee); box-shadow: 0 0 8px #22d3ee;"></div>
+          </div>
+          <div class="kpi-spark" style="margin-top:6px; font-size:10px;">Backend runtime active</div>
         </div>
       </div>
     </div>
-    <div class="notebook-body" id="notebook-body" style="flex:1; overflow-y:auto; padding:20px 28px;">
-      <div id="notebook-cells-list" class="notebook-body"></div>
+    
+    <!-- 3-Pane Split Grid Layout -->
+    <div class="ide-workspace-layout" style="display:flex; flex:1; overflow:hidden; gap:16px; min-height:0; margin-bottom: 24px;">
+      
+      <!-- Left Column: Workspace Files & Dataset Guidance (Width: 260px) -->
+      <div class="ide-left-pane" style="width:260px; display:flex; flex-direction:column; gap:16px; flex-shrink:0; overflow:hidden; min-height:0;">
+        
+        <!-- File explorer glass card -->
+        <div class="ide-card" style="flex:1; display:flex; flex-direction:column; overflow:hidden;">
+          <div class="ide-card-header">
+            <span>📁 WORKSPACE FILES</span>
+            <button class="btn btn-xs btn-ghost" id="btn-ide-new-file" style="margin-left:auto; color:var(--blue); font-size:10.5px; padding:2px 8px;">+ New</button>
+          </div>
+          <div class="ide-files-list" id="ide-files-list" style="flex:1; overflow-y:auto; padding:8px;">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+        
+        <!-- Dataset Guidance glass card -->
+        <div class="ide-card" style="flex:1.2; display:flex; flex-direction:column; overflow:hidden;">
+          <div class="ide-card-header">
+            <span>📊 DATASET GUIDANCE</span>
+          </div>
+          <div class="ide-datasets-content" id="ide-datasets-list" style="flex:1; overflow-y:auto; padding:12px; font-size:12px; display:flex; flex-direction:column; gap:8px;">
+            <div style="color:var(--muted); text-align:center; margin-top:20px; padding:0 8px;">
+              No research paper active. Go to Search or Library and open a paper to populate dataset loading scripts.
+            </div>
+          </div>
+        </div>
+        
+      </div>
+      
+      <!-- Center Column: Active Editor & Run Terminal (Flex: 1) -->
+      <div class="ide-center-pane" style="flex:1; display:flex; flex-direction:column; gap:16px; overflow:hidden; min-height:0;">
+        
+        <!-- Editor Card -->
+        <div class="ide-card" style="flex:1.4; display:flex; flex-direction:column; overflow:hidden; position:relative;">
+          
+          <!-- Editor Tabs -->
+          <div class="ide-tab-bar" style="display:flex; background:rgba(0,0,0,0.25); border-bottom:1px solid var(--border); overflow-x:auto; flex-shrink:0;">
+            <div class="ide-tab-list" id="ide-tab-list" style="display:flex;">
+              <!-- Rendered dynamically -->
+            </div>
+            <span id="ide-active-file-label" style="margin-left:auto; padding:0 16px; display:flex; align-items:center; font-size:11px; color:var(--blue); font-family:var(--font-mono)"></span>
+          </div>
+          
+          <!-- Code Editor Workspace -->
+          <div class="ide-editor-wrapper" style="flex:1; display:flex; position:relative; overflow:hidden;">
+            <div class="ide-gutter" id="ide-gutter">
+              <!-- Gutter line numbers -->
+            </div>
+            <div style="position:relative; flex:1; height:100%; overflow:hidden;">
+              <pre class="ide-editor-pre" id="ide-editor-pre"><code class="language-python" id="ide-editor-code"></code></pre>
+              <textarea class="ide-editor-textarea" id="ide-editor-textarea" spellcheck="false" autocomplete="off" placeholder="Write python code here..."></textarea>
+            </div>
+          </div>
+          
+        </div>
+        
+        <!-- Terminal Output Card -->
+        <div class="ide-card" style="flex:0.8; display:flex; flex-direction:column; overflow:hidden; min-height:160px;">
+          <div class="ide-card-header" style="display:flex; justify-content:space-between; align-items:center; flex-shrink:0;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span class="status-indicator" id="ide-terminal-status" style="width:7px; height:7px; border-radius:50%; background:var(--faint);"></span>
+              <span>TERMINAL OUTPUT</span>
+            </div>
+            <div class="ide-terminal-actions" style="display:flex; gap:8px;">
+              <button class="ide-terminal-btn btn-xs ide-btn-fix" id="btn-ide-fix" style="display:none; background:var(--blue-bg); border-color:var(--blue-border); color:var(--blue)">⚙️ Fix with AI</button>
+              <button class="ide-terminal-btn btn-xs" id="btn-ide-clear">Clear</button>
+              <button class="ide-terminal-btn btn-xs btn-ai" id="btn-ide-run" style="background:var(--blue-bg); border-color:var(--blue-border); color:var(--blue); font-weight:600; padding:4px 12px;">▶ Run Code</button>
+            </div>
+          </div>
+          <pre class="ide-terminal-output" id="ide-terminal-output"></pre>
+        </div>
+        
+      </div>
+      
+      <!-- Right Column: Aurelius AI Live Guidance (Width: 320px) -->
+      <div class="ide-right-pane" style="width:320px; display:flex; flex-direction:column; flex-shrink:0; overflow:hidden; min-height:0;">
+        <div class="ide-card" style="height:100%; display:flex; flex-direction:column; overflow:hidden;">
+          
+          <!-- AI header -->
+          <div class="ide-card-header" style="border-bottom:1px solid var(--border); flex-shrink:0;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:16px; color:var(--blue)">✦</span>
+              <span>AURELIUS AI GUIDANCE</span>
+            </div>
+            <span class="badge-ai-model" id="ide-ai-model-badge" style="font-size:9px; background:var(--blue-bg); color:var(--blue); border:1px solid var(--blue-border); padding:2px 6px; border-radius:4px; margin-left:auto;">LLaMA 3.3</span>
+          </div>
+          
+          <!-- Quick action pills -->
+          <div class="ide-ai-quick" id="ide-ai-quick" style="flex-shrink:0;">
+            <button class="ide-quick-pill" data-prompt="Explain the structure of the current python code and what it does.">💡 Explain Code</button>
+            <button class="ide-quick-pill" data-prompt="Analyze the active python code for GPU performance optimization.">⚡ Optimize GPU</button>
+            <button class="ide-quick-pill" data-prompt="Generate unittests for the active python script.">🧪 Generate Tests</button>
+          </div>
+          
+          <!-- AI chat message list -->
+          <div class="ide-ai-msgs" id="ide-ai-msgs" style="flex:1;">
+            <div class="ide-ai-empty">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:24px; height:24px; color:var(--blue); margin-bottom:8px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span>Aurelius is online.<br>Ask questions about your code, optimize CUDA models, or troubleshoot terminal traceback errors.</span>
+            </div>
+          </div>
+          
+          <!-- AI chat input bar -->
+          <div class="ide-ai-input-row" style="flex-shrink:0;">
+            <textarea class="ide-ai-ta" id="ide-ai-input" placeholder="Ask Aurelius about your code..." rows="1" style="flex:1; background:var(--bg-input); border:1px solid var(--border); border-radius:8px; color:var(--text); padding:8px 12px; font-size:12px; outline:none; resize:none; font-family:inherit;"></textarea>
+            <button class="ide-ai-send" id="btn-ide-ai-send">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:16px; height:16px; stroke-width:2; vertical-align:middle;"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+          
+        </div>
+      </div>
+      
     </div>
+    
   </div>
 
   <!-- ─── READER ─── -->
@@ -1958,7 +2542,7 @@ pre code{background:none;padding:0;font-size:12.5px;border:none}
               <button class="btn btn-xs btn-ghost" id="btn-download-code">⬇ .py</button>
               <button class="btn btn-xs btn-ghost" id="btn-regen-code" title="Regenerate">↺</button>
               <button class="btn btn-xs btn-ai" id="btn-run-code" style="background:var(--blue-bg);color:var(--blue);border:1.5px solid var(--blue-border);font-weight:600">▶ Run Code</button>
-              <button class="btn btn-xs btn-ghost" id="btn-load-notebook" style="color:var(--teal)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:12px;height:12px;vertical-align:middle;margin-right:2px"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke-linecap="round" stroke-linejoin="round"/></svg>⚡ Load into Notebook</button>
+              <button class="btn btn-xs btn-ghost" id="btn-load-notebook" style="color:var(--blue)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:12px;height:12px;vertical-align:middle;margin-right:2px;color:var(--blue)"><polygon points="5 3 19 12 5 21 5 3"/></svg>⚡ Open in Aurum IDE</button>
             </div>
             <div class="code-area">
               <pre><code class="language-python" id="code-display"></code></pre>
@@ -2051,6 +2635,11 @@ const App = {
   _streaming: false,
   notebookCells: [],
   currentPaperDatasets: [],
+  ideFiles: {},
+  ideActiveFile: '',
+  ideRunsCount: 42,
+  ideChatMessages: [],
+  _ideStreaming: false,
 };
 const PAGE_SIZE = 15;
 
@@ -2065,8 +2654,8 @@ function navigateTo(viewId) {
   if (viewId === 'library') loadLibrary();
   if (viewId === 'search') refreshStats();
   if (viewId === 'notebook') {
-    initNotebook();
-    renderNotebook();
+    initIde();
+    renderIde();
   }
 }
 
@@ -2969,33 +3558,481 @@ document.getElementById('lib-search').addEventListener('input', e => {
 document.getElementById('reader-back').addEventListener('click', () => navigateTo(App._prevView||'search'));
 document.querySelectorAll('.modal-bg').forEach(bg => bg.addEventListener('click', e => { if(e.target===e.currentTarget) e.currentTarget.classList.remove('open'); }));
 
-  // Notebook IDE Actions
-  document.getElementById('btn-nb-add-code').addEventListener('click', () => addNotebookCell('code'));
-  document.getElementById('btn-nb-add-md').addEventListener('click', () => addNotebookCell('markdown'));
-  document.getElementById('btn-nb-clear').addEventListener('click', () => {
-    App.notebookCells.forEach(c => { c.output = null; c.running = false; });
-    renderNotebook();
-    toast('Cleared all cell outputs');
+// ══════════════════════════════════════════════════════════
+// AURUM INTEGRATED PYTHON IDE LOGIC
+// ══════════════════════════════════════════════════════════
+function initIde() {
+  if (!App.ideFiles || Object.keys(App.ideFiles).length === 0) {
+    App.ideFiles = {
+      'triton_inference.py': `# Triton Inference Pipeline\nimport torch\nimport numpy as np\n\nclass TritonPipeline:\n    def __init__(self):\n        print("Initializing Triton kernels...")\n        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")\n        self.weight = torch.randn(512, 512, device=self.device)\n\n    def forward(self, x):\n        # Run simulated fused kernel matrix multiply\n        device_x = x.to(self.device)\n        out = torch.matmul(device_x, self.weight)\n        return out.mean(dim=-1, keepdim=True)\n\npipeline = TritonPipeline()\nx = torch.randn(32, 10, 512)\nout = pipeline.forward(x)\nprint("Forward pass shapes: Input:", x.shape, "-> Output:", out.shape)\nprint("System Execution check complete. Status: SUCCESS")\n`,
+      'dataset_loader.py': `# Dataset loader helper script\nimport torch\nfrom torch.utils.data import Dataset, DataLoader\n\nclass MockMLDataset(Dataset):\n    def __init__(self):\n        self.data = torch.randn(100, 512)\n        self.targets = torch.randint(0, 2, (100, 1))\n\n    def __len__(self):\n        return len(self.data)\n\n    def __getitem__(self, idx):\n        return self.data[idx], self.targets[idx]\n\ndataset = MockMLDataset()\nloader = DataLoader(dataset, batch_size=32, shuffle=True)\nfor batch_idx, (data, targets) in enumerate(loader):\n    print(f"Batch {batch_idx}: data shape {data.shape}, targets shape {targets.shape}")\n    break\n`,
+      'config.yaml': `# High-performance config parameter definitions\nmodel_name: "aurelia-core-llm"\nversion: "1.0.4"\ntarget_partition: "GPU-SXM4"\nprecision: "float16"\nbatch_size: 32\nlearning_rate: 0.00055\n`
+    };
+  }
+  if (!App.ideActiveFile || !App.ideFiles[App.ideActiveFile]) {
+    App.ideActiveFile = Object.keys(App.ideFiles)[0];
+  }
+}
+
+function renderIde() {
+  initIde();
+  
+  // Render Files List in sidebar
+  const filesList = document.getElementById('ide-files-list');
+  if (filesList) {
+    let html = '';
+    for (const filename in App.ideFiles) {
+      const isActive = filename === App.ideActiveFile;
+      const isPython = filename.endsWith('.py');
+      const fileIcon = isPython 
+        ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:14px;height:14px;color:var(--blue);margin-right:6px;vertical-align:middle;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`
+        : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:14px;height:14px;color:var(--muted);margin-right:6px;vertical-align:middle;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`;
+      
+      html += `
+        <div class="ide-file-item ${isActive ? 'active' : ''}" onclick="setIdeActiveFile('${filename}')">
+          ${fileIcon}
+          <span style="vertical-align:middle;">${escH(filename)}</span>
+          <span class="ide-file-item-close" onclick="event.stopPropagation(); deleteIdeFile('${filename}')">×</span>
+        </div>
+      `;
+    }
+    filesList.innerHTML = html;
+  }
+
+  // Render Tabs in Editor header
+  const tabList = document.getElementById('ide-tab-list');
+  if (tabList) {
+    let html = '';
+    for (const filename in App.ideFiles) {
+      const isActive = filename === App.ideActiveFile;
+      html += `
+        <div class="ide-tab-item ${isActive ? 'active' : ''}" onclick="setIdeActiveFile('${filename}')">
+          <span>${escH(filename)}</span>
+          <span class="ide-tab-close" onclick="event.stopPropagation(); deleteIdeFile('${filename}')">×</span>
+        </div>
+      `;
+    }
+    tabList.innerHTML = html;
+  }
+
+  // Render Datasets Guidance list
+  const datasetsContainer = document.getElementById('ide-datasets-list');
+  if (datasetsContainer) {
+    if (App.currentPaperDatasets && App.currentPaperDatasets.length > 0) {
+      datasetsContainer.innerHTML = App.currentPaperDatasets.map((d, index) => {
+        return `
+          <div class="dataset-card">
+            <div class="dataset-name">${escH(d.name)}</div>
+            ${d.task ? `<div class="dataset-task">${escH(d.task)}</div>` : ''}
+            <button class="dataset-load-btn" onclick="loadDatasetIntoIde('${escH(d.name)}', ${index})">⚡ Load into Editor</button>
+          </div>
+        `;
+      }).join('');
+    } else {
+      datasetsContainer.innerHTML = `
+        <div style="color:var(--muted); text-align:center; margin-top:20px; padding:0 8px; line-height:1.5;">
+          No active datasets from papers loaded. Read a paper to retrieve dataset guidance snippets.
+        </div>
+      `;
+    }
+  }
+
+  // Update KPI card runs count
+  const runsVal = document.getElementById('kpi-runs-val');
+  if (runsVal) {
+    runsVal.textContent = App.ideRunsCount;
+  }
+
+  // Populate editor contents
+  const ta = document.getElementById('ide-editor-textarea');
+  if (ta) {
+    ta.value = App.ideFiles[App.ideActiveFile] || '';
+    updateIdeHighlighter(ta.value);
+  }
+}
+
+function setIdeActiveFile(filename) {
+  App.ideActiveFile = filename;
+  
+  // Highlight active items
+  document.querySelectorAll('.ide-file-item').forEach(el => {
+    const nameSpan = el.querySelector('span');
+    el.classList.toggle('active', nameSpan && nameSpan.textContent === filename);
   });
-  document.getElementById('btn-nb-download').addEventListener('click', exportNotebook);
-  document.getElementById('btn-nb-run-all').addEventListener('click', async () => {
-    const runBtn = document.getElementById('btn-nb-run-all');
-    runBtn.disabled = true;
-    runBtn.textContent = 'Running...';
-    try {
-      for (const cell of App.notebookCells) {
-        if (cell.type === 'code') {
-          await runNotebookCell(cell.id);
+  
+  document.querySelectorAll('.ide-tab-item').forEach(el => {
+    const nameSpan = el.querySelector('span');
+    el.classList.toggle('active', nameSpan && nameSpan.textContent === filename);
+  });
+
+  const activeLabel = document.getElementById('ide-active-file-label');
+  if (activeLabel) activeLabel.textContent = filename;
+
+  const ta = document.getElementById('ide-editor-textarea');
+  if (ta) {
+    ta.value = App.ideFiles[filename] || '';
+    updateIdeHighlighter(ta.value);
+  }
+}
+
+window.deleteIdeFile = function(filename) {
+  if (Object.keys(App.ideFiles).length <= 1) {
+    toast('Cannot delete the last file in the workspace!', '⚠️');
+    return;
+  }
+  
+  delete App.ideFiles[filename];
+  if (App.ideActiveFile === filename) {
+    App.ideActiveFile = Object.keys(App.ideFiles)[0];
+  }
+  
+  renderIde();
+  toast(`Deleted file ${filename}`);
+};
+
+window.loadDatasetIntoIde = function(name, datasetIndex) {
+  const d = App.currentPaperDatasets[datasetIndex];
+  if (!d || !d.pythonCode) {
+    toast('No load snippet available', '⚠️');
+    return;
+  }
+
+  const cleanName = 'load_' + name.toLowerCase().replace(/[^a-z0-9]+/g, '_').substring(0, 15) + '.py';
+  App.ideFiles[cleanName] = d.pythonCode;
+  setIdeActiveFile(cleanName);
+  renderIde();
+  toast(`Loaded dataset loader script ${cleanName}!`);
+};
+
+function updateIdeHighlighter(text) {
+  const codeEl = document.getElementById('ide-editor-code');
+  if (!codeEl) return;
+
+  codeEl.textContent = text;
+  if (typeof hljs !== 'undefined') {
+    hljs.highlightElement(codeEl);
+  }
+
+  // Update Gutter numbers
+  const gutterEl = document.getElementById('ide-gutter');
+  if (gutterEl) {
+    const linesCount = text.split('\n').length;
+    let gutterHTML = '';
+    for (let i = 1; i <= linesCount; i++) {
+      gutterHTML += `<div>${i}</div>`;
+    }
+    gutterEl.innerHTML = gutterHTML;
+  }
+}
+
+async function runIdeCode() {
+  const runBtn = document.getElementById('btn-ide-run');
+  if (!runBtn) return;
+
+  const code = App.ideFiles[App.ideActiveFile];
+  if (!code) {
+    toast('No code in active file to run!', '⚠️');
+    return;
+  }
+
+  runBtn.disabled = true;
+  runBtn.innerHTML = `<span style="display:inline-block;width:10px;height:10px;border:2px solid transparent;border-top-color:var(--blue);border-radius:50%;animation:spin 0.6s linear infinite;margin-right:6px;vertical-align:middle;"></span> Running...`;
+
+  const termOut = document.getElementById('ide-terminal-output');
+  const termStatus = document.getElementById('ide-terminal-status');
+  const fixBtn = document.getElementById('btn-ide-fix');
+
+  if (termOut) {
+    termOut.innerHTML += `\n<span class="console-line-sys">>>> Running script ${App.ideActiveFile} on local cluster...</span>\n`;
+    termOut.scrollTop = termOut.scrollHeight;
+  }
+  if (termStatus) termStatus.style.background = '#e5c158'; // compiling yellow
+  if (fixBtn) fixBtn.style.display = 'none';
+
+  try {
+    const response = await fetch('/api/run-code', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code })
+    });
+
+    if (!response.ok) {
+      throw new Error('API Execution Request Failed');
+    }
+
+    const data = await response.json();
+    let out = '';
+
+    if (data.stdout) {
+      out += `<span class="console-line-stdout">${escH(data.stdout)}</span>`;
+    }
+    if (data.stderr) {
+      out += `<span class="console-line-stderr">${escH(data.stderr)}</span>`;
+      App._lastError = data.stderr;
+    }
+
+    if (data.timeout) {
+      out += `\n<span class="console-line-stderr">>>> Execution exceeded 10-second timeout.</span>`;
+      if (termStatus) termStatus.style.background = 'var(--red)';
+      if (fixBtn) fixBtn.style.display = 'inline-block';
+    } else if (data.exitCode === 0) {
+      out += `\n<span class="console-line-sys">>>> Script finished successfully in ${data.duration}s.</span>`;
+      if (termStatus) termStatus.style.background = 'var(--green)';
+      
+      // Increment successful run counters
+      App.ideRunsCount++;
+      const runsVal = document.getElementById('kpi-runs-val');
+      if (runsVal) runsVal.textContent = App.ideRunsCount;
+    } else {
+      out += `\n<span class="console-line-stderr">>>> Script exited with error code ${data.exitCode} in ${data.duration}s.</span>`;
+      if (termStatus) termStatus.style.background = 'var(--red)';
+      if (fixBtn) fixBtn.style.display = 'inline-block';
+      App._lastError = data.stderr || `Exit code ${data.exitCode}`;
+    }
+
+    if (termOut) termOut.innerHTML += out;
+
+  } catch (err) {
+    if (termOut) {
+      termOut.innerHTML += `\n<span class="console-line-stderr">>>> Execution failed: ${escH(err.message)}</span>`;
+    }
+    if (termStatus) termStatus.style.background = 'var(--red)';
+  } finally {
+    runBtn.disabled = false;
+    runBtn.innerHTML = `▶ Run Code`;
+    if (termOut) termOut.scrollTop = termOut.scrollHeight;
+  }
+}
+
+function fixIdeCodeWithAI() {
+  const errorText = App._lastError || 'Unknown compiler error';
+  const currentCode = App.ideFiles[App.ideActiveFile] || '';
+  
+  if (!currentCode) return;
+
+  const userPrompt = `The python code script "${App.ideActiveFile}" encountered the following error during execution:\n\n\`\`\`\n${errorText}\n\`\`\`\n\nHere is the active file code:\n\n\`\`\`python\n${currentCode}\n\`\`\`\n\nPlease locate the bug, explain the issue clearly, and provide the corrected python script.`;
+  
+  const aiInput = document.getElementById('ide-ai-input');
+  if (aiInput) {
+    aiInput.value = userPrompt;
+    aiInput.focus();
+  }
+  
+  // Switch model badge to GPT-OSS model for code fix
+  const badge = document.getElementById('ide-ai-model-badge');
+  if (badge) badge.textContent = 'GPT-OSS-120B';
+  
+  sendIdeAiMessage('implement');
+}
+
+async function sendIdeAiMessage(forcedMode = null) {
+  if (App._ideStreaming) return;
+
+  const aiInput = document.getElementById('ide-ai-input');
+  if (!aiInput) return;
+
+  const query = aiInput.value.trim();
+  if (!query) return;
+
+  aiInput.value = '';
+  aiInput.style.height = 'auto';
+
+  const msgsContainer = document.getElementById('ide-ai-msgs');
+  const emptyPrompt = msgsContainer.querySelector('.ide-ai-empty');
+  if (emptyPrompt) emptyPrompt.remove();
+
+  // Append user bubble
+  const userDiv = document.createElement('div');
+  userDiv.className = 'ide-chat-bubble ide-chat-bubble-user';
+  userDiv.textContent = query;
+  msgsContainer.appendChild(userDiv);
+  msgsContainer.scrollTop = msgsContainer.scrollHeight;
+
+  // Append typing AI bubble
+  const aiDiv = document.createElement('div');
+  aiDiv.className = 'ide-chat-bubble ide-chat-bubble-ai';
+  aiDiv.innerHTML = `<span style="display:inline-block;width:10px;height:10px;border:2px solid transparent;border-top-color:var(--blue);border-radius:50%;animation:spin 0.6s linear infinite;vertical-align:middle;"></span> Aurelius is analyzing...`;
+  msgsContainer.appendChild(aiDiv);
+  msgsContainer.scrollTop = msgsContainer.scrollHeight;
+
+  App._ideStreaming = true;
+  App.ideChatMessages.push({ role: 'user', content: query });
+
+  try {
+    // Check if we have API keys
+    const settings = await api('/api/settings');
+    if (!settings.hasGroqKey) {
+      aiDiv.innerHTML = `<span style="color:var(--red)">⚠ Groq API key is not set. Please open ⚙ Settings in the sidebar to configure your key.</span>`;
+      App._ideStreaming = false;
+      return;
+    }
+
+    const activeCode = App.ideFiles[App.ideActiveFile] || '';
+    const mode = forcedMode || (query.toLowerCase().includes('implement') || query.toLowerCase().includes('code') ? 'implement' : 'chat');
+
+    // Update model badge accordingly
+    const badge = document.getElementById('ide-ai-model-badge');
+    if (badge) {
+      badge.textContent = mode === 'implement' ? 'GPT-OSS-120B' : 'LLaMA-3.3';
+    }
+
+    // Build context
+    const recentMessages = App.ideChatMessages.slice(-6); // Last 3 turns
+    
+    // Inject active file code and terminal output context as system context parameters inside chat api request
+    const paperContext = App.currentPaper ? App.currentPaper : null;
+
+    const body = {
+      messages: recentMessages,
+      paper: paperContext,
+      mode: mode
+    };
+
+    // If query does not contain code already, append the editor code in the user prompt as context
+    if (activeCode && !query.includes('Here is the active file code')) {
+      body.messages[body.messages.length - 1].content += `\n\n[Active editor file: "${App.ideActiveFile}"]\n\`\`\`python\n${activeCode.substring(0, 5000)}\n\`\`\``;
+    }
+
+    const resp = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({ error: resp.statusText }));
+      throw new Error(err.error || resp.statusText);
+    }
+
+    // Clear typing indicator
+    aiDiv.innerHTML = '';
+    
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder('utf-8');
+    let chunkBuf = '';
+    let fullText = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      chunkBuf += decoder.decode(value, { stream: true });
+      const lines = chunkBuf.split('\n');
+      chunkBuf = lines.pop();
+
+      for (const line of lines) {
+        const cleanLine = line.trim();
+        if (!cleanLine) continue;
+        if (cleanLine === 'data: [DONE]') continue;
+        if (cleanLine.startsWith('data: ')) {
+          try {
+            const data = JSON.parse(cleanLine.substring(6));
+            const delta = data.choices?.[0]?.delta?.content || '';
+            fullText += delta;
+            aiDiv.innerHTML = renderMd(fullText);
+            
+            // Highlight pre code blocks
+            aiDiv.querySelectorAll('pre code').forEach(block => {
+              if (typeof hljs !== 'undefined') hljs.highlightElement(block);
+            });
+            
+            msgsContainer.scrollTop = msgsContainer.scrollHeight;
+          } catch (jsonErr) {
+            // Ignored if partial parse
+          }
         }
       }
-      toast('Run all cells completed');
-    } finally {
-      runBtn.disabled = false;
-      runBtn.textContent = '▶ Run All';
+    }
+
+    App.ideChatMessages.push({ role: 'assistant', content: fullText });
+
+  } catch (err) {
+    aiDiv.innerHTML = `<span style="color:var(--red)">⚠ Error streaming response: ${escH(err.message)}</span>`;
+  } finally {
+    App._ideStreaming = false;
+    msgsContainer.scrollTop = msgsContainer.scrollHeight;
+  }
+}
+
+  // Aurum IDE Event Actions
+  document.getElementById('btn-ide-new-file').addEventListener('click', () => {
+    const filename = prompt('Enter new filename (e.g. model.py or config.yaml):');
+    if (!filename) return;
+    const cleanName = filename.trim();
+    if (!cleanName) return;
+    if (App.ideFiles[cleanName]) {
+      toast('File already exists!', '⚠️');
+      return;
+    }
+    App.ideFiles[cleanName] = cleanName.endsWith('.py') ? '# New python script\n' : '# New file\n';
+    setIdeActiveFile(cleanName);
+    renderIde();
+    toast(`Created file ${cleanName}`);
+  });
+
+  document.getElementById('btn-ide-run').addEventListener('click', runIdeCode);
+  document.getElementById('btn-ide-clear').addEventListener('click', () => {
+    document.getElementById('ide-terminal-output').textContent = '';
+    document.getElementById('ide-terminal-status').style.background = 'var(--faint)';
+    document.getElementById('btn-ide-fix').style.display = 'none';
+  });
+  document.getElementById('btn-ide-fix').addEventListener('click', fixIdeCodeWithAI);
+
+  const ideTa = document.getElementById('ide-editor-textarea');
+  ideTa.addEventListener('input', (e) => {
+    const text = e.target.value;
+    if (App.ideActiveFile) {
+      App.ideFiles[App.ideActiveFile] = text;
+      updateIdeHighlighter(text);
     }
   });
 
-  // Code Tab load into notebook bridge
+  ideTa.addEventListener('scroll', () => {
+    const pre = document.getElementById('ide-editor-pre');
+    const gutter = document.getElementById('ide-gutter');
+    if (pre) {
+      pre.scrollTop = ideTa.scrollTop;
+      pre.scrollLeft = ideTa.scrollLeft;
+    }
+    if (gutter) {
+      gutter.scrollTop = ideTa.scrollTop;
+    }
+  });
+
+  // Keep TAB character default behavior in editor textarea
+  ideTa.addEventListener('keydown', function(e) {
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      const start = this.selectionStart;
+      const end = this.selectionEnd;
+      this.value = this.value.substring(0, start) + "    " + this.value.substring(end);
+      this.selectionStart = this.selectionEnd = start + 4;
+      if (App.ideActiveFile) {
+        App.ideFiles[App.ideActiveFile] = this.value;
+        updateIdeHighlighter(this.value);
+      }
+    }
+  });
+
+  const ideAiInput = document.getElementById('ide-ai-input');
+  ideAiInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendIdeAiMessage();
+    }
+  });
+
+  document.getElementById('btn-ide-ai-send').addEventListener('click', sendIdeAiMessage);
+
+  document.querySelectorAll('.ide-quick-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      const prompt = pill.dataset.prompt;
+      ideAiInput.value = prompt;
+      ideAiInput.focus();
+    });
+  });
+
+  // Code Tab load into Aurum IDE bridge
   document.getElementById('btn-load-notebook').addEventListener('click', () => {
     const toggleBtn = document.getElementById('btn-toggle-edit');
     if (toggleBtn && toggleBtn.textContent === '👁️ View') {
@@ -3003,347 +4040,27 @@ document.querySelectorAll('.modal-bg').forEach(bg => bg.addEventListener('click'
     }
     
     if (!App.currentCode) {
-      toast('No code to load into notebook', '⚠️');
+      toast('No code to load into Aurum IDE', '⚠️');
       return;
     }
 
-    initNotebook();
-    addNotebookCell('code', App.currentCode);
+    initIde();
+    const cleanTitle = (App.currentPaper?.title || 'paper_implementation')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '_')
+      .substring(0, 30);
+    const filename = `${cleanTitle}.py`;
+    
+    App.ideFiles[filename] = App.currentCode;
+    setIdeActiveFile(filename);
     navigateTo('notebook');
-    toast('Loaded code into Notebook playground!');
+    renderIde();
+    toast('Loaded code into Aurum Python IDE playground!');
   });
 
 // ══════════════════════════════════════════════════════════
-// NOTEBOOK IDE LOGIC
-// ══════════════════════════════════════════════════════════
-function initNotebook() {
-  if (!App.notebookCells || App.notebookCells.length === 0) {
-    App.notebookCells = [
-      {
-        id: generateCellId(),
-        type: 'code',
-        content: '# Write Python code here\nimport torch\nprint("PyTorch version:", torch.__version__)\nprint("CUDA available:", torch.cuda.is_available())\n\n# Let\'s do a simple tensor check\nx = torch.rand(5, 3)\nprint("Random Tensor:\\n", x)',
-        output: null,
-        running: false
-      }
-    ];
-  }
-}
 
-function generateCellId() {
-  return 'cell_' + Math.random().toString(36).substring(2, 11);
-}
-
-function renderNotebook() {
-  const container = document.getElementById('notebook-cells-list');
-  if (!container) return;
-
-  if (App.notebookCells.length === 0) {
-    container.innerHTML = `
-      <div class="empty-state">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:36px;height:36px;color:var(--faint);margin-bottom:8px"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 9h6M9 13h6M9 17h6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <h3>Notebook is empty</h3>
-        <p>Add a code or markdown cell to get started.</p>
-      </div>
-    `;
-    return;
-  }
-
-  let codeCellCounter = 1;
-
-  container.innerHTML = App.notebookCells.map((c, index) => {
-    let executionIndicator = ' ';
-    if (c.type === 'code') {
-      if (c.running) {
-        executionIndicator = '*';
-      } else if (c.output) {
-        executionIndicator = codeCellCounter++;
-      } else {
-        executionIndicator = ' ';
-      }
-    }
-
-    const typeBadge = c.type === 'code' 
-      ? `<span class="cell-type-badge cell-type-code">Code</span>` 
-      : `<span class="cell-type-badge cell-type-markdown">Markdown</span>`;
-
-    const isFirst = index === 0;
-    const isLast = index === App.notebookCells.length - 1;
-
-    let bodyHtml = '';
-    if (c.type === 'code') {
-      bodyHtml = `
-        <div class="cell-editor-container">
-          <textarea class="cell-textarea" id="textarea-${c.id}" placeholder="Write python code..." rows="4">${escH(c.content)}</textarea>
-        </div>
-      `;
-    } else {
-      // Markdown cell
-      if (c.editing) {
-        bodyHtml = `
-          <div class="cell-editor-container">
-            <textarea class="cell-textarea" id="textarea-${c.id}" placeholder="Write markdown..." rows="3">${escH(c.content)}</textarea>
-          </div>
-        `;
-      } else {
-        const rendered = c.content.trim() 
-          ? renderMd(c.content) 
-          : `<div class="cell-markdown-preview empty-md">Double click to edit markdown...</div>`;
-        bodyHtml = `
-          <div class="cell-markdown-preview" id="preview-${c.id}">${rendered}</div>
-        `;
-      }
-    }
-
-    let outputHtml = '';
-    if (c.type === 'code' && (c.output || c.running)) {
-      let content = '';
-      if (c.running) {
-        content = `<div class="cell-output-sys">Executing on local Python runner...</div>`;
-      } else if (c.output) {
-        const out = c.output;
-        let sysInfo = `Exit code: ${out.exitCode} · Duration: ${out.duration}s`;
-        if (out.timeout) sysInfo += ' · TIMEOUT (10s limit)';
-        content = `<div class="cell-output-sys">${sysInfo}</div>`;
-        if (out.stdout) content += `<span class="cell-output-stdout">${escH(out.stdout)}</span>`;
-        if (out.stderr) content += `<span class="cell-output-stderr">${escH(out.stderr)}</span>`;
-      }
-      outputHtml = `<div class="cell-output-container">${content}</div>`;
-    }
-
-    return `
-      <div class="notebook-cell" id="cell-container-${c.id}" data-id="${c.id}">
-        <div class="cell-header">
-          <div class="cell-info">
-            <span style="font-family:'JetBrains Mono',monospace; font-weight:600; width:45px; display:inline-block">
-              ${c.type === 'code' ? `In [${executionIndicator}]:` : 'Md:'}
-            </span>
-            ${typeBadge}
-          </div>
-          <div class="cell-actions">
-            ${c.type === 'code' 
-              ? `<button class="cell-btn run-btn" onclick="runNotebookCell('${c.id}')">▶ Run</button>` 
-              : `<button class="cell-btn" onclick="toggleMarkdownEditing('${c.id}')">${c.editing ? '👁 Preview' : '✏ Edit'}</button>`
-            }
-            <button class="cell-btn" onclick="moveNotebookCell('${c.id}', -1)" ${isFirst ? 'disabled style="opacity:0.3"' : ''}>▲</button>
-            <button class="cell-btn" onclick="moveNotebookCell('${c.id}', 1)" ${isLast ? 'disabled style="opacity:0.3"' : ''}>▼</button>
-            <button class="cell-btn" style="color:var(--red)" onclick="deleteNotebookCell('${c.id}')">🗑</button>
-          </div>
-        </div>
-        <div class="cell-body-wrap">
-          ${bodyHtml}
-        </div>
-        ${outputHtml}
-      </div>
-    `;
-  }).join('');
-
-  // Attach event listeners for inputs
-  App.notebookCells.forEach(c => {
-    const textarea = document.getElementById(`textarea-${c.id}`);
-    if (textarea) {
-      textarea.style.height = 'auto';
-      textarea.style.height = textarea.scrollHeight + 'px';
-
-      textarea.addEventListener('input', e => {
-        c.content = e.target.value;
-        textarea.style.height = 'auto';
-        textarea.style.height = textarea.scrollHeight + 'px';
-      });
-
-      // Support Ctrl+Enter to run cell
-      textarea.addEventListener('keydown', e => {
-        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-          e.preventDefault();
-          runNotebookCell(c.id);
-        }
-      });
-
-      // For markdown cells, toggle preview on blur
-      if (c.type === 'markdown') {
-        textarea.addEventListener('blur', () => {
-          setTimeout(() => {
-            if (c.editing) {
-              c.editing = false;
-              renderNotebook();
-            }
-          }, 200);
-        });
-      }
-    }
-
-    const preview = document.getElementById(`preview-${c.id}`);
-    if (preview) {
-      preview.addEventListener('dblclick', () => {
-        c.editing = true;
-        renderNotebook();
-        setTimeout(() => {
-          const ta = document.getElementById(`textarea-${c.id}`);
-          if (ta) ta.focus();
-        }, 50);
-      });
-    }
-  });
-}
-
-window.runNotebookCell = async function(id) {
-  const cell = App.notebookCells.find(c => c.id === id);
-  if (!cell) return;
-
-  if (cell.type === 'markdown') {
-    cell.editing = false;
-    renderNotebook();
-    return;
-  }
-
-  cell.running = true;
-  cell.output = null;
-  renderNotebook();
-
-  try {
-    const res = await fetch('/api/run-code', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code: cell.content }),
-    });
-
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({ error: res.statusText }));
-      throw new Error(err.error || res.statusText);
-    }
-
-    const data = await res.json();
-    cell.output = data;
-  } catch (err) {
-    cell.output = {
-      stdout: '',
-      stderr: 'Failed to execute: ' + err.message,
-      exitCode: 1,
-      duration: '0.00',
-      timeout: false
-    };
-  } finally {
-    cell.running = false;
-    renderNotebook();
-  }
-};
-
-window.toggleMarkdownEditing = function(id) {
-  const cell = App.notebookCells.find(c => c.id === id);
-  if (!cell) return;
-  cell.editing = !cell.editing;
-  renderNotebook();
-  if (cell.editing) {
-    setTimeout(() => {
-      const ta = document.getElementById(`textarea-${id}`);
-      if (ta) ta.focus();
-    }, 50);
-  }
-};
-
-window.deleteNotebookCell = function(id) {
-  App.notebookCells = App.notebookCells.filter(c => c.id !== id);
-  renderNotebook();
-};
-
-window.moveNotebookCell = function(id, direction) {
-  const index = App.notebookCells.findIndex(c => c.id === id);
-  if (index === -1) return;
-  const newIndex = index + direction;
-  if (newIndex < 0 || newIndex >= App.notebookCells.length) return;
-
-  const temp = App.notebookCells[index];
-  App.notebookCells[index] = App.notebookCells[newIndex];
-  App.notebookCells[newIndex] = temp;
-
-  renderNotebook();
-};
-
-window.addNotebookCell = function(type, content = '') {
-  initNotebook();
-  App.notebookCells.push({
-    id: generateCellId(),
-    type: type,
-    content: content,
-    output: null,
-    running: false,
-    editing: content === ''
-  });
-  renderNotebook();
-  const body = document.getElementById('notebook-body');
-  if (body) {
-    setTimeout(() => {
-      body.scrollTop = body.scrollHeight;
-    }, 50);
-  }
-};
-
-function exportNotebook() {
-  let executionCount = 1;
-  const ipynbCells = App.notebookCells.map(c => {
-    const sourceLines = c.content.split('\n').map((line, i, arr) => line + (i < arr.length - 1 ? '\n' : ''));
-    if (c.type === 'code') {
-      const outputs = [];
-      if (c.output) {
-        if (c.output.stdout) {
-          outputs.push({
-            name: 'stdout',
-            output_type: 'stream',
-            text: c.output.stdout.split('\n').map((line, i, arr) => line + (i < arr.length - 1 ? '\n' : ''))
-          });
-        }
-        if (c.output.stderr) {
-          outputs.push({
-            name: 'stderr',
-            output_type: 'stream',
-            text: c.output.stderr.split('\n').map((line, i, arr) => line + (i < arr.length - 1 ? '\n' : ''))
-          });
-        }
-      }
-      return {
-        cell_type: 'code',
-        execution_count: executionCount++,
-        metadata: {},
-        outputs: outputs,
-        source: sourceLines
-      };
-    } else {
-      return {
-        cell_type: 'markdown',
-        metadata: {},
-        source: sourceLines
-      };
-    }
-  });
-
-  const ipynb = {
-    cells: ipynbCells,
-    metadata: {
-      kernelspec: {
-        display_name: "Python 3",
-        language: "python",
-        name: "python3"
-      },
-      language_info: {
-        name: "python"
-      }
-    },
-    nbformat: 4,
-    nbformat_minor: 2
-  };
-
-  const filename = (App.currentPaper?.title || 'notebook').toLowerCase().replace(/[^a-z0-9]+/g, '_').substring(0, 40) + '.ipynb';
-  const blob = new Blob([JSON.stringify(ipynb, null, 2)], { type: 'application/x-ipynb+json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
-  toast(`Downloaded ${filename}`);
-}
+// Leftover notebook cell methods removed.
 
 // ══════════════════════════════════════════════════════════
 // DATASET EXTRACTION LOGIC
@@ -3401,7 +4118,7 @@ async function loadDatasets(paper) {
                 <button class="btn-dataset-copy" onclick="event.stopPropagation(); copyDatasetCode(${index})">Copy</button>
                 <pre class="dataset-code-pre"><code class="language-python" id="dataset-code-${index}">${escH(codeHtml)}</code></pre>
               </div>
-              <button class="btn btn-xs btn-ghost" style="margin-top:6px; background:var(--blue-bg); border-color:var(--blue-border); color:var(--blue)" onclick="event.stopPropagation(); loadDatasetIntoNotebook(${index})">⚡ Load into Notebook</button>
+              <button class="btn btn-xs btn-ghost" style="margin-top:6px; background:var(--blue-bg); border-color:var(--blue-border); color:var(--blue)" onclick="event.stopPropagation(); loadDatasetIntoNotebook(${index})">⚡ Open in Aurum IDE</button>
             ` : ''}
           </div>
         </div>
@@ -3454,12 +4171,11 @@ window.copyDatasetCode = function(index) {
 };
 
 window.loadDatasetIntoNotebook = function(index) {
-  const code = App.currentPaperDatasets?.[index]?.pythonCode;
-  if (!code) return;
-  initNotebook();
-  addNotebookCell('code', code);
+  const d = App.currentPaperDatasets?.[index];
+  if (!d || !d.pythonCode) return;
+  const name = d.name || 'dataset';
+  loadDatasetIntoIde(name, index);
   navigateTo('notebook');
-  toast('Loaded dataset code into Notebook playground!');
 };
 
 // ══════════════════════════════════════════════════════════
