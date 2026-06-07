@@ -2137,6 +2137,205 @@ h1, h2, h3, h4, .brand-title, .logo-name, .page-title, .r-paper-title, .reader-p
 .compute-status-mini, .badge-ai-model {
   user-select: none;
 }
+
+/* ── Trace Flow Visualizer Styles ── */
+.ide-code-line {
+  padding-left: 4px;
+  border-left: 2px solid transparent;
+  transition: background 0.1s, border-color 0.1s;
+}
+.ide-code-line.trace-highlight {
+  background: rgba(212, 175, 55, 0.08);
+  border-left-color: var(--blue);
+}
+.ide-gutter div.trace-highlight {
+  color: var(--blue) !important;
+  font-weight: 700 !important;
+  text-shadow: 0 0 6px rgba(212, 175, 55, 0.4);
+}
+.ide-console-tab {
+  display: inline-block;
+  padding: 8px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: var(--transition);
+  user-select: none;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.ide-console-tab:hover {
+  color: var(--text);
+}
+.ide-console-tab.active {
+  color: var(--blue);
+  border-bottom-color: var(--blue);
+}
+.ide-trace-visualizer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  background: rgba(6, 6, 8, 0.3);
+}
+.ide-trace-player {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: rgba(0, 0, 0, 0.25);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.ide-trace-btn {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 5px;
+  transition: var(--transition);
+}
+.ide-trace-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+  border-color: var(--border-med);
+}
+.ide-trace-btn.active-play {
+  color: var(--green);
+  border-color: var(--green-bg);
+  background: var(--green-bg);
+}
+.ide-trace-slider {
+  flex: 1;
+  height: 4px;
+  -webkit-appearance: none;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+.ide-trace-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--blue);
+  box-shadow: 0 0 6px var(--blue);
+  transition: transform 0.1s;
+}
+.ide-trace-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+.ide-trace-step-label {
+  font-size: 11px;
+  color: var(--text);
+  font-family: var(--font-mono);
+  min-width: 95px;
+  text-align: right;
+}
+.ide-trace-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+.ide-trace-vars {
+  flex: 1.3;
+  overflow-y: auto;
+  padding: 12px 16px;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ide-trace-stdout-panel {
+  flex: 0.7;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.ide-trace-stdout-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  color: var(--muted);
+  padding: 8px 16px;
+  background: rgba(0,0,0,0.15);
+  border-bottom: 1px solid var(--border);
+  text-transform: uppercase;
+}
+.ide-trace-stdout-logs {
+  flex: 1;
+  padding: 12px 16px;
+  overflow-y: auto;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: #e2e8f0;
+  margin: 0;
+  white-space: pre-wrap;
+}
+.ide-var-flow-card {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  transition: var(--transition);
+}
+.ide-var-flow-card:hover {
+  border-color: var(--border-med);
+  background: rgba(0, 0, 0, 0.3);
+}
+.ide-var-flow-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.ide-var-flow-name {
+  font-weight: 600;
+  color: var(--blue);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+.ide-var-flow-type {
+  font-size: 9.5px;
+  color: var(--muted);
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+.ide-var-flow-val {
+  font-size: 12px;
+  color: var(--text);
+  word-break: break-all;
+}
+.ide-number-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(36px, 1fr));
+  gap: 4px;
+  margin-top: 6px;
+}
+.ide-number-cell {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  border: 1px solid rgba(255,255,255,0.03);
+  user-select: none;
+  transition: transform 0.15s;
+}
+.ide-number-cell:hover {
+  transform: scale(1.15);
+  z-index: 10;
+}
 </style>
 </head>
 <body>
@@ -2378,20 +2577,56 @@ h1, h2, h3, h4, .brand-title, .logo-name, .page-title, .r-paper-title, .reader-p
           
         </div>
         
-        <!-- Terminal Output Card -->
-        <div class="ide-card" style="flex:0.8; display:flex; flex-direction:column; overflow:hidden; min-height:160px;">
-          <div class="ide-card-header" style="display:flex; justify-content:space-between; align-items:center; flex-shrink:0;">
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span class="status-indicator" id="ide-terminal-status" style="width:7px; height:7px; border-radius:50%; background:var(--faint);"></span>
-              <span>TERMINAL OUTPUT</span>
+        <!-- Terminal Output / Trace Visualizer Card -->
+        <div class="ide-card" style="flex:0.8; display:flex; flex-direction:column; overflow:hidden; min-height:165px;">
+          <div class="ide-card-header" style="display:flex; justify-content:space-between; align-items:center; flex-shrink:0; padding: 4px 16px;">
+            <div style="display:flex; align-items:center; gap:4px;">
+              <div class="ide-console-tab active" id="tab-ide-console" onclick="switchIdeConsoleMode('console')">
+                <span class="status-indicator" id="ide-terminal-status" style="width:6px; height:6px; border-radius:50%; background:var(--faint); display:inline-block; margin-right:6px; vertical-align:middle;"></span>Console Output
+              </div>
+              <div class="ide-console-tab" id="tab-ide-visualizer" onclick="switchIdeConsoleMode('visualizer')">
+                🔍 Trace Visualizer
+              </div>
             </div>
-            <div class="ide-terminal-actions" style="display:flex; gap:8px;">
+            <div class="ide-terminal-actions" style="display:flex; gap:8px; align-items:center;">
               <button class="ide-terminal-btn btn-xs ide-btn-fix" id="btn-ide-fix" style="display:none; background:var(--blue-bg); border-color:var(--blue-border); color:var(--blue)">⚙️ Fix with AI</button>
               <button class="ide-terminal-btn btn-xs" id="btn-ide-clear">Clear</button>
+              <button class="ide-terminal-btn btn-xs btn-ai" id="btn-ide-trace" style="background:rgba(212,175,55,0.06); border-color:rgba(212,175,55,0.2); color:var(--blue); font-weight:600; padding:4px 10px;">🔍 Trace Flow</button>
               <button class="ide-terminal-btn btn-xs btn-ai" id="btn-ide-run" style="background:var(--blue-bg); border-color:var(--blue-border); color:var(--blue); font-weight:600; padding:4px 12px;">▶ Run Code</button>
             </div>
           </div>
-          <pre class="ide-terminal-output" id="ide-terminal-output"></pre>
+          
+          <!-- Tab 1: Terminal Console Logs -->
+          <pre class="ide-terminal-output" id="ide-terminal-output" style="display:block; flex:1; overflow-y:auto; margin:0;"></pre>
+          
+          <!-- Tab 2: Interactive Stepper & Flow Visualizer -->
+          <div class="ide-trace-visualizer" id="ide-trace-visualizer" style="display:none; flex:1; overflow:hidden;">
+            <!-- Player Bar -->
+            <div class="ide-trace-player">
+              <button class="ide-trace-btn" id="btn-trace-prev" onclick="stepIdeTrace(-1)">◀ Step</button>
+              <button class="ide-trace-btn" id="btn-trace-play" onclick="togglePlayIdeTrace()">Play</button>
+              <button class="ide-trace-btn" id="btn-trace-next" onclick="stepIdeTrace(1)">Step ▶</button>
+              <button class="ide-trace-btn" id="btn-trace-reset" onclick="seekIdeTrace(0)">↺ Reset</button>
+              <input type="range" class="ide-trace-slider" id="ide-trace-slider" min="0" max="0" value="0" oninput="seekIdeTrace(parseInt(this.value))"/>
+              <div class="ide-trace-step-label" id="ide-trace-step-label">Step 0 / 0</div>
+            </div>
+            
+            <!-- visualizer body -->
+            <div class="ide-trace-body">
+              <!-- Variables flow -->
+              <div class="ide-trace-vars" id="ide-trace-vars">
+                <div style="color:var(--muted); text-align:center; padding-top:20px;">
+                  No variables inside scope. Run "Trace Flow" on your script to debug variables step-by-step.
+                </div>
+              </div>
+              
+              <!-- Stdout history at step -->
+              <div class="ide-trace-stdout-panel">
+                <div class="ide-trace-stdout-title">Terminal output at step</div>
+                <pre class="ide-trace-stdout-logs" id="ide-trace-stdout-logs">No output.</pre>
+              </div>
+            </div>
+          </div>
         </div>
         
       </div>
@@ -2640,6 +2875,9 @@ const App = {
   ideRunsCount: 42,
   ideChatMessages: [],
   _ideStreaming: false,
+  _traceSteps: [],
+  _currentTraceStep: 0,
+  _tracePlayerInterval: null,
 };
 const PAGE_SIZE = 15;
 
@@ -3654,6 +3892,26 @@ function renderIde() {
 function setIdeActiveFile(filename) {
   App.ideActiveFile = filename;
   
+  // Reset trace visualizer state
+  if (App._tracePlayerInterval) {
+    clearInterval(App._tracePlayerInterval);
+    App._tracePlayerInterval = null;
+    const playBtn = document.getElementById('btn-trace-play');
+    if (playBtn) {
+      playBtn.textContent = 'Play';
+      playBtn.classList.remove('active-play');
+    }
+  }
+  App._traceSteps = [];
+  App._currentTraceStep = 0;
+  
+  // Clear trace editor highlights
+  document.querySelectorAll('.ide-code-line.trace-highlight').forEach(el => el.classList.remove('trace-highlight'));
+  document.querySelectorAll('.ide-gutter div.trace-highlight').forEach(el => el.classList.remove('trace-highlight'));
+  
+  // Switch back to console view
+  switchIdeConsoleMode('console');
+  
   // Highlight active items
   document.querySelectorAll('.ide-file-item').forEach(el => {
     const nameSpan = el.querySelector('span');
@@ -3713,13 +3971,21 @@ function updateIdeHighlighter(text) {
     hljs.highlightElement(codeEl);
   }
 
+  // Wrap lines in divs for individual line highlighting
+  const html = codeEl.innerHTML;
+  const lines = html.split('\n');
+  const wrappedHTML = lines.map((lineHtml, idx) => {
+    return `<div class="ide-code-line" id="ide-line-${idx + 1}">${lineHtml || ' '}</div>`;
+  }).join('');
+  codeEl.innerHTML = wrappedHTML;
+
   // Update Gutter numbers
   const gutterEl = document.getElementById('ide-gutter');
   if (gutterEl) {
-    const linesCount = text.split('\n').length;
+    const linesCount = lines.length;
     let gutterHTML = '';
     for (let i = 1; i <= linesCount; i++) {
-      gutterHTML += `<div>${i}</div>`;
+      gutterHTML += `<div id="ide-gutter-line-${i}">${i}</div>`;
     }
     gutterEl.innerHTML = gutterHTML;
   }
@@ -3954,6 +4220,290 @@ async function sendIdeAiMessage(forcedMode = null) {
   }
 }
 
+function switchIdeConsoleMode(mode) {
+  const tabConsole = document.getElementById('tab-ide-console');
+  const tabVisualizer = document.getElementById('tab-ide-visualizer');
+  const termOut = document.getElementById('ide-terminal-output');
+  const traceVis = document.getElementById('ide-trace-visualizer');
+  
+  if (mode === 'console') {
+    if (tabConsole) tabConsole.classList.add('active');
+    if (tabVisualizer) tabVisualizer.classList.remove('active');
+    if (termOut) termOut.style.display = 'block';
+    if (traceVis) traceVis.style.display = 'none';
+  } else {
+    if (tabConsole) tabConsole.classList.remove('active');
+    if (tabVisualizer) tabVisualizer.classList.add('active');
+    if (termOut) termOut.style.display = 'none';
+    if (traceVis) traceVis.style.display = 'flex';
+  }
+}
+
+async function runTraceCode() {
+  const traceBtn = document.getElementById('btn-ide-trace');
+  if (!traceBtn) return;
+  
+  const code = App.ideFiles[App.ideActiveFile];
+  if (!code) {
+    toast('No code in active file to trace!', '⚠️');
+    return;
+  }
+  
+  // Disable and show tracing loader
+  traceBtn.disabled = true;
+  const originalHtml = traceBtn.innerHTML;
+  traceBtn.innerHTML = `<span style="display:inline-block;width:10px;height:10px;border:2px solid transparent;border-top-color:var(--blue);border-radius:50%;animation:spin 0.6s linear infinite;margin-right:6px;vertical-align:middle;"></span> Tracing...`;
+  
+  const termStatus = document.getElementById('ide-terminal-status');
+  if (termStatus) termStatus.style.background = '#e5c158'; // compiling yellow
+  
+  try {
+    const response = await fetch('/api/trace-code', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code })
+    });
+    
+    if (!response.ok) {
+      throw new Error('Trace API execution request failed');
+    }
+    
+    const data = await response.json();
+    if (!data.success) {
+      // Show traceback error in console
+      switchIdeConsoleMode('console');
+      const termOut = document.getElementById('ide-terminal-output');
+      if (termOut) {
+        termOut.innerHTML += `\n<span class="console-line-stderr">>>> Trace Execution Error:\n${escH(data.error || 'Unknown error')}\n${escH(data.traceback || '')}</span>\n`;
+        termOut.scrollTop = termOut.scrollHeight;
+      }
+      if (termStatus) termStatus.style.background = 'var(--red)';
+      toast('Trace failed! Check terminal logs.', '⚠️');
+      return;
+    }
+    
+    // Loaded trace successfully!
+    App._traceSteps = data.steps || [];
+    App._currentTraceStep = 0;
+    
+    if (App._traceSteps.length === 0) {
+      toast('Trace executed, but no code lines were stepped through.', '⚠️');
+      return;
+    }
+    
+    // Switch to visualizer
+    switchIdeConsoleMode('visualizer');
+    
+    // Setup slider
+    const slider = document.getElementById('ide-trace-slider');
+    if (slider) {
+      slider.min = 0;
+      slider.max = App._traceSteps.length - 1;
+      slider.value = 0;
+    }
+    
+    seekIdeTrace(0);
+    if (termStatus) termStatus.style.background = 'var(--green)';
+    toast('Trace completed! Flow visualizer active.');
+  } catch (err) {
+    switchIdeConsoleMode('console');
+    const termOut = document.getElementById('ide-terminal-output');
+    if (termOut) {
+      termOut.innerHTML += `\n<span class="console-line-stderr">>>> Trace connection failed: ${escH(err.message)}</span>\n`;
+      termOut.scrollTop = termOut.scrollHeight;
+    }
+    if (termStatus) termStatus.style.background = 'var(--red)';
+    toast('Network/API Trace error!', '⚠️');
+  } finally {
+    traceBtn.disabled = false;
+    traceBtn.innerHTML = originalHtml;
+  }
+}
+
+function seekIdeTrace(stepIndex) {
+  if (!App._traceSteps || App._traceSteps.length === 0) return;
+  
+  // Boundary check
+  if (stepIndex < 0) stepIndex = 0;
+  if (stepIndex >= App._traceSteps.length) stepIndex = App._traceSteps.length - 1;
+  
+  App._currentTraceStep = stepIndex;
+  
+  // Sync slider
+  const slider = document.getElementById('ide-trace-slider');
+  if (slider) {
+    slider.value = stepIndex;
+  }
+  
+  // Sync Label
+  const label = document.getElementById('ide-trace-step-label');
+  if (label) {
+    label.textContent = `Step ${stepIndex + 1} / ${App._traceSteps.length}`;
+  }
+  
+  const step = App._traceSteps[stepIndex];
+  
+  // 1. Highlight line in editor
+  if (step && typeof step.line === 'number') {
+    highlightIdeLine(step.line);
+  }
+  
+  // 2. Render variables flow
+  renderTraceVariables(step.vars || {});
+  
+  // 3. Update stdout console
+  const stdoutLogs = document.getElementById('ide-trace-stdout-logs');
+  if (stdoutLogs) {
+    stdoutLogs.innerHTML = step.output ? escH(step.output) : '<span style="color:var(--muted)">No output.</span>';
+    stdoutLogs.scrollTop = stdoutLogs.scrollHeight;
+  }
+}
+
+function stepIdeTrace(direction) {
+  // If playing, pause
+  if (App._tracePlayerInterval) {
+    togglePlayIdeTrace();
+  }
+  
+  const nextStep = App._currentTraceStep + direction;
+  seekIdeTrace(nextStep);
+}
+
+function togglePlayIdeTrace() {
+  const playBtn = document.getElementById('btn-trace-play');
+  if (!playBtn) return;
+  
+  if (App._tracePlayerInterval) {
+    // Pause
+    clearInterval(App._tracePlayerInterval);
+    App._tracePlayerInterval = null;
+    playBtn.textContent = 'Play';
+    playBtn.classList.remove('active-play');
+  } else {
+    // Play
+    if (!App._traceSteps || App._traceSteps.length === 0) return;
+    
+    // If we are at the end, start from 0
+    if (App._currentTraceStep >= App._traceSteps.length - 1) {
+      seekIdeTrace(0);
+    }
+    
+    playBtn.textContent = 'Pause';
+    playBtn.classList.add('active-play');
+    
+    App._tracePlayerInterval = setInterval(() => {
+      const nextStep = App._currentTraceStep + 1;
+      if (nextStep >= App._traceSteps.length) {
+        // Reached the end, pause
+        togglePlayIdeTrace();
+        toast('Trace playback finished.', '✓');
+      } else {
+        seekIdeTrace(nextStep);
+      }
+    }, 850); // step speed
+  }
+}
+
+function highlightIdeLine(lineNum) {
+  // Remove existing highlights
+  document.querySelectorAll('.ide-code-line.trace-highlight').forEach(el => el.classList.remove('trace-highlight'));
+  document.querySelectorAll('.ide-gutter div.trace-highlight').forEach(el => el.classList.remove('trace-highlight'));
+
+  const lineEl = document.getElementById(`ide-line-${lineNum}`);
+  const gutterEl = document.getElementById(`ide-gutter-line-${lineNum}`);
+  if (lineEl) {
+    lineEl.classList.add('trace-highlight');
+    // Scroll editor window to make sure highlighted line is visible
+    lineEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+  if (gutterEl) {
+    gutterEl.classList.add('trace-highlight');
+  }
+}
+
+function renderTraceVariables(vars) {
+  const container = document.getElementById('ide-trace-vars');
+  if (!container) return;
+  
+  const varKeys = Object.keys(vars);
+  if (varKeys.length === 0) {
+    container.innerHTML = `
+      <div style="color:var(--muted); text-align:center; padding-top:20px; font-size:12px;">
+        No variables inside active scope at this step.
+      </div>
+    `;
+    return;
+  }
+  
+  let html = '';
+  
+  for (const name of varKeys) {
+    const info = vars[name];
+    const type = info.type || 'unknown';
+    const value = info.value !== undefined ? info.value : '';
+    const shape = info.shape;
+    const sample = info.sample;
+    
+    let sampleHtml = '';
+    if (Array.isArray(sample) && sample.length > 0) {
+      // Calculate min & max to color cells as a heatmap
+      const numericSample = sample.map(v => {
+        const num = parseFloat(v);
+        return isNaN(num) ? null : num;
+      }).filter(v => v !== null);
+      
+      const maxVal = numericSample.length > 0 ? Math.max(...numericSample) : 1;
+      const minVal = numericSample.length > 0 ? Math.min(...numericSample) : -1;
+      
+      const cells = sample.map(val => {
+        const num = parseFloat(val);
+        let styleStr = '';
+        let displayVal = val;
+        
+        if (!isNaN(num)) {
+          displayVal = num % 1 === 0 ? num : num.toFixed(3);
+          if (num >= 0) {
+            const denom = maxVal > 0 ? maxVal : 1;
+            const ratio = Math.min(1, num / denom);
+            const alpha = 0.15 + 0.65 * ratio;
+            styleStr = `background: rgba(212, 175, 55, ${alpha}); border-color: rgba(212, 175, 55, ${0.3 + 0.5 * ratio}); color: #fff; font-weight: bold;`;
+          } else {
+            const denom = minVal < 0 ? Math.abs(minVal) : 1;
+            const ratio = Math.min(1, Math.abs(num) / denom);
+            const alpha = 0.15 + 0.65 * ratio;
+            styleStr = `background: rgba(0, 168, 204, ${alpha}); border-color: rgba(0, 168, 204, ${0.3 + 0.5 * ratio}); color: #fff; font-weight: bold;`;
+          }
+        }
+        
+        return `<div class="ide-number-cell" style="${styleStr}" title="Value: ${val}">${displayVal}</div>`;
+      }).join('');
+      
+      let gridTitle = shape ? `Grid Visualizer (Shape: [${shape.join(', ')}])` : `List Elements (Length: ${sample.length})`;
+      
+      sampleHtml = `
+        <div style="font-size:10px; color:var(--muted); margin-top:8px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">${gridTitle}</div>
+        <div class="ide-number-grid">
+          ${cells}
+        </div>
+      `;
+    }
+    
+    html += `
+      <div class="ide-var-flow-card">
+        <div class="ide-var-flow-header">
+          <span class="ide-var-flow-name">${escH(name)}</span>
+          <span class="ide-var-flow-type">${escH(type)}</span>
+        </div>
+        <div class="ide-var-flow-val">${escH(value)}</div>
+        ${sampleHtml}
+      </div>
+    `;
+  }
+  
+  container.innerHTML = html;
+}
+
+
   // Aurum IDE Event Actions
   document.getElementById('btn-ide-new-file').addEventListener('click', () => {
     const filename = prompt('Enter new filename (e.g. model.py or config.yaml):');
@@ -3971,6 +4521,7 @@ async function sendIdeAiMessage(forcedMode = null) {
   });
 
   document.getElementById('btn-ide-run').addEventListener('click', runIdeCode);
+  document.getElementById('btn-ide-trace').addEventListener('click', runTraceCode);
   document.getElementById('btn-ide-clear').addEventListener('click', () => {
     document.getElementById('ide-terminal-output').textContent = '';
     document.getElementById('ide-terminal-status').style.background = 'var(--faint)';

@@ -601,6 +601,172 @@ app.post('/api/run-code', chatRateLimiter, (req, res) => {
   });
 });
 
+// ── TRACE PYTHON CODE ────────────────────────────────────────────────────────
+app.post('/api/trace-code', chatRateLimiter, (req, res) => {
+  const { code } = req.body;
+  if (!code) {
+    return res.status(400).json({ error: 'No code provided' });
+  }
+
+  const tempDir = path.join(__dirname, 'temp_runs');
+  if (!fs.existsSync(tempDir)) {
+    fs.mkdirSync(tempDir, { recursive: true });
+  }
+
+  const codeFilename = `trace_code_${Date.now()}_${Math.floor(Math.random() * 1000)}.py`;
+  const codeFilePath = path.join(tempDir, codeFilename);
+
+  const tracerFilename = `tracer_${Date.now()}_${Math.floor(Math.random() * 1000)}.py`;
+  const tracerFilePath = path.join(tempDir, tracerFilename);
+
+  // Write user code to run
+  try {
+    fs.writeFileSync(codeFilePath, code, 'utf8');
+  } catch (writeErr) {
+    return res.status(500).json({ error: `Failed to create code file: ${writeErr.message}` });
+  }
+
+  // Write Python settrace wrapper script
+  const tracerScript = `
+import sys
+import json
+import traceback
+
+code_path = sys.argv[1]
+with open(code_path, 'r', encoding='utf-8') as f:
+    user_code = f.read()
+
+steps = []
+
+class CaptureOutput:
+    def __init__(self, original):
+        self.original = original
+        self.buffer = []
+    def write(self, text):
+        self.buffer.append(text)
+    def flush(self):
+        pass
+
+capture_stdout = CaptureOutput(sys.stdout)
+sys.stdout = capture_stdout
+
+def trace_lines(frame, event, arg):
+    # Only trace code from exec string scope
+    if frame.f_code.co_filename != '<string>':
+        return trace_lines
+        
+    if event == 'line':
+        local_vars = {}
+        for k, v in frame.f_locals.items():
+            if k.startswith('__') or k in ['sys', 'json', 'traceback', 'capture_stdout']:
+                continue
+            
+            var_type = type(v).__name__
+            
+            if isinstance(v, (int, float, str, bool)) or v is None:
+                local_vars[k] = {"type": var_type, "value": v}
+            elif hasattr(v, 'shape'):
+                try:
+                    shape = list(v.shape)
+                    if hasattr(v, 'detach'):
+                        t = v.detach().cpu()
+                        if len(t.shape) == 0:
+                            flat = [t.item()]
+                        else:
+                            flat = t.numpy().flatten().tolist()
+                    else:
+                        flat = v.flatten().tolist()
+                    local_vars[k] = {
+                        "type": var_type,
+                        "value": f"Tensor {shape}",
+                        "shape": shape,
+                        "sample": flat[:24]
+                    }
+                except Exception as e:
+                    local_vars[k] = {"type": var_type, "value": str(v)}
+            elif isinstance(v, (list, tuple)):
+                try:
+                    sample = [x if isinstance(x, (int, float, str, bool)) else str(x) for x in v[:24]]
+                    local_vars[k] = {
+                        "type": var_type,
+                        "value": f"{var_type.capitalize()} of length {len(v)}",
+                        "sample": sample
+                    }
+                except:
+                    local_vars[k] = {"type": var_type, "value": str(v)}
+            else:
+                local_vars[k] = {"type": var_type, "value": str(v)}
+
+        steps.append({
+            "line": frame.f_lineno,
+            "vars": local_vars,
+            "output": "".join(capture_stdout.buffer)
+        })
+    return trace_lines
+
+try:
+    compiled = compile(user_code, '<string>', 'exec')
+    sys.settrace(trace_lines)
+    global_scope = {}
+    local_scope = {}
+    exec(compiled, global_scope, local_scope)
+    sys.settrace(None)
+    
+    sys.stdout = capture_stdout.original
+    print(json.dumps({
+        "success": True,
+        "steps": steps
+    }))
+except Exception as err:
+    sys.settrace(None)
+    sys.stdout = capture_stdout.original
+    tb = traceback.format_exc()
+    print(json.dumps({
+        "success": False,
+        "error": str(err),
+        "traceback": tb,
+        "steps": steps
+    }))
+`;
+
+  try {
+    fs.writeFileSync(tracerFilePath, tracerScript, 'utf8');
+  } catch (writeErr) {
+    try { fs.unlinkSync(codeFilePath); } catch {}
+    return res.status(500).json({ error: `Failed to create tracer file: ${writeErr.message}` });
+  }
+
+  // Execute using Python (10s timeout limit)
+  const childProcess = exec(`python "${tracerFilePath}" "${codeFilePath}"`, { timeout: 10000 }, (error, stdout, stderr) => {
+    // Clean up temp files
+    try {
+      if (fs.existsSync(codeFilePath)) fs.unlinkSync(codeFilePath);
+      if (fs.existsSync(tracerFilePath)) fs.unlinkSync(tracerFilePath);
+    } catch (cleanupErr) {
+      console.error('[trace cleanup err]', cleanupErr.message);
+    }
+
+    if (error && error.killed) {
+      return res.json({
+        success: false,
+        error: 'Execution exceeded the 10-second timeout limit and was terminated.',
+        steps: []
+      });
+    }
+
+    try {
+      const result = JSON.parse(stdout.trim());
+      res.json(result);
+    } catch (parseErr) {
+      res.json({
+        success: false,
+        error: stderr || stdout || 'Failed to execute or parse trace output.',
+        steps: []
+      });
+    }
+  });
+});
+
 // ── START ─────────────────────────────────────────────────────────────────────
 app.listen(PORT, () => {
   console.log(`\n  ✦  Aether Research Platform  v3`);
